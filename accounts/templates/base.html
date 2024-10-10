@@ -1,0 +1,76 @@
+{% from 'bootstrap5/utils.html' import render_icon %}
+{% from 'bootstrap5/nav.html' import render_nav_item %}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="shortcut icon" href="{{ url_for('static', filename='assets/favicon.ico') }}" type="image/x-icon">
+  <title>{% block title %}{% endblock %} - Flask Authentication System</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  {{ bootstrap.load_css() }}
+</head>
+
+<body style="background-color: #f1f4fc;">
+  <!-- navbar -->
+  <nav class="navbar navbar-expand-md navbar-dark bg-dark static-top py-1">
+    <div class="container-fluid px-lg-4">
+      <a class="navbar-brand" href="{{ url_for('accounts.index') }}">
+        <div class="d-flex p-2 rounded-3" style="border: 1px solid #fff;">
+          <img class="w-100 me-2" src="{{ url_for('static', filename='assets/images/logo.png') }}" alt=""
+            style="height: 28px;">
+          <h4 class="text-uppercase m-0">Flask Auth</h4>
+        </div>
+      </a>
+
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNavbar">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+
+      <div class="collapse navbar-collapse" id="mainNavbar">
+        <ul class="navbar-nav">
+          {{ render_nav_item('accounts.index', 'Home') }}
+          {% if current_user.is_authenticated %}
+          {{ render_nav_item('accounts.profile', 'Profile') }}
+          {{ render_nav_item('accounts.change_email', 'Reset Email') }}
+          {{ render_nav_item('accounts.change_password', 'Change Password') }}
+          {% endif %}
+        </ul>
+        <ul class="navbar-nav ms-auto my-2">
+          {% if not current_user.is_authenticated %}
+          {{ render_nav_item('accounts.login', 'Login') }}
+          <li class="nav-item my-2 my-md-0 ms-md-2">
+            <a class="btn btn-outline-light" href="{{ url_for('accounts.register') }}">Signup</a>
+          </li>
+          {% else %}
+          <li class="nav-item">
+            <a class="btn btn-outline-light" href="{{ url_for('accounts.logout') }}">Logout</a>
+          </li>
+          {% endif %}
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  {% block body %} {% endblock %}
+
+  <!-- Footer -->
+  <footer class="text-center text-lg-start text-dark" style="background-color: #ECEFF1">
+    <div class="d-flex justify-content-between p-4" style="background-color: rgba(170, 170, 170, 0.2)">
+      <p class="text-body m-0">Source Code <a href="https://github.com/anuraagnagar/flask-user-authentication"
+          target="_blank" class="text-dark fs-5">
+          {{ render_icon('github') }}</a></p>
+      <p class="m-0">© 2023 Copyright</p>
+    </div>
+  </footer>
+
+  {% block scripts %}
+  <!-- Optional JavaScript -->
+  {{ bootstrap.load_js() }}
+  {% endblock %}
+</body>
+
+</html>
