@@ -1,17 +1,20 @@
-
+# Byte-compiled / optimized / DLL files
 __pycache__/
-migrations/
-*.py[cod]
-*$py.class
-.pyc
+*.pyc
 
+# Environment files
 .env
-.venv
+.venv/
 venv/
-env/
-profile/
 
-*.db
+# Database files
 *.sqlite3
-db.sqlite3
 sqlite3.*
+
+# Logs and coverage
+*.log
+*.coverage
+
+# IDE-specific files
+.vscode/
+.idea/
