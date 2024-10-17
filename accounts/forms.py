@@ -14,7 +14,7 @@ from flask_wtf.file import FileAllowed, FileSize
 
 from accounts.models import User
 from accounts.validators import Unique, StrongNames, StrongUsername, StrongPassword
-
+ 
 
 class RegisterForm(FlaskForm):
 
