@@ -1,45 +1,51 @@
 import os
 import typing as t
 
-from smtplib import SMTPException
+from sendgrid import SendGridAPIClient
+from sendgrid.helpers.mail import Mail
 from werkzeug.exceptions import ServiceUnavailable
 
 from flask import current_app, render_template, url_for
-from flask_mail import Message
-
-from accounts.extensions import mail
 from accounts.models import User
 from accounts.utils import get_full_url
 
 
 def send_mail(subject: t.AnyStr, recipients: t.List[str], body: t.Text):
     """
-    Sends an email using the Flask-Mail extension.
+    Sends an email using SendGrid.
 
     :param subject: The subject of the email.
     :param recipients: A list of recipient email addresses.
     :param body: The body content of the email.
 
-    :raises ValueError: If the `MAIL_USERNAME` environment variable is not set.
-    :raises ServiceUnavailable: If the SMTP service is unavailable.
+    :raises ValueError: If the `SENDGRID_API_KEY` environment variable is not set.
+    :raises ServiceUnavailable: If the SendGrid service is unavailable.
     """
-    sender: str = os.environ.get("MAIL_USERNAME", None)
+    sender: str = os.environ.get("SENDGRID_SENDER_EMAIL", None)
+    api_key: str = os.environ.get("SENDGRID_API_KEY", None)
 
     if not sender:
-        raise ValueError("`MAIL_USERNAME` environment variable is not set")
+        raise ValueError("`SENDGRID_SENDER_EMAIL` environment variable is not set")
+    
+    if not api_key:
+        raise ValueError("`SENDGRID_API_KEY` environment variable is not set")
 
-    message = Message(subject=subject, sender=sender, recipients=recipients)
-    message.body = body
-
-    print(message.body)
+    message = Mail(
+        from_email=sender,
+        to_emails=recipients,
+        subject=subject,
+        html_content=body  # SendGrid can handle both HTML and text content
+    )
 
     try:
-        mail.connect()
-        mail.send(message)
-    except (SMTPException, Exception) as e:
+        sg = SendGridAPIClient(api_key)
+        response = sg.send(message)
+        print(f"Email sent with status code: {response.status_code}")
+    except Exception as e:
+        print(f"Failed to send email: {e}")
         raise ServiceUnavailable(
             description=(
-                "The SMTP mail service is currently not available. "
+                "The SendGrid mail service is currently not available. "
                 "Please try later or contact the developers team."
             )
         )
