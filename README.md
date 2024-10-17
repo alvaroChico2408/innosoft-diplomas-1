@@ -93,7 +93,7 @@ Cuando registres tiempo en **Clockify**, cada entrada debe ser clara y precisa. 
 - **`work`**: Para el tiempo dedicado a la investigación de temas relacionado con el proyecto y/o tecnología.
 - **`meet`**: Para el tiempo invertido en reuniones de equipo.
 - **`docs`**: Para el tiempo dedicado a actualizar o crear documentación, tanto de código como funcional.
-- **`Task`**: Para tareas relacionadas con el código y la programación.
+- **`task`**: Para tareas relacionadas con el código y la programación.
 
 ### Formato de registro de tiempo:
 
