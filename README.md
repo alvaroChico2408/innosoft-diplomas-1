@@ -1,152 +1,127 @@
-# User Authentication System in Flask/Python
+## 1. Política de ramas
 
-### A Simple Authentication System Project with basic user functionality in Python Flask with SQLAlchemy.
+### 1.1. Rama `main`
+**Descripción:** La rama `main` es la rama principal y contiene el código que está listo para producción. Solo se actualiza cuando el código ha sido completamente probado en `preproduction`.
 
-## 👩‍💻 Live Demo
+**Acciones permitidas:**
+- **Merge desde `preproduction`:** Solo se permite hacer merge de la rama `preproduction` una vez que todas las pruebas en preproducción han sido exitosas.
+- **No se permite el desarrollo directo:** No se debe desarrollar ni hacer commits directamente en `main`. Todo cambio debe pasar por `preproduction`.
 
-#### 🔗https://flaskauth.pythonanywhere.com
+**Uso:** Desplegar el código desde `main` a producción.
 
-## Project features & functionality
+### 1.2. Rama `preproduction`
+**Descripción:** Rama donde se prueban las características antes de que se integren en `main`. Aquí se hacen pruebas de integración y de preproducción. Esta rama actúa como un entorno de "ensayo" antes de producción.
 
-- Create account
-- Log In via (Username & Email address)
-- Logout
-- Account activation via verification link
-- Reset password via reset link
-- Reset new email via confirmation link
-- Update profile details & add profile image
-- Change password after login
+**Acciones permitidas:**
+- **Merge desde ramas de features:** Las ramas de características o correcciones salen de `preproduction` y, una vez finalizadas, se integran de vuelta en `preproduction`.
+- **Pruebas de preproducción:** Todo el código debe ser probado a fondo en esta rama antes de ser fusionado en `main`.
 
-## Framework & Library
+**Uso:** Integrar y probar características nuevas, correcciones de errores y cambios antes de enviarlos a producción.
 
-1. [Flask](https://flask.palletsprojects.com/)
-2. [Flask-Login](https://flask-login.readthedocs.io/)
-3. [Flask-SQLAlchemy](https://flask-sqlalchemy.palletsprojects.com/)
-4. [Flask-WTF](https://flask-wtf.readthedocs.io/)
-5. [Flask-Mail](https://pythonhosted.org/Flask-Mail/)
-6. [Flask-Migrate](https://flask-migrate.readthedocs.io)
-7. [Bootstrap-Flask](https://bootstrap-flask.readthedocs.io/)
-8. [Jinja2](https://jinja.palletsprojects.com/)
+### 1.3. Ramas de características (`feature/*`)
+**Descripción:** Las ramas `feature/*` son ramas temporales creadas para desarrollar nuevas funcionalidades o corregir errores. Cada tarea o característica debe tener su propia rama.
 
-## Application Screenshots
+**Convención de nombre:** Se sigue la convención `feature/nombre-de-la-característica`.
 
-### Register Page
+**Acciones permitidas:**
+- **Desarrollo y commits:** Los desarrolladores pueden crear nuevas ramas a partir de `preproduction` para trabajar en una nueva característica. Todos los commits relacionados con esa característica se realizarán en esta rama.
+- **Merge en `preproduction`:** Una vez que la característica ha sido completada y probada localmente, se debe hacer un pull request (PR) y realizar un merge de la rama `feature/*` en `preproduction`.
 
-![Register](https://github.com/anuraagnagar/flask-user-authentication/blob/main/screenshots/register_page.png)
+**Uso:** Desarrollar nuevas características o corregir errores.
 
-### Login Page
+### 1.4. Rama `hotfix/*` (si es necesario)
+**Descripción:** Estas ramas se utilizan para hacer correcciones rápidas en producción. Si se descubre un error crítico en `main` que debe corregirse inmediatamente, se crea una rama `hotfix/*` a partir de `main`.
 
-![Login](https://github.com/anuraagnagar/flask-user-authentication/blob/main/screenshots/login_page.png)
+**Convención de nombre:** Se sigue la convención `hotfix/nombre-del-hotfix`.
 
-### Forgot Password Page
+**Acciones permitidas:**
+- **Desarrollo rápido:** Se desarrolla una solución rápida para corregir un error crítico en producción.
+- **Merge en `main` y `preproduction`:** Una vez resuelto el error, se fusiona la rama `hotfix/*` tanto en `main` como en `preproduction` para asegurar que el código en ambas ramas esté alineado.
 
-![Forgot Password](https://github.com/anuraagnagar/flask-user-authentication/blob/main/screenshots/forgot_password_page.png)
+**Uso:** Corregir rápidamente errores críticos en producción sin esperar al ciclo de desarrollo habitual.
 
-### Reset Password Page
+## 2. Flujo de Trabajo General:
 
-![Reset Password](https://github.com/anuraagnagar/flask-user-authentication/blob/main/screenshots/reset_password_page.png)
+### 2.1. Crear una nueva feature:
+1. Crear una nueva rama `feature/nueva-característica` a partir de `preproduction`.
+2. Desarrollar la nueva característica en esta rama.
+3. Hacer commits frecuentemente en esta rama.
 
-### Reset Email Page
+### 2.2. Integración de una feature:
+1. Una vez que se termina el desarrollo de la característica, hacer un pull request desde `feature/nueva-característica` hacia `preproduction`.
+2. Revisar el código y hacer merge en `preproduction` si pasa todas las revisiones.
 
-![Reset Email](https://github.com/anuraagnagar/flask-user-authentication/blob/main/screenshots/reset_email_page.png)
+### 2.3. Pruebas en `preproduction`:
+1. Realizar pruebas exhaustivas en la rama `preproduction`.
+2. Si se encuentra un problema, crear una nueva rama de feature para corregirlo y fusionarlo en `preproduction`.
 
-### Home Page
+### 2.4. Deploy a producción:
+1. Una vez que todo el código en `preproduction` ha pasado las pruebas, hacer un pull request desde `preproduction` hacia `main`.
+2. Hacer merge en `main` y desplegar el código en producción.
 
-![Home](https://github.com/anuraagnagar/flask-user-authentication/blob/main/screenshots/home_page.png)
+### 2.5. Corregir un error crítico (`hotfix`):
+1. Si hay un error crítico en producción, crear una rama `hotfix/*` desde `main`.
+2. Corregir el error en la rama `hotfix/*`.
+3. Hacer merge en `main` y en `preproduction` para asegurar que la corrección esté en ambas ramas.
 
-### Edit Profile Page
+## 3. Política de commits
+Se harán commits atómicos, que permitan un historial de commits claro y legible. Cada commit deberá contener un cambio autocontenido. Cada commit irá precedido de uno de los siguientes tópicos:
 
-![Edit Profile](https://github.com/anuraagnagar/flask-user-authentication/blob/main/screenshots/profile_page.png)
+- `feat`: Nueva funcionalidad para el usuario.
+- `fix`: Corrección de bugs/errores.
+- `docs`: Cambios en la documentación.
+- `styles`: Formato, cambios en frontend.
+- `refactor`: Refactorizar código sin cambiar funcionamiento.
+- `test`: Tests para probar las funcionalidades.
+- `chore`: Actualizar tareas.
+- `config`: Editar fichero de configuración.
 
-### Change Password Page
+Seguido de una descripción y al final irá incluido el número de la issue asignada a esa tarea.
 
-![Change Password](https://github.com/anuraagnagar/flask-user-authentication/blob/main/screenshots/change_password_page.png)
+El límite de la descripción del commit será de 75 caracteres.
 
-## Set up & Run locally.
+## 4. Proceso para desplegarlo en local.
 
-### 1. Clone the git repository.
-
-```bash
-git clone https://github.com/anuraagnagar/flask-user-authentication.git
-```
-
-### 2. Go to the project directory.
-
-```bash
-cd flask-user-authentication
-```
-
-### 3. Create virtual environment.
+### 4.1. Crear un entorno virtual.
 
 ```bash
 python3 -m venv venv
 ```
 
-### 4. Activate the environment.
-
-On Windows
-
-```bash
-venv\scripts\activate
-```
-
-On MacOS/Linux
+### 4.2. Activar el entorno virtual.
 
 ```bash
 source venv/bin/activate
 ```
 
-To run this project locally, you will need to change `.env.example` file to `.env` on base directory
-and set the environment variables.
+Para ejecutar este proyecto localmente, hay que crear el `.env` en el directorio base y configurar las variables de entorno.
 
-### 5. Install the requirement packages.
+### 4.3. Instalar el paquete de dependencias.
 
 ```bash
 pip install -r requirements.txt
 ```
 
-### 6. Migrate/Create a database.
+### 4.4. Migrar/crear base de datos.
 
-**Note**: Before initializing the database, run the `flask run` command in your terminal to ensure that
-the application is set up properly. This allows you to access the `flask db` command for database migrations.
-
-Initialize the database migration directory.
+Inicializa el directorio de migraciones de la base de datos.
 
 ```bash
 flask db init
 ```
 
-Run migrate command.
-
-```bash
-flask db migrate -m "initial_migration"
-```
-
-Upgrade the database for latest migration.
+Actualiza la base de datos con la última migración.
 
 ```bash
 flask db upgrade
 ```
 
-### 7. Last to run the server.
+### 4.5. Finalmente, ejecutar el servidor.
 
-Once the database is set up, you can run the Flask server to start your application.
+Una vez que la base de datos esté configurada, puedes iniciar el servidor Flask para comenzar a usar la aplicación..
 
 ```bash
 flask run
 ```
 
-To access this application open `http://localhost:5000` in your web browser.
-
-## Contributing
-
-Contributions are welcome! If you find a bug or want to add a new feature, please open an issue or submit a pull request.
-For more information checkout ![CONTRIBUTING.md](https://github.com/anuraagnagar/flask-user-authentication/blob/main/CONTRIBUTING.md)
-
-## Licence
-
-By contributing to this project, you agree that your contributions will be licensed under the ![MIT License](https://github.com/anuraagnagar/flask-user-authentication/blob/main/LICENSE).
-
-## Author
-
-[Anurag Nagar](mailto:nagaranurag1999@gmail.com)
+Para acceder a esta aplicación, abre `http://localhost:5000
