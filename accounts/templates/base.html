@@ -34,9 +34,9 @@
         <ul class="navbar-nav">
           {{ render_nav_item('accounts.index', 'Home') }}
           {% if current_user.is_authenticated %}
-          {{ render_nav_item('accounts.profile', 'Profile') }}
-          {{ render_nav_item('accounts.change_email', 'Reset Email') }}
-          {{ render_nav_item('accounts.change_password', 'Change Password') }}
+          {{ render_nav_item('accounts.index', 'Diplomas') }}
+          {{ render_nav_item('accounts.index', 'Credenciales') }}
+          {{ render_nav_item('accounts.index', 'Carteles') }}
           {% endif %}
         </ul>
         <ul class="navbar-nav ms-auto my-2">
@@ -46,6 +46,9 @@
             <a class="btn btn-outline-light" href="{{ url_for('accounts.register') }}">Signup</a>
           </li>
           {% else %}
+          {{ render_nav_item('accounts.profile', 'Profile') }}
+          {{ render_nav_item('accounts.change_email', 'Reset Email') }}
+          {{ render_nav_item('accounts.change_password', 'Change Password') }}
           <li class="nav-item">
             <a class="btn btn-outline-light" href="{{ url_for('accounts.logout') }}">Logout</a>
           </li>
