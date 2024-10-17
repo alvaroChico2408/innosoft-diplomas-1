@@ -70,25 +70,43 @@ Se harán commits atómicos, que permitan un historial de commits claro y legibl
 - `feat`: Nueva funcionalidad para el usuario.
 - `fix`: Corrección de bugs/errores.
 - `docs`: Cambios en la documentación.
-- `styles`: Formato, cambios en frontend.
-- `refactor`: Refactorizar código sin cambiar funcionamiento.
 - `test`: Tests para probar las funcionalidades.
-- `chore`: Actualizar tareas.
-- `config`: Editar fichero de configuración.
 
-Seguido de una descripción y al final irá incluido el número de la issue asignada a esa tarea.
+Seguido de una descripción, con la primera letra en mayúscula.
 
 El límite de la descripción del commit será de 75 caracteres.
 
-## 4. Proceso para desplegarlo en local.
+Un ejemplo de commit: 
 
-### 4.1. Crear un entorno virtual.
+`[feat] Adapted email sending functionality`
+
+## 4. Política de registros en Clockify
+
+Cuando registres tiempo en **Clockify**, cada entrada debe ser clara y precisa. Cada descripción de registro debe estar precedida por un prefijo que identifique el tipo de trabajo que se está realizando.
+
+### Prefijos para el tipo de trabajo:
+
+- **`work`**: Para el tiempo dedicado a la investigación de temas relacionado con el proyecto y/o tecnología.
+- **`meet`**: Para el tiempo invertido en reuniones de equipo.
+- **`docs`**: Para el tiempo dedicado a actualizar o crear documentación, tanto de código como funcional.
+- **`task`**: Para tareas relacionadas con el código y la programación.
+
+### Formato de registro de tiempo:
+
+Al insertar un registro de tiempo en **Clockify**, utiliza este formato:
+
+`[work] Resolved problems with initialization`
+
+
+## 5. Proceso para desplegarlo en local.
+
+### 5.1. Crear un entorno virtual.
 
 ```bash
 python3 -m venv venv
 ```
 
-### 4.2. Activar el entorno virtual.
+### 5.2. Activar el entorno virtual.
 
 ```bash
 source venv/bin/activate
@@ -96,13 +114,13 @@ source venv/bin/activate
 
 Para ejecutar este proyecto localmente, hay que crear el `.env` en el directorio base y configurar las variables de entorno.
 
-### 4.3. Instalar el paquete de dependencias.
+### 5.3. Instalar el paquete de dependencias.
 
 ```bash
 pip install -r requirements.txt
 ```
 
-### 4.4. Migrar/crear base de datos.
+### 5.4. Migrar/crear base de datos.
 
 Inicializa el directorio de migraciones de la base de datos.
 
@@ -116,7 +134,7 @@ Actualiza la base de datos con la última migración.
 flask db upgrade
 ```
 
-### 4.5. Finalmente, ejecutar el servidor.
+### 5.5. Finalmente, ejecutar el servidor.
 
 Una vez que la base de datos esté configurada, puedes iniciar el servidor Flask para comenzar a usar la aplicación..
 
