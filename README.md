@@ -76,9 +76,13 @@ Se harán commits atómicos, que permitan un historial de commits claro y legibl
 - `chore`: Actualizar tareas.
 - `config`: Editar fichero de configuración.
 
-Seguido de una descripción y al final irá incluido el número de la issue asignada a esa tarea.
+Seguido de una descripción, con la primera letra en mayúscula.
 
 El límite de la descripción del commit será de 75 caracteres.
+
+Un ejemplo de commit: 
+
+`[feat] Adapted email sending functionality`
 
 ## 4. Proceso para desplegarlo en local.
 
