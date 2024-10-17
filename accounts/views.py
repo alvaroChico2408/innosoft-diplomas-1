@@ -549,3 +549,24 @@ def profile() -> Response:
         return redirect(url_for("accounts.profile"))
 
     return render_template("profile.html", form=form)
+
+@accounts.route("/")
+@accounts.route("/diplomas")
+@login_required
+def diplomas() -> Response:
+    
+    return render_template("diplomas.html")
+
+@accounts.route("/")
+@accounts.route("/credenciales")
+@login_required
+def credenciales() -> Response:
+
+    return render_template("credenciales.html")
+
+@accounts.route("/")
+@accounts.route("/carteles")
+@login_required
+def carteles() -> Response:
+    
+    return render_template("carteles.html")

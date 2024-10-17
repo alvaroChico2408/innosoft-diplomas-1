@@ -34,9 +34,9 @@
         <ul class="navbar-nav">
           {{ render_nav_item('accounts.index', 'Home') }}
           {% if current_user.is_authenticated %}
-          {{ render_nav_item('accounts.index', 'Diplomas') }}
-          {{ render_nav_item('accounts.index', 'Credenciales') }}
-          {{ render_nav_item('accounts.index', 'Carteles') }}
+          {{ render_nav_item('accounts.diplomas', 'Diplomas') }}
+          {{ render_nav_item('accounts.credenciales', 'Credenciales') }}
+          {{ render_nav_item('accounts.carteles', 'Carteles') }}
           {% endif %}
         </ul>
         <ul class="navbar-nav ms-auto my-2">
