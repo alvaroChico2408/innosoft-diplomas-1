@@ -70,11 +70,7 @@ Se harán commits atómicos, que permitan un historial de commits claro y legibl
 - `feat`: Nueva funcionalidad para el usuario.
 - `fix`: Corrección de bugs/errores.
 - `docs`: Cambios en la documentación.
-- `styles`: Formato, cambios en frontend.
-- `refactor`: Refactorizar código sin cambiar funcionamiento.
 - `test`: Tests para probar las funcionalidades.
-- `chore`: Actualizar tareas.
-- `config`: Editar fichero de configuración.
 
 Seguido de una descripción, con la primera letra en mayúscula.
 
