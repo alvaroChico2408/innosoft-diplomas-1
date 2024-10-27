@@ -8,6 +8,9 @@ from sqlalchemy import event, or_
 from sqlalchemy.engine import Connection
 from sqlalchemy.orm import Mapper
 from sqlalchemy.ext.declarative import DeclarativeMeta
+import re
+from accounts.extensions import database as db
+from sqlalchemy.orm import validates
 
 from werkzeug.exceptions import InternalServerError, HTTPException
 from werkzeug.security import (
@@ -363,3 +366,81 @@ def create_profile_for_user(
 
     # Execute an INSERT statement to add the user's profile table to the database.
     connection.execute(Profile.__table__.insert(), {"user_id": profile.user_id})
+
+
+
+class Diploma(db.Model):
+    __tablename__ = "diploma"
+
+    id = db.Column(db.Integer, primary_key=True)
+
+    apellidos = db.Column(db.String(120), nullable=False)
+    nombre = db.Column(db.String(120), nullable=False)
+    uvus = db.Column(db.String(120), nullable=False)
+    correo = db.Column(db.String(120), nullable=False)
+    perfil = db.Column(db.String(120), nullable=False)
+    participacion = db.Column(db.String(20), nullable=False)
+    comite = db.Column(db.String(255), nullable=False)  # Almacenamos varios comités como cadena separada
+    evidencia_aleatoria = db.Column(db.String(120), nullable=True)
+    horas_de_evidencia_aleatoria = db.Column(db.Float, nullable=True)
+    eventos_asistidos = db.Column(db.String(120), nullable=True)
+    horas_de_asistencia = db.Column(db.Float, nullable=False)
+    reuniones_asistiadas = db.Column(db.Integer, nullable=False)
+    horas_de_reuniones = db.Column(db.Float, nullable=False)
+    bono_de_horas = db.Column(db.Float, nullable=True)
+    evidencias_registradas = db.Column(db.Integer, nullable=False)
+    horas_de_evidencias = db.Column(db.Float, nullable=False)
+    horas_en_total = db.Column(db.Float, nullable=False)
+
+    @validates('apellidos')
+    def validate_apellidos(self, key, apellidos):
+        if len(apellidos.split()) > 2:
+            raise ValueError("Los apellidos deben contener una o dos palabras.")
+        return apellidos
+
+    @validates('correo')
+    def validate_correo(self, key, correo):
+        email_regex = r'^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$'
+        if not re.match(email_regex, correo):
+            raise ValueError("Correo no tiene un formato válido.")
+        return correo
+
+    @validates('perfil')
+    def validate_perfil(self, key, perfil):
+        if not perfil.startswith("https://www.evidentia.cloud/2024/profiles/view/"):
+            raise ValueError("El perfil debe comenzar con la URL: https://www.evidentia.cloud/2024/profiles/view/")
+        return perfil
+
+    @validates('participacion')
+    def validate_participacion(self, key, participacion):
+        valid_participacion_types = ["ORGANIZATION", "INTERMEDIATE", "ASSISTANCE"]
+        if participacion not in valid_participacion_types:
+            raise ValueError(f"Participación debe ser uno de los siguientes valores: {', '.join(valid_participacion_types)}")
+        return participacion
+
+    @validates('comite')
+    def validate_comite(self, key, comite):
+        valid_comite_types = [
+            "Comunicación", "Secretaría", "Finanzas", "Programa", "Logística",
+            "Sostenibilidad", "Presidencia"
+        ]
+        comite_list = [c.strip() for c in comite.split(",")]
+        for c in comite_list:
+            if c not in valid_comite_types:
+                raise ValueError(f"Comité debe ser uno o más de los siguientes valores: {', '.join(valid_comite_types)}")
+        return ",".join(comite_list)  # Almacenamos los comités como cadena separada por comas
+
+    @validates('horas_de_asistencia', 'horas_de_reuniones', 'horas_de_evidencias', 'horas_en_total')
+    def validate_floats(self, key, value):
+        if not isinstance(value, float):
+            raise ValueError(f"{key} debe ser un número decimal.")
+        return value
+
+    @validates('reuniones_asistiadas', 'evidencias_registradas')
+    def validate_integers(self, key, value):
+        if not isinstance(value, int):
+            raise ValueError(f"{key} debe ser un número entero.")
+        return value
+
+    def __repr__(self):
+        return f"<Diploma {self.nombre}>"

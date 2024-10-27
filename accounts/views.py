@@ -7,9 +7,30 @@ from datetime import timedelta
 from werkzeug.exceptions import InternalServerError
 from werkzeug.utils import secure_filename
 
+
 from flask import Blueprint, Response
 from flask import abort, current_app, render_template, request, redirect, url_for, flash
 from flask_login import current_user, login_required, login_user, logout_user
+
+import os
+import pandas as pd
+from flask import flash, redirect, url_for
+from reportlab.lib.pagesizes import A4
+from reportlab.pdfgen import canvas
+from werkzeug.utils import secure_filename
+from .models import Diploma
+from .extensions import database as db 
+
+
+
+from flask import flash, redirect, url_for, render_template, request
+from werkzeug.utils import secure_filename
+from reportlab.pdfgen import canvas
+from reportlab.lib.pagesizes import A4
+from accounts.models import Diploma
+from accounts.forms import EnterExcelHours
+
+
 
 from accounts.decorators import authentication_redirect, guest_user_exempt
 from accounts.email_utils import (
@@ -552,19 +573,16 @@ def profile() -> Response:
 
     return render_template("profile.html", form=form)
 
-
+'''
 @accounts.route('/generate_diplomas', methods=['GET', 'POST'])
 def generate_diplomas():
     form = EnterExcelHours()
     if form.validate_on_submit():
         file = form.hours_excel.data
         if file:
-            filename = secure_filename(file.filename)
-            upload_path = os.path.join('uploads', filename)
-            #file.save(upload_path)
-            flash("Archivo subido exitosamente", "success")
-            return redirect(url_for('accounts.index'))
+            procesar_excel(file)
     return render_template('generate_diplomas.html', form=form)
+'''
 
 
 @accounts.route("/credenciales")
@@ -577,3 +595,262 @@ def credenciales() -> Response:
 @login_required
 def carteles() -> Response:
     return render_template("carteles.html")
+
+
+
+'''
+def procesar_excel(file):
+    # Ruta de subida de los archivos
+    UPLOAD_FOLDER = os.path.join("uploads", "processed_excels")
+    PDF_FOLDER = os.path.join("uploads", "pdf_diplomas")
+    os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+    os.makedirs(PDF_FOLDER, exist_ok=True)
+    
+    # Guardar el archivo subido
+    filename = secure_filename(file.filename)
+    file_path = os.path.join(UPLOAD_FOLDER, filename)
+    file.save(file_path)
+    
+    # Leer el archivo Excel
+    try:
+        df = pd.read_excel(file_path)
+    except Exception as e:
+        flash("Error al leer el archivo Excel. Asegúrate de que el archivo está en el formato correcto.", "warning")
+        return redirect(url_for("accounts.generate_diplomas"))
+
+    # Validar las columnas del archivo
+    expected_columns = [
+        "apellidos", "nombre", "uvus", "correo", "perfil", "participacion", "comite",
+        "evidencia_aleatoria", "horas_de_evidencia_aleatoria", "eventos_asistidos",
+        "horas_de_asistencia", "reuniones_asistidas", "horas_de_reuniones", "bono_de_horas",
+        "evidencias_registradas", "horas_de_evidencias", "horas_en_total"
+    ]
+    if list(df.columns) != expected_columns:
+        flash(f"Las columnas del archivo no coinciden con las esperadas: {expected_columns}", "warning")
+        return redirect(url_for("accounts.generate_diplomas"))
+
+    # Procesar cada fila del Excel
+    errores = []
+    for _, row in df.iterrows():
+        try:
+            diploma = Diploma(
+                apellidos=validar_apellidos(row["apellidos"]),
+                nombre=validar_nombre(row["nombre"]),
+                uvus=validar_uvus(row["uvus"]),
+                correo=validar_correo(row["correo"]),
+                perfil=validar_perfil(row["perfil"]),
+                participacion=validar_participacion(row["participacion"]),
+                comite=validar_comite(row["comite"]),
+                evidencia_aleatoria=row["evidencia_aleatoria"] or None,
+                horas_de_evidencia_aleatoria=row["horas_de_evidencia_aleatoria"] or None,
+                eventos_asistidos=row["eventos_asistidos"] or None,
+                horas_de_asistencia=float(row["horas_de_asistencia"]),
+                reuniones_asistidas=int(row["reuniones_asistidas"]),
+                horas_de_reuniones=float(row["horas_de_reuniones"]),
+                bono_de_horas=row["bono_de_horas"] or None,
+                evidencias_registradas=int(row["evidencias_registradas"]),
+                horas_de_evidencias=float(row["horas_de_evidencias"]),
+                horas_en_total=float(row["horas_en_total"]),
+            )
+            db.session.add(diploma)
+            generar_pdf(diploma, PDF_FOLDER)
+        except ValueError as e:
+            errores.append(f"Error en fila {row['uvus']}: {str(e)}")
+
+    # Confirmar cambios o mostrar errores
+    if errores:
+        flash("Errores encontrados en el archivo:", "warning")
+        for error in errores:
+            flash(error, "warning")
+    else:
+        db.session.commit()
+        flash("Diplomas procesados exitosamente y PDFs generados.", "success")
+
+    return redirect(url_for("accounts.index"))
+
+def generar_pdf(diploma, pdf_folder):
+    pdf_path = os.path.join(pdf_folder, f"{diploma.uvus}_diploma.pdf")
+    c = canvas.Canvas(pdf_path, pagesize=A4)
+    c.drawString(100, 800, f"Diploma de: {diploma.nombre} {diploma.apellidos}")
+    c.drawString(100, 780, f"UVUS: {diploma.uvus}")
+    c.drawString(100, 760, f"Correo: {diploma.correo}")
+    # Añadir más datos según se requiera
+    c.save()
+
+import re
+
+def validar_apellidos(apellidos):
+    if not isinstance(apellidos, str) or len(apellidos.split()) not in [1, 2]:
+        raise ValueError("Apellidos deben ser 1 o 2 palabras.")
+    return apellidos
+
+def validar_nombre(nombre):
+    if not isinstance(nombre, str):
+        raise ValueError("Nombre debe ser un string.")
+    return nombre
+
+def validar_uvus(uvus):
+    if not isinstance(uvus, str):
+        raise ValueError("UVUS debe ser un string.")
+    return uvus
+
+def validar_correo(correo):
+    pattern = r"[^@]+@[^@]+\.[^@]+"
+    if not re.match(pattern, correo):
+        raise ValueError("Correo no válido.")
+    return correo
+
+def validar_perfil(perfil):
+    if not perfil.startswith("https://www.evidentia.cloud/2024/profiles/view/"):
+        raise ValueError("Perfil debe comenzar con https://www.evidentia.cloud/2024/profiles/view/")
+    return perfil
+
+def validar_participacion(participacion):
+    if participacion not in ["ORGANIZATION", "INTERMEDIATE", "ASSISTANCE"]:
+        raise ValueError("Participación no válida.")
+    return participacion
+
+def validar_comite(comite):
+    comites_validos = {"Comunicación", "Secretaría", "Finanzas", "Programa", "Logística", "Sostenibilidad", "Presidencia"}
+    if not set(comite.split(", ")).issubset(comites_validos):
+        raise ValueError("Comité no válido.")
+    return comite
+
+'''
+
+
+
+# Carpeta única para guardar el archivo Excel y los PDFs generados
+PDF_FOLDER = os.path.join("uploads", "pdf_diplomas")
+os.makedirs(PDF_FOLDER, exist_ok=True)
+
+
+@accounts.route('/generate_diplomas', methods=['GET', 'POST'])
+def generate_diplomas():
+    form = EnterExcelHours()
+    if form.validate_on_submit():
+        file = form.hours_excel.data
+        if file:
+            # Llamar a procesar_excel solo si se subió un archivo válido
+            errores = procesar_excel(file)
+            if errores:
+                # Mostrar errores específicos en el archivo de Excel
+                for error in errores:
+                    flash(error, "warning")
+            else:
+                flash("Diplomas procesados exitosamente y PDFs generados.", "success")
+            return redirect(url_for("accounts.index"))
+    return render_template('generate_diplomas.html', form=form)
+
+
+def procesar_excel(file):
+    """
+    Procesa el archivo Excel, valida el contenido, y genera PDFs si es exitoso.
+    """
+    # Guardar el archivo Excel en `PDF_FOLDER`
+    filename = secure_filename(file.filename)
+    file_path = os.path.join(PDF_FOLDER, filename)
+    file.save(file_path)
+    
+    # Leer el archivo Excel
+    try:
+        df = pd.read_excel(file_path)
+    except Exception as e:
+        return [f"Error al leer el archivo Excel: {str(e)}"]
+
+    # Validar las columnas del archivo
+    expected_columns = [
+        "apellidos", "nombre", "uvus", "correo", "perfil", "participacion", "comite",
+        "evidencia_aleatoria", "horas_de_evidencia_aleatoria", "eventos_asistidos",
+        "horas_de_asistencia", "reuniones_asistidas", "horas_de_reuniones", "bono_de_horas",
+        "evidencias_registradas", "horas_de_evidencias", "horas_en_total"
+    ]
+    if list(df.columns) != expected_columns:
+        return [f"Las columnas del archivo no coinciden con las esperadas: {expected_columns}"]
+
+    # Procesar cada fila del Excel
+    errores = []
+    for _, row in df.iterrows():
+        try:
+            diploma = Diploma(
+                apellidos=validar_apellidos(row["apellidos"]),
+                nombre=validar_nombre(row["nombre"]),
+                uvus=validar_uvus(row["uvus"]),
+                correo=validar_correo(row["correo"]),
+                perfil=validar_perfil(row["perfil"]),
+                participacion=validar_participacion(row["participacion"]),
+                comite=validar_comite(row["comite"]),
+                evidencia_aleatoria=row["evidencia_aleatoria"] or None,
+                horas_de_evidencia_aleatoria=row["horas_de_evidencia_aleatoria"] or None,
+                eventos_asistidos=row["eventos_asistidos"] or None,
+                horas_de_asistencia=float(row["horas_de_asistencia"]),
+                reuniones_asistidas=int(row["reuniones_asistidas"]),
+                horas_de_reuniones=float(row["horas_de_reuniones"]),
+                bono_de_horas=row["bono_de_horas"] or None,
+                evidencias_registradas=int(row["evidencias_registradas"]),
+                horas_de_evidencias=float(row["horas_de_evidencias"]),
+                horas_en_total=float(row["horas_en_total"]),
+            )
+            db.session.add(diploma)
+            generar_pdf(diploma)  # Genera el PDF para cada diploma
+        except ValueError as e:
+            errores.append(f"Error en fila {row['uvus']}: {str(e)}")
+
+    # Confirmar cambios si no hubo errores
+    if not errores:
+        db.session.commit()
+
+    return errores
+
+
+def generar_pdf(diploma):
+    """
+    Genera un PDF en blanco para cada diploma con los datos proporcionados.
+    """
+    pdf_path = os.path.join(PDF_FOLDER, f"{diploma.uvus}_diploma.pdf")
+    c = canvas.Canvas(pdf_path, pagesize=A4)
+    c.drawString(100, 800, f"Diploma de: {diploma.nombre} {diploma.apellidos}")
+    c.drawString(100, 780, f"UVUS: {diploma.uvus}")
+    c.drawString(100, 760, f"Correo: {diploma.correo}")
+    # Añadir más datos según se requiera
+    c.save()
+
+
+
+# Funciones de validación
+def validar_apellidos(apellidos):
+    if not isinstance(apellidos, str) or len(apellidos.split()) not in [1, 2]:
+        raise ValueError("Apellidos deben ser 1 o 2 palabras.")
+    return apellidos
+
+def validar_nombre(nombre):
+    if not isinstance(nombre, str):
+        raise ValueError("Nombre debe ser un string.")
+    return nombre
+
+def validar_uvus(uvus):
+    if not isinstance(uvus, str):
+        raise ValueError("UVUS debe ser un string.")
+    return uvus
+
+def validar_correo(correo):
+    pattern = r"[^@]+@[^@]+\.[^@]+"
+    if not re.match(pattern, correo):
+        raise ValueError("Correo no válido.")
+    return correo
+
+def validar_perfil(perfil):
+    if not perfil.startswith("https://www.evidentia.cloud/2024/profiles/view/"):
+        raise ValueError("Perfil debe comenzar con https://www.evidentia.cloud/2024/profiles/view/")
+    return perfil
+
+def validar_participacion(participacion):
+    if participacion not in ["ORGANIZATION", "INTERMEDIATE", "ASSISTANCE"]:
+        raise ValueError("Participación no válida.")
+    return participacion
+
+def validar_comite(comite):
+    comites_validos = {"Comunicación", "Secretaría", "Finanzas", "Programa", "Logística", "Sostenibilidad", "Presidencia"}
+    if not set(comite.split(", ")).issubset(comites_validos):
+        raise ValueError("Comité no válido.")
+    return comite

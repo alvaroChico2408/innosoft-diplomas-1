@@ -7,7 +7,7 @@ BASE_DIR = Path(__file__).resolve().parent
 
 MEDIA_ROOT = os.path.join(BASE_DIR, "accounts", "static", "assets")
 
-UPLOAD_FOLDER = os.path.join(MEDIA_ROOT, "profile")
+UPLOAD_FOLDER = os.path.join(MEDIA_ROOT, "uploads")
 
 load_dotenv(os.path.join(BASE_DIR, ".env"))
 
