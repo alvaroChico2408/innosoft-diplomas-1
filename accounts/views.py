@@ -5,6 +5,7 @@ import typing as t
 from http import HTTPStatus
 from datetime import timedelta
 from werkzeug.exceptions import InternalServerError
+from werkzeug.utils import secure_filename
 
 from flask import Blueprint, Response
 from flask import abort, current_app, render_template, request, redirect, url_for, flash
@@ -25,7 +26,9 @@ from accounts.forms import (
     ChangePasswordForm,
     ChangeEmailForm,
     EditUserProfileForm,
+    EnterExcelHours
 )
+
 
 
 """
@@ -43,7 +46,6 @@ def login_guest_user() -> Response:
 
     :return: Redirects to the homepage on success or the login page on failure.
     """
-
     if request.method == "POST":
         # Fetch the predefined guest user instance by username.
         test_user = User.get_user_by_username(username="test_user")
@@ -550,23 +552,28 @@ def profile() -> Response:
 
     return render_template("profile.html", form=form)
 
-@accounts.route("/")
-@accounts.route("/diplomas")
-@login_required
-def diplomas() -> Response:
-    
-    return render_template("diplomas.html")
 
-@accounts.route("/")
+@accounts.route('/generate_diplomas', methods=['GET', 'POST'])
+def generate_diplomas():
+    form = EnterExcelHours()
+    if form.validate_on_submit():
+        file = form.hours_excel.data
+        if file:
+            filename = secure_filename(file.filename)
+            upload_path = os.path.join('uploads', filename)
+            #file.save(upload_path)
+            flash("Archivo subido exitosamente", "success")
+            return redirect(url_for('accounts.index'))
+    return render_template('generate_diplomas.html', form=form)
+
+
 @accounts.route("/credenciales")
 @login_required
 def credenciales() -> Response:
-
     return render_template("credenciales.html")
 
-@accounts.route("/")
+
 @accounts.route("/carteles")
 @login_required
 def carteles() -> Response:
-    
     return render_template("carteles.html")

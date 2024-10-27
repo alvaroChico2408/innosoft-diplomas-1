@@ -34,7 +34,7 @@
         <ul class="navbar-nav">
           {{ render_nav_item('accounts.index', 'Home') }}
           {% if current_user.is_authenticated %}
-          {{ render_nav_item('accounts.diplomas', 'Diplomas') }}
+          {{ render_nav_item('accounts.generate_diplomas', 'Generate Diplomas') }}
           {{ render_nav_item('accounts.credenciales', 'Credenciales') }}
           {{ render_nav_item('accounts.carteles', 'Carteles') }}
           {% endif %}
@@ -66,7 +66,7 @@
       <p class="text-body m-0">Source Code <a href="https://github.com/anuraagnagar/flask-user-authentication"
           target="_blank" class="text-dark fs-5">
           {{ render_icon('github') }}</a></p>
-      <p class="m-0">© 2023 Copyright</p>
+      <p class="m-0">© 2024 Copyright</p>
     </div>
   </footer>
 
