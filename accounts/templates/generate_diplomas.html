@@ -1,26 +1,26 @@
 {% extends "base.html" %}
-{% block title %}Seleccionar Dataset para los diplomas{% endblock %}
+{% block title %}Select Dataset for Diplomas{% endblock %}
 
 {% block body %}
 <div class="d-flex flex-column min-vh-100">
-    <!-- Contenedor para el título -->
+    <!-- Container for the title -->
     <div class="container my-4">
         <div class="card shadow-sm border-0 rounded-lg text-center">
             <div class="card-body">
-                <h1 class="display-5">🎓 Genera aquí tus diplomas 🎓</h1>
+                <h1 class="display-5">🎓 Generate Your Diplomas Here 🎓</h1>
             </div>
         </div>
     </div>
 
-    <!-- Contenedor para el formulario, centrado verticalmente -->
+    <!-- Container for the form, vertically centered -->
     <div class="container my-auto">
         <div class="card shadow-sm border-0 rounded-lg">
             <div class="card-body text-center">
                 <form action="{{ url_for('accounts.generate_diplomas') }}" method="POST" enctype="multipart/form-data">
                     {{ form.csrf_token }}
                     <div class="form-group">
-                        <label for="hours_excel" class="form-label font-weight-bold">Selecciona el archivo Excel</label>
-                        <div class="col-md-6 mx-auto"> <!-- Ajusta el ancho aquí -->
+                        <label for="hours_excel" class="form-label font-weight-bold">Select Excel File</label>
+                        <div class="col-md-6 mx-auto"> <!-- Adjust width here -->
                             {{ form.hours_excel(class="form-control") }}
                         </div>
                         {% if form.hours_excel.errors %}
@@ -29,15 +29,15 @@
                             </div>
                         {% endif %}
                     </div>
-                    <button type="submit" class="btn btn-primary btn-lg mt-4 px-5">Subir Archivo</button>
+                    <button type="submit" class="btn btn-primary btn-lg mt-4 px-5">Upload File</button>
                 </form>
             </div>
         </div>
     </div>
 </div>
 
-<!-- Pie de página -->
+<!-- Footer -->
 <footer class="mt-auto py-3 bg-light text-center">
-    <small>&copy; 2024 Copyright - Todos los derechos reservados</small>
+    <small>&copy; 2024 Copyright - All rights reserved</small>
 </footer>
 {% endblock %}
