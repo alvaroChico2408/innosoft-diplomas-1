@@ -1,8 +1,8 @@
 import os
 import typing as t
-
-from sendgrid import SendGridAPIClient
-from sendgrid.helpers.mail import Mail
+import smtplib
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
 from werkzeug.exceptions import ServiceUnavailable
 
 from flask import current_app, render_template, url_for
@@ -12,53 +12,51 @@ from accounts.utils import get_full_url
 
 def send_mail(subject: t.AnyStr, recipients: t.List[str], body: t.Text):
     """
-    Sends an email using SendGrid.
+    Sends an email using Gmail SMTP.
 
     :param subject: The subject of the email.
     :param recipients: A list of recipient email addresses.
     :param body: The body content of the email.
 
-    :raises ValueError: If the `SENDGRID_API_KEY` environment variable is not set.
-    :raises ServiceUnavailable: If the SendGrid service is unavailable.
+    :raises ValueError: If required environment variables are not set.
+    :raises ServiceUnavailable: If the SMTP service is unavailable.
     """
-    sender: str = os.environ.get("SENDGRID_SENDER_EMAIL", None)
-    api_key: str = os.environ.get("SENDGRID_API_KEY", None)
+    sender: str = os.environ.get("SMTP_USERNAME", None)
+    password: str = os.environ.get("SMTP_PASSWORD", None)
 
-    if not sender:
-        raise ValueError("`SENDGRID_SENDER_EMAIL` environment variable is not set")
-    
-    if not api_key:
-        raise ValueError("`SENDGRID_API_KEY` environment variable is not set")
+    if not sender or not password:
+        raise ValueError("`SMTP_USERNAME` or `SMTP_PASSWORD` environment variable is not set")
 
-    message = Mail(
-        from_email=sender,
-        to_emails=recipients,
-        subject=subject,
-        html_content=body  # SendGrid can handle both HTML and text content
-    )
+    # Set up the SMTP server
+    smtp_server = "smtp.gmail.com"
+    smtp_port = 587
+
+    # Create the email message
+    message = MIMEMultipart()
+    message["From"] = sender
+    message["To"] = ", ".join(recipients)
+    message["Subject"] = subject
+    message.attach(MIMEText(body, "html"))
 
     try:
-        sg = SendGridAPIClient(api_key)
-        response = sg.send(message)
-        print(f"Email sent with status code: {response.status_code}")
+        # Connect to the SMTP server and send the email
+        with smtplib.SMTP(smtp_server, smtp_port) as server:
+            server.starttls()  # Secure the connection
+            server.login(sender, password)
+            server.sendmail(sender, recipients, message.as_string())
+            print("Email sent successfully.")
     except Exception as e:
         print(f"Failed to send email: {e}")
         raise ServiceUnavailable(
-            description=(
-                "The SendGrid mail service is currently not available. "
-                "Please try later or contact the developers team."
-            )
+            description="The Gmail SMTP service is currently not available. "
+                        "Please try later or contact the developers team."
         )
 
 
 def send_confirmation_mail(user: User = None):
     subject: str = "Verify Your Account"
-
     token: str = user.generate_token(salt=current_app.config["ACCOUNT_CONFIRM_SALT"])
-
-    verification_link: str = get_full_url(
-        url_for("accounts.confirm_account", token=token)
-    )
+    verification_link: str = get_full_url(url_for("accounts.confirm_account", token=token))
 
     context = render_template(
         "emails/verify_account.txt",
@@ -71,9 +69,7 @@ def send_confirmation_mail(user: User = None):
 
 def send_reset_password(user: User = None):
     subject: str = "Reset Your Password"
-
     token: str = user.generate_token(salt=current_app.config["RESET_PASSWORD_SALT"])
-
     reset_link: str = get_full_url(url_for("accounts.reset_password", token=token))
 
     context = render_template(
@@ -85,12 +81,8 @@ def send_reset_password(user: User = None):
 
 def send_reset_email(user: User = None):
     subject: str = "Confirm Your Email Address"
-
     token: str = user.generate_token(salt=current_app.config["CHANGE_EMAIL_SALT"])
-
-    confirmation_link: str = get_full_url(
-        url_for("accounts.confirm_email", token=token)
-    )
+    confirmation_link: str = get_full_url(url_for("accounts.confirm_email", token=token))
 
     context = render_template(
         "emails/reset_email.txt",
