@@ -136,3 +136,17 @@ class EditUserProfileForm(FlaskForm):
     )
     about = TextAreaField("About")
     submit = SubmitField("Save Profile")
+    
+
+class EnterExcelHours(FlaskForm):
+    hours_excel = FileField(
+        "Excel to generate diplomas",
+        validators=[
+            FileAllowed(["xlsx"], "Please upload an Excel file (.xlsx) only."),
+            FileSize(
+                max_size=500 * 1024 * 1024,  # 500 MB
+                message="File size should not exceed 500 MB.",
+            ),
+        ],
+    )
+    submit = SubmitField("Generate Diplomas")

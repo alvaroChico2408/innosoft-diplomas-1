@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% block title %}Seleccionar Dataset para los diplomas{% endblock %}
+
+{% block body %}
+<div class="d-flex flex-column min-vh-100">
+    <!-- Contenedor para el título -->
+    <div class="container my-4">
+        <div class="card shadow-sm border-0 rounded-lg text-center">
+            <div class="card-body">
+                <h1 class="display-5">🎓 Genera aquí tus diplomas 🎓</h1>
+            </div>
+        </div>
+    </div>
+
+    <!-- Contenedor para el formulario, centrado verticalmente -->
+    <div class="container my-auto">
+        <div class="card shadow-sm border-0 rounded-lg">
+            <div class="card-body text-center">
+                <form action="{{ url_for('accounts.generate_diplomas') }}" method="POST" enctype="multipart/form-data">
+                    {{ form.csrf_token }}
+                    <div class="form-group">
+                        <label for="hours_excel" class="form-label font-weight-bold">Selecciona el archivo Excel</label>
+                        <div class="col-md-6 mx-auto"> <!-- Ajusta el ancho aquí -->
+                            {{ form.hours_excel(class="form-control") }}
+                        </div>
+                        {% if form.hours_excel.errors %}
+                            <div class="text-danger mt-2">
+                                {{ form.hours_excel.errors[0] }}
+                            </div>
+                        {% endif %}
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-lg mt-4 px-5">Subir Archivo</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Pie de página -->
+<footer class="mt-auto py-3 bg-light text-center">
+    <small>&copy; 2024 Copyright - Todos los derechos reservados</small>
+</footer>
+{% endblock %}
