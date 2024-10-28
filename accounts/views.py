@@ -575,16 +575,10 @@ def profile() -> Response:
     return render_template("profile.html", form=form)
 
 
-@accounts.route("/credenciales")
+@accounts.route("/choose_send_diplomas", methods=["GET", "POST"])
 @login_required
-def credenciales() -> Response:
-    return render_template("credenciales.html")
-
-
-@accounts.route("/carteles")
-@login_required
-def carteles() -> Response:
-    return render_template("carteles.html")
+def choose_send_diplomas() -> Response:
+    return render_template("choose_send_diplomas.html")
 
 
 @accounts.route('/generate_diplomas', methods=['GET', 'POST'])

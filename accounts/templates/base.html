@@ -9,20 +9,19 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link rel="shortcut icon" href="{{ url_for('static', filename='assets/favicon.ico') }}" type="image/x-icon">
-  <title>{% block title %}{% endblock %} - Flask Authentication System</title>
+  <title>{% block title %}{% endblock %} - INNOSOFT</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
   {{ bootstrap.load_css() }}
 </head>
 
-<body style="background-color: #f1f4fc;">
+<body style="background-color: #f1f4fc; display: flex; flex-direction: column; min-height: 100vh;">
   <!-- navbar -->
   <nav class="navbar navbar-expand-md navbar-dark bg-dark static-top py-1">
     <div class="container-fluid px-lg-4">
       <a class="navbar-brand" href="{{ url_for('accounts.index') }}">
         <div class="d-flex p-2 rounded-3" style="border: 1px solid #fff;">
-          <img class="w-100 me-2" src="{{ url_for('static', filename='assets/images/logo.png') }}" alt=""
-            style="height: 28px;">
-          <h4 class="text-uppercase m-0">Flask Auth</h4>
+          <img class="w-100 me-2" src="{{ url_for('static', filename='assets/images/logo.png') }}" alt="" style="height: 30px;">
+          <h4 class="text-uppercase m-0">INNOSOFT</h4>
         </div>
       </a>
 
@@ -34,36 +33,36 @@
         <ul class="navbar-nav">
           {{ render_nav_item('accounts.index', 'Home') }}
           {% if current_user.is_authenticated %}
-          {{ render_nav_item('accounts.generate_diplomas', 'Generate Diplomas') }}
-          {{ render_nav_item('accounts.credenciales', 'Credenciales') }}
-          {{ render_nav_item('accounts.carteles', 'Carteles') }}
+            {{ render_nav_item('accounts.generate_diplomas', 'Generate Diplomas') }}
+            {{ render_nav_item('accounts.choose_send_diplomas', 'Choose and Send Diplomas') }}
           {% endif %}
         </ul>
         <ul class="navbar-nav ms-auto my-2">
           {% if not current_user.is_authenticated %}
-          {{ render_nav_item('accounts.login', 'Login') }}
-          <li class="nav-item my-2 my-md-0 ms-md-2">
-            <a class="btn btn-outline-light" href="{{ url_for('accounts.register') }}">Signup</a>
-          </li>
+            {{ render_nav_item('accounts.login', 'Login') }}
+            <li class="nav-item my-2 my-md-0 ms-md-2">
+              <a class="btn btn-outline-light" href="{{ url_for('accounts.register') }}">Sign up</a>
+            </li>
           {% else %}
-          {{ render_nav_item('accounts.profile', 'Profile') }}
-          {{ render_nav_item('accounts.change_email', 'Reset Email') }}
-          {{ render_nav_item('accounts.change_password', 'Change Password') }}
-          <li class="nav-item">
-            <a class="btn btn-outline-light" href="{{ url_for('accounts.logout') }}">Logout</a>
-          </li>
+            {{ render_nav_item('accounts.profile', 'Profile') }}
+            <li class="nav-item">
+              <a class="btn btn-outline-light ms-3" href="{{ url_for('accounts.logout') }}">Logout</a>
+            </li>
           {% endif %}
         </ul>
       </div>
     </div>
   </nav>
 
-  {% block body %} {% endblock %}
+  <!-- Main Content -->
+  <main class="flex-grow-1">
+    {% block body %}{% endblock %}
+  </main>
 
   <!-- Footer -->
-  <footer class="text-center text-lg-start text-dark" style="background-color: #ECEFF1">
+  <footer class="text-center text-lg-start text-dark mt-auto" style="background-color: #ECEFF1">
     <div class="d-flex justify-content-between p-4" style="background-color: rgba(170, 170, 170, 0.2)">
-      <p class="text-body m-0">Source Code <a href="https://github.com/anuraagnagar/flask-user-authentication"
+      <p class="text-body m-0">Source Code <a href="https://github.com/alvaroChico2408/innosoft-diplomas-1"
           target="_blank" class="text-dark fs-5">
           {{ render_icon('github') }}</a></p>
       <p class="m-0">© 2024 Copyright</p>
