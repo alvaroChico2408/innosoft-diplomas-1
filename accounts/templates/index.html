@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 {% from 'bootstrap5/utils.html' import render_messages %}
-{% block title %}Imagen innosoft{% endblock %}
+{% block title %}Link to our page{% endblock %}
 
 {% block body %}
 
@@ -9,8 +9,10 @@
         <div class="row justify-content-center">
             <div class="col-md-9 col-lg-9">
                 <div class="p-4 text-center">
-                    <img src="{{ url_for('static', filename='../static/assets/images/home_image.png') }}" 
-                         alt="Imagen innosoft" class="img-fluid mb-3">
+                    <a href="https://www.innosoftdays.com/" target="_blank">
+                        <img src="{{ url_for('static', filename='../static/assets/images/home_image.png') }}" 
+                             alt="Imagen innosoft" class="img-fluid mb-3">
+                    </a>
                 </div>
             </div>
         </div>

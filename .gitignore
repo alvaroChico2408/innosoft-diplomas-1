@@ -21,3 +21,6 @@ sqlite3.*
 
 # Allow .env.example
 !.env.example
+
+# Profile images
+/accounts/static/assets/profile/

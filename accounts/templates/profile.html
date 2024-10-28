@@ -57,8 +57,10 @@
                                     can only reset it by sending a confirmation link to your newly entered email. If you
                                     want to make a change, please click the button below.</p>
                             </div>
-                            <a href="{{ url_for('accounts.change_email') }}" class="btn btn-primary" type="button"
-                                role="button">Reset</a>
+                            <div class="d-flex justify-content-center">
+                                <a href="{{ url_for('accounts.change_email') }}" class="btn btn-primary" type="button" role="button">Reset email</a>
+                                <a href="{{ url_for('accounts.change_password') }}" class="btn btn-primary" type="button" role="button">Reset password</a>
+                            </div>
                         </div>
                         <div class="form-outline mb-3">
                             {{ render_field(form.about, id="bio", placeholder="Enter about yourself",
