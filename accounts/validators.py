@@ -73,3 +73,41 @@ class StrongPassword(object):
             password,
         ):
             raise ValidationError(self.message)
+
+
+class ExcelValidator:
+    """Validator for Excel file structure and data."""
+    expected_columns = [
+        "Apellidos", "Nombre", "Uvus", "Correo", "Perfil", "Participación", "Comité",
+        "Evidencia aleatoria", "Horas de evidencia aleatoria", "Eventos asistidos",
+        "Horas de asistencia", "Reuniones asistidas", "Horas de reuniones", "Bono de horas",
+        "Evidencias registradas", "Horas de evidencias", "Horas en total"
+    ]
+
+    @classmethod
+    def validate_structure(cls, df):
+        """Check if the Excel file has the expected columns."""
+        if list(df.columns) != cls.expected_columns:
+            raise ValidationError(f"Las columnas del archivo no coinciden con las esperadas: {cls.expected_columns}")
+
+    @staticmethod
+    def validate_row_data(row, index):
+        """Validate each field in a row."""
+        errors = []
+        if not isinstance(row["Apellidos"], str) or len(row["Apellidos"].split()) not in [1, 2]:
+            errors.append(f"Error en fila {index + 1}: Apellidos deben ser 1 o 2 palabras.")
+        if not isinstance(row["Nombre"], str):
+            errors.append(f"Error en fila {index + 1}: Nombre debe ser un string.")
+        if not re.match(r"[^@]+@[^@]+\.[^@]+", row["Correo"]):
+            errors.append(f"Error en fila {index + 1}: Correo no tiene un formato válido.")
+        if not row["Perfil"].startswith("https://www.evidentia.cloud/2024/profiles/view/"):
+            errors.append(f"Error en fila {index + 1}: Perfil debe comenzar con https://www.evidentia.cloud/2024/profiles/view/")
+        if row["Participación"] not in ["ORGANIZATION", "INTERMEDIATE", "ASSISTANCE"]:
+            errors.append(f"Error en fila {index + 1}: Participación no válida.")
+        
+        comites_validos = {"Comunicación", "Secretaría", "Finanzas", "Programa", "Logística", "Sostenibilidad", "Presidencia"}
+        if not set(row["Comité"].split(", ")).issubset(comites_validos):
+            errors.append(f"Error en fila {index + 1}: Comité no válido.")
+        
+        if errors:
+            raise ValidationError(" ".join(errors))
