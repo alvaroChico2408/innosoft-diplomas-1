@@ -567,13 +567,8 @@ def generate_diplomas():
     return render_template('generate_diplomas.html', form=form)
 
 
-@accounts.route("/credenciales")
+@accounts.route("/choose_send_diploomas", methods=["GET", "POST"])
 @login_required
-def credenciales() -> Response:
-    return render_template("credenciales.html")
+def choose_send_diplomas() -> Response:
+    return render_template("choose_send_diplomas.html")
 
-
-@accounts.route("/carteles")
-@login_required
-def carteles() -> Response:
-    return render_template("carteles.html")
