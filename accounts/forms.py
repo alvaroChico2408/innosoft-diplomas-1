@@ -14,6 +14,7 @@ from flask_wtf.file import FileAllowed, FileSize
 
 from accounts.models import User
 from accounts.validators import Unique, StrongNames, StrongUsername, StrongPassword
+
  
 
 class RegisterForm(FlaskForm):
@@ -138,15 +139,6 @@ class EditUserProfileForm(FlaskForm):
     submit = SubmitField("Save Profile")
     
 
-
-from flask_wtf import FlaskForm
-from flask_wtf.file import FileAllowed, FileSize
-from wtforms import FileField, SubmitField, ValidationError
-import pandas as pd
-import io
-import re
-from .validators import ExcelValidator
-
 class EnterExcelHours(FlaskForm):
     hours_excel = FileField(
         "Excel to generate diplomas",
@@ -155,32 +147,8 @@ class EnterExcelHours(FlaskForm):
             FileSize(
                 max_size=500 * 1024 * 1024,  # 500 MB
                 message="File size should not exceed 500 MB.",
-            ),
+            )
         ],
     )
     submit = SubmitField("Generate Diplomas")
 
-def validate_hours_excel(self, field):
-        if field.data:
-            try:
-                # Cargar el archivo y leer los datos en un DataFrame
-                file_stream = io.BytesIO(field.data.read())
-                df = pd.read_excel(file_stream)
-
-                # Validar si el archivo está vacío
-                if df.empty:
-                    raise ValidationError("El archivo Excel está vacío. Por favor, carga un archivo con datos.")
-                
-                # Validar la estructura del archivo
-                ExcelValidator.validate_structure(df)
-                
-                # Validar cada fila en el DataFrame
-                for index, row in df.iterrows():
-                    ExcelValidator.validate_row_data(row, index)
-
-            except ValidationError as e:
-                raise e  # Re-lanzar el ValidationError para mostrarlo en la pantalla
-            except Exception:
-                raise ValidationError("Error al leer el archivo. Asegúrate de que el archivo esté en el formato correcto (.xlsx).")
-            finally:
-                field.data.seek(0)  # Reiniciar el puntero del archivo

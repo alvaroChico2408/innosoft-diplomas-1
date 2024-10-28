@@ -1,37 +1,17 @@
-import os
 import re
-import typing as t
 
 from http import HTTPStatus
 from datetime import timedelta
 from werkzeug.exceptions import InternalServerError
-from werkzeug.utils import secure_filename
-
 
 from flask import Blueprint, Response
 from flask import abort, current_app, render_template, request, redirect, url_for, flash
 from flask_login import current_user, login_required, login_user, logout_user
 
-import os
-import pandas as pd
-from flask import flash, redirect, url_for
-from reportlab.lib.pagesizes import A4
-from reportlab.pdfgen import canvas
-from werkzeug.utils import secure_filename
-from .models import Diploma
 from .extensions import database as db 
 
-
-
-from flask import flash, redirect, url_for, render_template, request
-from werkzeug.utils import secure_filename
-from reportlab.pdfgen import canvas
 from reportlab.lib.pagesizes import A4
-from accounts.models import Diploma
 from accounts.forms import EnterExcelHours
-from .validators import ExcelValidator
-from wtforms import ValidationError
-
 
 from accounts.decorators import authentication_redirect, guest_user_exempt
 from accounts.email_utils import (
@@ -86,6 +66,7 @@ def login_guest_user() -> Response:
     return abort(HTTPStatus.NOT_FOUND)
 
 
+
 @accounts.route("/register", methods=["GET", "POST"])
 @authentication_redirect
 def register() -> Response:
@@ -128,6 +109,7 @@ def register() -> Response:
         return redirect(url_for("accounts.login"))
 
     return render_template("register.html", form=form)
+
 
 
 @accounts.route("/login", methods=["GET", "POST"])
@@ -175,6 +157,7 @@ def login() -> Response:
         return redirect(url_for("accounts.login"))
 
     return render_template("login.html", form=form)
+
 
 
 @accounts.route("/account/confirm", methods=["GET", "POST"])
@@ -228,6 +211,7 @@ def confirm_account() -> Response:
     return abort(HTTPStatus.NOT_FOUND)
 
 
+
 @accounts.route("/logout", methods=["GET", "POST"])
 @login_required
 def logout() -> Response:
@@ -242,6 +226,7 @@ def logout() -> Response:
 
     flash("You're logout successfully.", "success")
     return redirect(url_for("accounts.login"))
+
 
 
 @accounts.route("/forgot/password", methods=["GET", "POST"])
@@ -277,6 +262,7 @@ def forgot_password() -> Response:
         return redirect(url_for("accounts.forgot_password"))
 
     return render_template("forgot_password.html", form=form)
+
 
 
 @accounts.route("/password/reset", methods=["GET", "POST"])
@@ -344,6 +330,7 @@ def reset_password() -> Response:
     return abort(HTTPStatus.NOT_FOUND)
 
 
+
 @accounts.route("/change/password", methods=["GET", "POST"])
 @login_required
 @guest_user_exempt
@@ -405,6 +392,7 @@ def change_password() -> Response:
     return render_template("change_password.html", form=form)
 
 
+
 @accounts.route("/change/email", methods=["GET", "POST"])
 @login_required
 @guest_user_exempt
@@ -456,6 +444,7 @@ def change_email() -> Response:
     return render_template("change_email.html", form=form)
 
 
+
 @accounts.route("/account/email/confirm", methods=["GET", "POST"])
 def confirm_email() -> Response:
     """
@@ -503,6 +492,7 @@ def confirm_email() -> Response:
     return abort(HTTPStatus.NOT_FOUND)
 
 
+
 @accounts.route("/")
 @accounts.route("/home")
 @login_required
@@ -513,6 +503,7 @@ def index() -> Response:
     :return: Renders the `index.html` template.
     """
     return render_template("index.html")
+
 
 
 @accounts.route("/profile", methods=["GET", "POST"])
@@ -575,26 +566,35 @@ def profile() -> Response:
     return render_template("profile.html", form=form)
 
 
+
 @accounts.route("/choose_send_diplomas", methods=["GET", "POST"])
 @login_required
-def choose_send_diplomas() -> Response:
+def choose_send_diplomas():
     return render_template("choose_send_diplomas.html")
+
 
 
 @accounts.route('/generate_diplomas', methods=['GET', 'POST'])
 @login_required
 def generate_diplomas():
-    form = EnterExcelHours()
-    if form.validate_on_submit():
-        file = form.hours_excel.data
+    form_excel = EnterExcelHours()
+    if form_excel.validate_on_submit():
+        file = form_excel.hours_excel.data
         if file:
-            df = procesar_excel(file)
+            flash("Excel file can be uploaded", "success")
+            '''
+            df = _procesar_excel(file)
             if df is not None:
-                guardar_excel(df)
-    return render_template('generate_diplomas.html', form=form)
+                flash("Ahora guardaremos los diplomas en la base de datos", "success")
+            else:
+                flash("We can't generate diplomas with this excel", "error")
+            '''
+    return render_template('generate_diplomas.html', form=form_excel)
 
 
-def procesar_excel(file):
+# A PARTIR DE AQUI HAY QUE SACAR LA VALIDACIÓN DEL EXCEL (leerlo y comprobar los campos)
+'''
+def _procesar_excel(file):
     UPLOAD_FOLDER = os.path.join("uploads", "processed_excels")
     os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
@@ -621,18 +621,106 @@ def procesar_excel(file):
     except Exception:
         flash("Error al leer el archivo. Asegúrate de que esté en el formato correcto (.xlsx).", "warning")
         return None
+'''
+'''
+class ExcelValidator(object):
+    """
+    Main validator that orchestrates all individual row validations
+    and structure validation for the Excel file.
+    """
+
+    def __init__(self, message=None):
+        self.message = message or "The Excel file is not valid. Please check the structure and data."
+        self.structure_validator = ColumnStructureValidator()
+        self.email_validator = EmailValidator()
+        self.profile_validator = ProfileValidator()
+        self.participation_validator = ParticipationValidator()
+        self.committee_validator = CommitteeValidator()
+
+    def __call__(self, form, field):
+        try:
+            # Interpretar el contenido del campo como un DataFrame
+            file = field.data
+            df = pd.read_excel(file)
+            
+            # Validar la estructura de columnas
+            self.structure_validator(df)
+
+            # Validar los datos de cada fila
+            for index, row in df.iterrows():
+                self.email_validator(row, index)
+                self.profile_validator(row, index)
+                self.participation_validator(row, index)
+                self.committee_validator(row, index)
+        except ValidationError as e:
+            raise ValidationError(f"Error in row {index + 1}: {str(e)}")
+        except Exception:
+            raise ValidationError("Error reading the Excel file. Ensure it is a .xlsx file with the correct format.")
+
+class ColumnStructureValidator(object):
+    """Validator that checks if an Excel file has the expected column structure."""
+
+    expected_columns = [
+        "Apellidos", "Nombre", "Uvus", "Correo", "Perfil", "Participación", "Comité",
+        "Evidencia aleatoria", "Horas de evidencia aleatoria", "Eventos asistidos",
+        "Horas de asistencia", "Reuniones asistidas", "Horas de reuniones", "Bono de horas",
+        "Evidencias registradas", "Horas de evidencias", "Horas en total"
+    ]
+
+    def __init__(self, message=None):
+        self.message = message or f"The columns of the file do not match the expected ones: {self.expected_columns}"
+
+    def __call__(self, df):
+        if list(df.columns) != self.expected_columns:
+            raise ValidationError(self.message)
 
 
-def guardar_excel(df):
-    for _, row in df.iterrows():
-        diploma = Diploma(
-            apellidos=row["Apellidos"],
-            nombre=row["Nombre"],
-            uvus=row["Uvus"],
-            correo=row["Correo"],
-            perfil=row["Perfil"],
-            # Continuar con los otros campos según corresponda
-        )
-        db.session.add(diploma)
-    db.session.commit()
-    flash("Datos guardados exitosamente en la base de datos.", "success")
+class EmailValidator(object):
+    """Validator for validating email format to match alum.us.es or us.es patterns."""
+
+    def __init__(self, message=None):
+        self.message = message or "Email must end in '@alum.us.es' or '@us.es'."
+
+    def __call__(self, row, index):
+        # pattern to match emails ending with '@alum.us.es' or '@us.es'
+        if not re.match(r"^[a-zA-Z0-9._%+-]+@(alum\.)?us\.es$", row["Correo"]):
+            raise ValidationError(f"Error in row {index + 1}: {self.message}")
+
+
+class ProfileValidator(object):
+    """Validator for checking the profile URL format."""
+
+    def __init__(self, message=None):
+        self.message = message or "Profile URL must start with https://www.evidentia.cloud/2024/profiles/view/"
+
+    def __call__(self, row, index):
+        if not row["Perfil"].startswith("https://www.evidentia.cloud/2024/profiles/view/"):
+            raise ValidationError(f"Error in row {index + 1}: {self.message}")
+
+
+class ParticipationValidator(object):
+    """Validator for checking participation type."""
+
+    def __init__(self, message=None):
+        self.message = message or "Participation type is invalid."
+
+    def __call__(self, row, index):
+        if row["Participación"] not in ["ORGANIZATION", "INTERMEDIATE", "ASSISTANCE"]:
+            raise ValidationError(f"Error in row {index + 1}: {self.message}")
+
+
+class CommitteeValidator(object):
+    """Validator for checking valid committee names."""
+
+    valid_committees = {"Presidencia", "Secretaría", "Programa", "Igualdad", "Sostenibilidad", "Finanzas", "Logística", "Comunicación"}
+
+    def __init__(self, message=None):
+        self.message = message or "Invalid committee name."
+
+    def __call__(self, row, index):
+        committees = row["Comité"].split(" | ") if row["Comité"] else []
+        
+        # Check if all committees in the cell are valid or if it's blank
+        if not set(committees).issubset(self.valid_committees):
+            raise ValidationError(f"Error in row {index + 1}: {self.message}")
+'''

@@ -30,6 +30,7 @@ from accounts.utils import (
 )
 
 
+
 class BaseModel(db.Model):
     """
     A Base Model class for other models.
@@ -367,8 +368,7 @@ def create_profile_for_user(
     # Execute an INSERT statement to add the user's profile table to the database.
     connection.execute(Profile.__table__.insert(), {"user_id": profile.user_id})
 
-
-
+''' HAY QUE DARLE UNA VUELTA AÚN
 class Diploma(db.Model):
     __tablename__ = "diploma"
 
@@ -444,3 +444,4 @@ class Diploma(db.Model):
 
     def __repr__(self):
         return f"<Diploma {self.nombre}>"
+'''
