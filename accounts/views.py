@@ -589,6 +589,8 @@ def generate_diplomas():
             else:
                 flash("We can't generate diplomas with this excel", "error")
             '''
+        else:
+            flash("You didn't introduce any file.", "error")
     return render_template('generate_diplomas.html', form=form_excel)
 
 

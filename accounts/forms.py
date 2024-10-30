@@ -143,6 +143,7 @@ class EnterExcelHours(FlaskForm):
     hours_excel = FileField(
         "Excel to generate diplomas",
         validators=[
+            DataRequired(message="You didn't introduce any file."),
             FileAllowed(["xlsx"], "Please upload an Excel file (.xlsx) only."),
             FileSize(
                 max_size=500 * 1024 * 1024,  # 500 MB
