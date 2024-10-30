@@ -1,5 +1,7 @@
 import os
+import re
 import typing as t
+import pandas as pd
 
 from datetime import datetime, timedelta
 
@@ -8,9 +10,10 @@ from sqlalchemy import event, or_
 from sqlalchemy.engine import Connection
 from sqlalchemy.orm import Mapper
 from sqlalchemy.ext.declarative import DeclarativeMeta
-import re
 from accounts.extensions import database as db
 from sqlalchemy.orm import validates
+from sqlalchemy.exc import IntegrityError
+from wtforms import ValidationError
 
 from werkzeug.exceptions import InternalServerError, HTTPException
 from werkzeug.security import (
@@ -367,81 +370,142 @@ def create_profile_for_user(
 
     # Execute an INSERT statement to add the user's profile table to the database.
     connection.execute(Profile.__table__.insert(), {"user_id": profile.user_id})
-
-''' HAY QUE DARLE UNA VUELTA AÚN
+    
+    
 class Diploma(db.Model):
     __tablename__ = "diploma"
 
     id = db.Column(db.Integer, primary_key=True)
-
     apellidos = db.Column(db.String(120), nullable=False)
     nombre = db.Column(db.String(120), nullable=False)
-    uvus = db.Column(db.String(120), nullable=False)
-    correo = db.Column(db.String(120), nullable=False)
-    perfil = db.Column(db.String(120), nullable=False)
+    uvus = db.Column(db.String(120), unique=True, nullable=False)
+    correo = db.Column(db.String(120), unique=True, nullable=False)
+    perfil = db.Column(db.String(120), unique=True, nullable=False)
     participacion = db.Column(db.String(20), nullable=False)
-    comite = db.Column(db.String(255), nullable=False)  # Almacenamos varios comités como cadena separada
-    evidencia_aleatoria = db.Column(db.String(120), nullable=True)
+    comite = db.Column(db.String(255), nullable=True)
+    evidencia_aleatoria = db.Column(db.Float, nullable=True)
     horas_de_evidencia_aleatoria = db.Column(db.Float, nullable=True)
-    eventos_asistidos = db.Column(db.String(120), nullable=True)
-    horas_de_asistencia = db.Column(db.Float, nullable=False)
-    reuniones_asistiadas = db.Column(db.Integer, nullable=False)
-    horas_de_reuniones = db.Column(db.Float, nullable=False)
+    eventos_asistidos = db.Column(db.Integer, nullable=True)
+    horas_de_asistencia = db.Column(db.Float, nullable=True)
+    reuniones_asistidas = db.Column(db.Integer, nullable=True)
+    horas_de_reuniones = db.Column(db.Float, nullable=True)
     bono_de_horas = db.Column(db.Float, nullable=True)
-    evidencias_registradas = db.Column(db.Integer, nullable=False)
-    horas_de_evidencias = db.Column(db.Float, nullable=False)
-    horas_en_total = db.Column(db.Float, nullable=False)
-
-    @validates('apellidos')
-    def validate_apellidos(self, key, apellidos):
-        if len(apellidos.split()) > 2:
-            raise ValueError("Los apellidos deben contener una o dos palabras.")
-        return apellidos
+    evidencias_registradas = db.Column(db.Integer, nullable=True)
+    horas_de_evidencias = db.Column(db.Float, nullable=True)
+    horas_en_total = db.Column(db.Float, nullable=True)
 
     @validates('correo')
     def validate_correo(self, key, correo):
-        email_regex = r'^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$'
-        if not re.match(email_regex, correo):
+        if not re.match(r"^[a-zA-Z0-9_.+-]+@(alum\.)?us\.es$", correo):
             raise ValueError("Correo no tiene un formato válido.")
         return correo
 
     @validates('perfil')
     def validate_perfil(self, key, perfil):
-        if not perfil.startswith("https://www.evidentia.cloud/2024/profiles/view/"):
-            raise ValueError("El perfil debe comenzar con la URL: https://www.evidentia.cloud/2024/profiles/view/")
+        if not re.match(r"^https://www\.evidentia\.cloud/2024/profiles/view/\d+$", perfil):
+            raise ValueError("Perfil debe comenzar con https://www.evidentia.cloud/2024/profiles/view/ seguido de un número.")
         return perfil
 
     @validates('participacion')
     def validate_participacion(self, key, participacion):
-        valid_participacion_types = ["ORGANIZATION", "INTERMEDIATE", "ASSISTANCE"]
-        if participacion not in valid_participacion_types:
-            raise ValueError(f"Participación debe ser uno de los siguientes valores: {', '.join(valid_participacion_types)}")
+        valid_types = ["ORGANIZATION", "INTERMEDIATE", "ASSISTANCE"]
+        if participacion not in valid_types:
+            raise ValueError(f"Participación no válida. Debe ser uno de: {', '.join(valid_types)}.")
         return participacion
 
     @validates('comite')
     def validate_comite(self, key, comite):
-        valid_comite_types = [
-            "Comunicación", "Secretaría", "Finanzas", "Programa", "Logística",
-            "Sostenibilidad", "Presidencia"
-        ]
-        comite_list = [c.strip() for c in comite.split(",")]
-        for c in comite_list:
-            if c not in valid_comite_types:
-                raise ValueError(f"Comité debe ser uno o más de los siguientes valores: {', '.join(valid_comite_types)}")
-        return ",".join(comite_list)  # Almacenamos los comités como cadena separada por comas
+        if comite is None:
+            return comite # Comité es opcional        
+        valid_comites = {"Presidencia", "Secretaría", "Programa", "Igualdad", "Sostenibilidad", "Finanzas", "Logística", "Comunicación"}
+        # Usar `split` y eliminar elementos vacíos
+        comite_list = [c.strip() for c in comite.split(" | ") if c.strip()]
+        if not set(comite_list).issubset(valid_comites):
+            raise ValueError("Comité no válido.")
+        # Unir la lista filtrada en caso de que haya espacios extra
+        return " | ".join(comite_list)
 
-    @validates('horas_de_asistencia', 'horas_de_reuniones', 'horas_de_evidencias', 'horas_en_total')
-    def validate_floats(self, key, value):
-        if not isinstance(value, float):
-            raise ValueError(f"{key} debe ser un número decimal.")
-        return value
+    @classmethod
+    def from_excel_row(cls, row):
+        return cls(
+            apellidos=row["Apellidos"],
+            nombre=row["Nombre"],
+            uvus=row["Uvus"],
+            correo=row["Correo"],
+            perfil=row["Perfil"],
+            participacion=row["Participación"],
+            comite=row["Comité"] if pd.notnull(row["Comité"]) else None,
+            evidencia_aleatoria=float(row["Evidencia aleatoria"]) if pd.notnull(row["Evidencia aleatoria"]) else None,
+            horas_de_evidencia_aleatoria=float(row["Horas de evidencia aleatoria"]) if pd.notnull(row["Horas de evidencia aleatoria"]) else None,
+            eventos_asistidos=int(row["Eventos asistidos"]) if pd.notnull(row["Eventos asistidos"]) else None,
+            horas_de_asistencia=float(row["Horas de asistencia"]) if pd.notnull(row["Horas de asistencia"]) else None,
+            reuniones_asistidas=int(row["Reuniones asistidas"]) if pd.notnull(row["Reuniones asistidas"]) else None,
+            horas_de_reuniones=float(row["Horas de reuniones"]) if pd.notnull(row["Horas de reuniones"]) else None,
+            bono_de_horas=float(row["Bono de horas"]) if pd.notnull(row["Bono de horas"]) else None,
+            evidencias_registradas=int(row["Evidencias registradas"]) if pd.notnull(row["Evidencias registradas"]) else None,
+            horas_de_evidencias=float(row["Horas de evidencias"]) if pd.notnull(row["Horas de evidencias"]) else None,
+            horas_en_total=float(row["Horas en total"]) if pd.notnull(row["Horas en total"]) else None,
+        )
+        
+# función realizará la validación de la estructura del archivo y los datos específicos de cada campo. Si se detecta algún error, 
+# lanzará una excepción y no guardará los datos.
+def validate_and_save_excel(file):
+    try:
+        df = pd.read_excel(file)
+        print("Archivo Excel leído exitosamente.")
+    except Exception as e:
+        print("Error al leer el archivo Excel:", e)
+        raise ValidationError("Error reading the Excel file. Please make sure it's a valid .xlsx file.")
 
-    @validates('reuniones_asistiadas', 'evidencias_registradas')
-    def validate_integers(self, key, value):
-        if not isinstance(value, int):
-            raise ValueError(f"{key} debe ser un número entero.")
-        return value
+    # Verifica que las columnas coincidan
+    expected_columns = [
+        "Apellidos", "Nombre", "Uvus", "Correo", "Perfil", "Participación", "Comité",
+        "Evidencia aleatoria", "Horas de evidencia aleatoria", "Eventos asistidos",
+        "Horas de asistencia", "Reuniones asistidas", "Horas de reuniones", "Bono de horas",
+        "Evidencias registradas", "Horas de evidencias", "Horas en total"
+    ]
 
-    def __repr__(self):
-        return f"<Diploma {self.nombre}>"
-'''
+    if list(df.columns) != expected_columns:
+        print("Estructura de columnas en el archivo:", df.columns)
+        raise ValidationError("Excel columns do not match the expected structure.")
+
+    # Verificar unicidad de 'uvus', 'correo' y 'perfil'
+    unique_uvus = set()
+    unique_correos = set()
+    unique_perfiles = set()
+    records = []
+
+    for index, row in df.iterrows():
+        # Validar UVUS, Correo y Perfil
+        if row["Uvus"] in unique_uvus:
+            raise ValidationError(f"Duplicated UVUS found in row {index + 1}.")
+        if row["Correo"] in unique_correos:
+            raise ValidationError(f"Duplicated email found in row {index + 1}.")
+        if row["Perfil"] in unique_perfiles:
+            raise ValidationError(f"Duplicated profile found in row {index + 1}.")
+
+        unique_uvus.add(row["Uvus"])
+        unique_correos.add(row["Correo"])
+        unique_perfiles.add(row["Perfil"])
+
+        # Crear instancia de Diploma desde la fila actual
+        try:
+            diploma = Diploma.from_excel_row(row)
+            records.append(diploma)
+        except Exception as e:
+            print(f"Error al crear Diploma en la fila {index + 1}: {e}")
+            raise ValidationError(f"Error in row {index + 1}: {e}")
+
+    # Guardar todos los registros en una transacción
+    try:
+        db.session.bulk_save_objects(records)
+        db.session.commit()
+        print("Datos guardados exitosamente en la base de datos.")
+    except IntegrityError as e:
+        db.session.rollback()
+        print("Error de integridad al guardar los datos:", e)
+        raise ValidationError("Error saving data. Ensure all records are unique.")
+    except Exception as e:
+        db.session.rollback()
+        print("Error inesperado al guardar los datos:", e)
+        raise ValidationError("An error occurred while saving data to the database.")
