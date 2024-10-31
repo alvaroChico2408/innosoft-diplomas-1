@@ -427,6 +427,12 @@ class Diploma(db.Model):
 
     @classmethod
     def from_excel_row(cls, row):
+        def to_float(value):
+            return float(value) if pd.notnull(value) else None
+
+        def to_int(value):
+            return int(value) if pd.notnull(value) else None
+
         return cls(
             apellidos=row["Apellidos"],
             nombre=row["Nombre"],
@@ -435,16 +441,16 @@ class Diploma(db.Model):
             perfil=row["Perfil"],
             participacion=row["Participación"],
             comite=row["Comité"] if pd.notnull(row["Comité"]) else None,
-            evidencia_aleatoria=float(row["Evidencia aleatoria"]) if pd.notnull(row["Evidencia aleatoria"]) else None,
-            horas_de_evidencia_aleatoria=float(row["Horas de evidencia aleatoria"]) if pd.notnull(row["Horas de evidencia aleatoria"]) else None,
-            eventos_asistidos=int(row["Eventos asistidos"]) if pd.notnull(row["Eventos asistidos"]) else None,
-            horas_de_asistencia=float(row["Horas de asistencia"]) if pd.notnull(row["Horas de asistencia"]) else None,
-            reuniones_asistidas=int(row["Reuniones asistidas"]) if pd.notnull(row["Reuniones asistidas"]) else None,
-            horas_de_reuniones=float(row["Horas de reuniones"]) if pd.notnull(row["Horas de reuniones"]) else None,
-            bono_de_horas=float(row["Bono de horas"]) if pd.notnull(row["Bono de horas"]) else None,
-            evidencias_registradas=int(row["Evidencias registradas"]) if pd.notnull(row["Evidencias registradas"]) else None,
-            horas_de_evidencias=float(row["Horas de evidencias"]) if pd.notnull(row["Horas de evidencias"]) else None,
-            horas_en_total=float(row["Horas en total"]) if pd.notnull(row["Horas en total"]) else None,
+            evidencia_aleatoria=to_float(row["Evidencia aleatoria"]),
+            horas_de_evidencia_aleatoria=to_float(row["Horas de evidencia aleatoria"]),
+            eventos_asistidos=to_int(row["Eventos asistidos"]),
+            horas_de_asistencia=to_float(row["Horas de asistencia"]),
+            reuniones_asistidas=to_int(row["Reuniones asistidas"]),
+            horas_de_reuniones=to_float(row["Horas de reuniones"]),
+            bono_de_horas=to_float(row["Bono de horas"]),
+            evidencias_registradas=to_int(row["Evidencias registradas"]),
+            horas_de_evidencias=to_float(row["Horas de evidencias"]),
+            horas_en_total=to_float(row["Horas en total"]),
         )
         
 # función realizará la validación de la estructura del archivo y los datos específicos de cada campo. Si se detecta algún error, 
