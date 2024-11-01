@@ -14,6 +14,7 @@ from flask_wtf.file import FileAllowed, FileSize
 
 from accounts.models import User
 from accounts.validators import Unique, StrongNames, StrongUsername, StrongPassword
+
  
 
 class RegisterForm(FlaskForm):
@@ -142,11 +143,13 @@ class EnterExcelHours(FlaskForm):
     hours_excel = FileField(
         "Excel to generate diplomas",
         validators=[
+            DataRequired(message="You didn't introduce any file."),
             FileAllowed(["xlsx"], "Please upload an Excel file (.xlsx) only."),
             FileSize(
                 max_size=500 * 1024 * 1024,  # 500 MB
                 message="File size should not exceed 500 MB.",
-            ),
+            )
         ],
     )
     submit = SubmitField("Generate Diplomas")
+

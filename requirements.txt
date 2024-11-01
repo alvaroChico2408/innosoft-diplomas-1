@@ -33,3 +33,6 @@ tomli==2.0.1
 typing_extensions==4.6.3
 Werkzeug==2.3.6
 WTForms==3.0.1
+pandas
+reportlab
+openpyxl

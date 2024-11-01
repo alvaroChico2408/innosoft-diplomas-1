@@ -1,5 +1,10 @@
 import os
+import re
+import random
+import string
+import shutil
 import typing as t
+import pandas as pd
 
 from datetime import datetime, timedelta
 
@@ -8,6 +13,10 @@ from sqlalchemy import event, or_
 from sqlalchemy.engine import Connection
 from sqlalchemy.orm import Mapper
 from sqlalchemy.ext.declarative import DeclarativeMeta
+from sqlalchemy.orm import validates
+from sqlalchemy.exc import IntegrityError
+from wtforms import ValidationError
+from reportlab.pdfgen import canvas
 
 from werkzeug.exceptions import InternalServerError, HTTPException
 from werkzeug.security import (
@@ -15,7 +24,7 @@ from werkzeug.security import (
     generate_password_hash,
 )
 
-from flask import url_for
+from flask import url_for, current_app
 from flask_login.mixins import UserMixin
 
 from accounts.extensions import database as db
@@ -25,6 +34,7 @@ from accounts.utils import (
     unique_security_token,
     get_unique_id,
 )
+
 
 
 class BaseModel(db.Model):
@@ -363,3 +373,180 @@ def create_profile_for_user(
 
     # Execute an INSERT statement to add the user's profile table to the database.
     connection.execute(Profile.__table__.insert(), {"user_id": profile.user_id})
+    
+    
+class Diploma(db.Model):
+    __tablename__ = "diploma"
+
+    id = db.Column(db.Integer, primary_key=True)
+    apellidos = db.Column(db.String(120), nullable=False)
+    nombre = db.Column(db.String(120), nullable=False)
+    uvus = db.Column(db.String(120), unique=True, nullable=False)
+    correo = db.Column(db.String(120), unique=True, nullable=False)
+    perfil = db.Column(db.String(120), unique=True, nullable=False)
+    participacion = db.Column(db.String(20), nullable=False)
+    comite = db.Column(db.String(255), nullable=True)
+    evidencia_aleatoria = db.Column(db.Float, nullable=True)
+    horas_de_evidencia_aleatoria = db.Column(db.Float, nullable=True)
+    eventos_asistidos = db.Column(db.Integer, nullable=True)
+    horas_de_asistencia = db.Column(db.Float, nullable=True)
+    reuniones_asistidas = db.Column(db.Integer, nullable=True)
+    horas_de_reuniones = db.Column(db.Float, nullable=True)
+    bono_de_horas = db.Column(db.Float, nullable=True)
+    evidencias_registradas = db.Column(db.Integer, nullable=True)
+    horas_de_evidencias = db.Column(db.Float, nullable=True)
+    horas_en_total = db.Column(db.Float, nullable=True)
+    file_path = db.Column(db.String(255), unique=True, nullable=False)
+
+    @validates('correo')
+    def validate_correo(self, key, correo):
+        if not re.match(r"^[a-zA-Z0-9_.+-]+@(alum\.)?us\.es$", correo):
+            raise ValueError("Correo no tiene un formato válido.")
+        return correo
+
+    @validates('perfil')
+    def validate_perfil(self, key, perfil):
+        if not re.match(r"^https://www\.evidentia\.cloud/2024/profiles/view/\d+$", perfil):
+            raise ValueError("Perfil debe comenzar con https://www.evidentia.cloud/2024/profiles/view/ seguido de un número.")
+        return perfil
+
+    @validates('participacion')
+    def validate_participacion(self, key, participacion):
+        valid_types = ["ORGANIZATION", "INTERMEDIATE", "ASSISTANCE"]
+        if participacion not in valid_types:
+            raise ValueError(f"Participación no válida. Debe ser uno de: {', '.join(valid_types)}.")
+        return participacion
+
+    @validates('comite')
+    def validate_comite(self, key, comite):
+        if comite is None:
+            return comite # Comité es opcional        
+        valid_comites = {"Presidencia", "Secretaría", "Programa", "Igualdad", "Sostenibilidad", "Finanzas", "Logística", "Comunicación"}
+        # Usar `split` y eliminar elementos vacíos
+        comite_list = [c.strip() for c in comite.split(" | ") if c.strip()]
+        if not set(comite_list).issubset(valid_comites):
+            raise ValueError("Comité no válido.")
+        # Unir la lista filtrada en caso de que haya espacios extra
+        return " | ".join(comite_list)
+    
+    @classmethod
+    def from_excel_row(cls, row):
+        def to_float(value):
+            return float(value) if pd.notnull(value) else None
+
+        def to_int(value):
+            return int(value) if pd.notnull(value) else None
+
+        return cls(
+            apellidos=row["Apellidos"],
+            nombre=row["Nombre"],
+            uvus=row["Uvus"],
+            correo=row["Correo"],
+            perfil=row["Perfil"],
+            participacion=row["Participación"],
+            comite=row["Comité"] if pd.notnull(row["Comité"]) else None,
+            evidencia_aleatoria=to_float(row["Evidencia aleatoria"]),
+            horas_de_evidencia_aleatoria=to_float(row["Horas de evidencia aleatoria"]),
+            eventos_asistidos=to_int(row["Eventos asistidos"]),
+            horas_de_asistencia=to_float(row["Horas de asistencia"]),
+            reuniones_asistidas=to_int(row["Reuniones asistidas"]),
+            horas_de_reuniones=to_float(row["Horas de reuniones"]),
+            bono_de_horas=to_float(row["Bono de horas"]),
+            evidencias_registradas=to_int(row["Evidencias registradas"]),
+            horas_de_evidencias=to_float(row["Horas de evidencias"]),
+            horas_en_total=to_float(row["Horas en total"]),
+            file_path=generate_file_path(row["Uvus"])
+        )
+    
+ # método para generar la ruta del diploma
+def generate_file_path(uvus):
+    random_str = ''.join(random.choices(string.ascii_letters + string.digits, k=10))
+    return f"diplomas/{uvus}_{random_str}.pdf"
+        
+# función realizará la validación de la estructura del archivo y los datos específicos de cada campo. Si se detecta algún error, 
+# lanzará una excepción y no guardará los datos.
+def validate_and_save_excel(file):
+    try:
+        df = pd.read_excel(file)
+        print("Archivo Excel leído exitosamente.")
+    except Exception as e:
+        print("Error al leer el archivo Excel:", e)
+        raise ValidationError("Error reading the Excel file. Please make sure it's a valid .xlsx file.")
+
+    # Verifica que las columnas coincidan
+    expected_columns = [
+        "Apellidos", "Nombre", "Uvus", "Correo", "Perfil", "Participación", "Comité",
+        "Evidencia aleatoria", "Horas de evidencia aleatoria", "Eventos asistidos",
+        "Horas de asistencia", "Reuniones asistidas", "Horas de reuniones", "Bono de horas",
+        "Evidencias registradas", "Horas de evidencias", "Horas en total"
+    ]
+
+    if list(df.columns) != expected_columns:
+        print("Estructura de columnas en el archivo:", df.columns)
+        raise ValidationError("Excel columns do not match the expected structure.")
+
+    # Verificar unicidad de 'uvus', 'correo' y 'perfil'
+    unique_uvus = set()
+    unique_correos = set()
+    unique_perfiles = set()
+    records = []
+
+    for index, row in df.iterrows():
+        # Validar UVUS, Correo y Perfil
+        if row["Uvus"] in unique_uvus:
+            raise ValidationError(f"Duplicated UVUS found in row {index + 1}.")
+        if row["Correo"] in unique_correos:
+            raise ValidationError(f"Duplicated email found in row {index + 1}.")
+        if row["Perfil"] in unique_perfiles:
+            raise ValidationError(f"Duplicated profile found in row {index + 1}.")
+
+        unique_uvus.add(row["Uvus"])
+        unique_correos.add(row["Correo"])
+        unique_perfiles.add(row["Perfil"])
+
+        # Crear instancia de Diploma desde la fila actual
+        try:
+            diploma = Diploma.from_excel_row(row)
+            records.append(diploma)
+        except Exception as e:
+            print(f"Error al crear Diploma en la fila {index + 1}: {e}")
+            raise ValidationError(f"Error in row {index + 1}: {e}")
+
+    # Guardar todos los registros en una transacción
+    try:
+        db.session.bulk_save_objects(records)
+        db.session.commit()
+        print("Datos guardados exitosamente en la base de datos.")
+        try:
+            generate_all_pdfs()
+        except Exception as e:
+            print("Error al generar los PDFs:", e)
+            raise ValidationError("Error generating PDFs. Please try again.")
+    except IntegrityError as e:
+        db.session.rollback()
+        print("Error de integridad al guardar los datos:", e)
+        raise ValidationError("Error saving data. Ensure all records are unique.")
+    except Exception as e:
+        db.session.rollback()
+        print("Error inesperado al guardar los datos:", e)
+        raise ValidationError("An error occurred while saving data to the database.")
+    
+# función para generar un diploma en PDF
+def generate_pdf(diploma):
+    # crea la ruta de la carpeta donde se guardarán los diplomas
+    folder_path = os.path.join(current_app.root_path, "..", "diplomas")
+    folder_path = os.path.abspath(folder_path)
+    if not os.path.exists(folder_path):
+        os.makedirs(folder_path, exist_ok=True)
+    file_path = os.path.join(folder_path, os.path.basename(diploma.file_path))
+    # crear el PDF
+    c = canvas.Canvas(file_path)
+    c.drawString(100, 750, "¡Enhorabuena!")
+    c.drawString(100, 730, f"{diploma.nombre} {diploma.apellidos}")
+    c.save()
+
+# función para generar los PDFs para todos los diplomas
+def generate_all_pdfs():
+    diplomas = Diploma.query.all()
+    for diploma in diplomas:
+        generate_pdf(diploma)

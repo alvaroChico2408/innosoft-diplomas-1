@@ -24,3 +24,6 @@ sqlite3.*
 
 # Profile images
 /accounts/static/assets/profile/
+
+# Diplomas
+diplomas/

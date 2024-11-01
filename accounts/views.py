@@ -1,15 +1,18 @@
-import os
 import re
-import typing as t
 
 from http import HTTPStatus
 from datetime import timedelta
 from werkzeug.exceptions import InternalServerError
-from werkzeug.utils import secure_filename
 
 from flask import Blueprint, Response
 from flask import abort, current_app, render_template, request, redirect, url_for, flash
 from flask_login import current_user, login_required, login_user, logout_user
+from wtforms import ValidationError
+
+from .extensions import database as db 
+
+from reportlab.lib.pagesizes import A4
+from accounts.forms import EnterExcelHours
 
 from accounts.decorators import authentication_redirect, guest_user_exempt
 from accounts.email_utils import (
@@ -17,7 +20,7 @@ from accounts.email_utils import (
     send_reset_email,
 )
 from accounts.extensions import database as db
-from accounts.models import User
+from accounts.models import User, validate_and_save_excel
 from accounts.forms import (
     RegisterForm,
     LoginForm,
@@ -64,6 +67,7 @@ def login_guest_user() -> Response:
     return abort(HTTPStatus.NOT_FOUND)
 
 
+
 @accounts.route("/register", methods=["GET", "POST"])
 @authentication_redirect
 def register() -> Response:
@@ -106,6 +110,7 @@ def register() -> Response:
         return redirect(url_for("accounts.login"))
 
     return render_template("register.html", form=form)
+
 
 
 @accounts.route("/login", methods=["GET", "POST"])
@@ -153,6 +158,7 @@ def login() -> Response:
         return redirect(url_for("accounts.login"))
 
     return render_template("login.html", form=form)
+
 
 
 @accounts.route("/account/confirm", methods=["GET", "POST"])
@@ -206,6 +212,7 @@ def confirm_account() -> Response:
     return abort(HTTPStatus.NOT_FOUND)
 
 
+
 @accounts.route("/logout", methods=["GET", "POST"])
 @login_required
 def logout() -> Response:
@@ -220,6 +227,7 @@ def logout() -> Response:
 
     flash("You're logout successfully.", "success")
     return redirect(url_for("accounts.login"))
+
 
 
 @accounts.route("/forgot/password", methods=["GET", "POST"])
@@ -255,6 +263,7 @@ def forgot_password() -> Response:
         return redirect(url_for("accounts.forgot_password"))
 
     return render_template("forgot_password.html", form=form)
+
 
 
 @accounts.route("/password/reset", methods=["GET", "POST"])
@@ -322,6 +331,7 @@ def reset_password() -> Response:
     return abort(HTTPStatus.NOT_FOUND)
 
 
+
 @accounts.route("/change/password", methods=["GET", "POST"])
 @login_required
 @guest_user_exempt
@@ -383,6 +393,7 @@ def change_password() -> Response:
     return render_template("change_password.html", form=form)
 
 
+
 @accounts.route("/change/email", methods=["GET", "POST"])
 @login_required
 @guest_user_exempt
@@ -434,6 +445,7 @@ def change_email() -> Response:
     return render_template("change_email.html", form=form)
 
 
+
 @accounts.route("/account/email/confirm", methods=["GET", "POST"])
 def confirm_email() -> Response:
     """
@@ -481,6 +493,7 @@ def confirm_email() -> Response:
     return abort(HTTPStatus.NOT_FOUND)
 
 
+
 @accounts.route("/")
 @accounts.route("/home")
 @login_required
@@ -491,6 +504,7 @@ def index() -> Response:
     :return: Renders the `index.html` template.
     """
     return render_template("index.html")
+
 
 
 @accounts.route("/profile", methods=["GET", "POST"])
@@ -553,22 +567,27 @@ def profile() -> Response:
     return render_template("profile.html", form=form)
 
 
+
 @accounts.route('/generate_diplomas', methods=['GET', 'POST'])
-def generate_diplomas():
-    form = EnterExcelHours()
-    if form.validate_on_submit():
-        file = form.hours_excel.data
-        if file:
-            filename = secure_filename(file.filename)
-            upload_path = os.path.join('uploads', filename)
-            #file.save(upload_path)
-            flash("Archivo subido exitosamente", "success")
-            return redirect(url_for('accounts.index'))
-    return render_template('generate_diplomas.html', form=form)
-
-
-@accounts.route("/choose_send_diploomas", methods=["GET", "POST"])
 @login_required
-def choose_send_diplomas() -> Response:
+def generate_diplomas():
+    form_excel = EnterExcelHours()
+    if form_excel.validate_on_submit():
+        file = form_excel.hours_excel.data
+        if file:
+            try:
+                validate_and_save_excel(file)
+                flash("Excel file processed and diplomas generated successfully.", "success")
+            except ValidationError as e:
+                flash(str(e), "error")
+            except Exception as e:
+                flash(f"An unexpected error occurred: {str(e)}", "error")
+    return render_template('generate_diplomas.html', form=form_excel)
+
+
+
+@accounts.route("/choose_send_diplomas", methods=["GET", "POST"])
+@login_required
+def choose_send_diplomas():
     return render_template("choose_send_diplomas.html")
 

@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% from 'bootstrap5/utils.html' import render_messages %}
 {% block title %}Select Excel{% endblock %}
 
 {% block body %}
@@ -14,13 +15,14 @@
 
     <!-- Container for the form, vertically centered -->
     <div class="container my-auto">
+        {{ render_messages(dismissible=True, dismiss_animate=True) }}
         <div class="card shadow-sm border-0 rounded-lg">
             <div class="card-body text-center">
                 <form action="{{ url_for('accounts.generate_diplomas') }}" method="POST" enctype="multipart/form-data">
                     {{ form.csrf_token }}
                     <div class="form-group">
                         <label for="hours_excel" class="form-label font-weight-bold">Select Excel File</label>
-                        <div class="col-md-6 mx-auto"> <!-- Adjust width here -->
+                        <div class="col-md-6 mx-auto"> 
                             {{ form.hours_excel(class="form-control") }}
                         </div>
                         {% if form.hours_excel.errors %}

@@ -1,6 +1,8 @@
 import re
 
 from wtforms import ValidationError
+import pandas as pd
+
 
 
 class Unique(object):
@@ -20,6 +22,7 @@ class Unique(object):
             raise ValidationError(self.message)
 
 
+
 class StrongNames(object):
     """
     Validator that checks if a field contains only alphabetic characters.
@@ -33,6 +36,7 @@ class StrongNames(object):
     def __call__(self, form, field):
         if not re.match("^[a-zA-Z]+$", field.data):
             raise ValidationError(self.message)
+
 
 
 class StrongUsername(object):
@@ -51,6 +55,7 @@ class StrongUsername(object):
         username = field.data
         if not re.match("^[a-zA-Z0-9_.-]+$", username):
             raise ValidationError(self.message)
+
 
 
 class StrongPassword(object):
