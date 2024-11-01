@@ -2,6 +2,7 @@ import os
 import re
 import random
 import string
+import shutil
 import typing as t
 import pandas as pd
 
@@ -12,10 +13,10 @@ from sqlalchemy import event, or_
 from sqlalchemy.engine import Connection
 from sqlalchemy.orm import Mapper
 from sqlalchemy.ext.declarative import DeclarativeMeta
-from accounts.extensions import database as db
 from sqlalchemy.orm import validates
 from sqlalchemy.exc import IntegrityError
 from wtforms import ValidationError
+from reportlab.pdfgen import canvas
 
 from werkzeug.exceptions import InternalServerError, HTTPException
 from werkzeug.security import (
@@ -23,7 +24,7 @@ from werkzeug.security import (
     generate_password_hash,
 )
 
-from flask import url_for
+from flask import url_for, current_app
 from flask_login.mixins import UserMixin
 
 from accounts.extensions import database as db
@@ -516,6 +517,11 @@ def validate_and_save_excel(file):
         db.session.bulk_save_objects(records)
         db.session.commit()
         print("Datos guardados exitosamente en la base de datos.")
+        try:
+            generate_all_pdfs()
+        except Exception as e:
+            print("Error al generar los PDFs:", e)
+            raise ValidationError("Error generating PDFs. Please try again.")
     except IntegrityError as e:
         db.session.rollback()
         print("Error de integridad al guardar los datos:", e)
@@ -524,3 +530,23 @@ def validate_and_save_excel(file):
         db.session.rollback()
         print("Error inesperado al guardar los datos:", e)
         raise ValidationError("An error occurred while saving data to the database.")
+    
+# función para generar un diploma en PDF
+def generate_pdf(diploma):
+    # crea la ruta de la carpeta donde se guardarán los diplomas
+    folder_path = os.path.join(current_app.root_path, "..", "diplomas")
+    folder_path = os.path.abspath(folder_path)
+    if not os.path.exists(folder_path):
+        os.makedirs(folder_path, exist_ok=True)
+    file_path = os.path.join(folder_path, os.path.basename(diploma.file_path))
+    # crear el PDF
+    c = canvas.Canvas(file_path)
+    c.drawString(100, 750, "¡Enhorabuena!")
+    c.drawString(100, 730, f"{diploma.nombre} {diploma.apellidos}")
+    c.save()
+
+# función para generar los PDFs para todos los diplomas
+def generate_all_pdfs():
+    diplomas = Diploma.query.all()
+    for diploma in diplomas:
+        generate_pdf(diploma)
