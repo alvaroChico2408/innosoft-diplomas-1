@@ -1,5 +1,7 @@
 import os
 import re
+import random
+import string
 import typing as t
 import pandas as pd
 
@@ -393,6 +395,7 @@ class Diploma(db.Model):
     evidencias_registradas = db.Column(db.Integer, nullable=True)
     horas_de_evidencias = db.Column(db.Float, nullable=True)
     horas_en_total = db.Column(db.Float, nullable=True)
+    file_path = db.Column(db.String(255), unique=True, nullable=False)
 
     @validates('correo')
     def validate_correo(self, key, correo):
@@ -424,7 +427,7 @@ class Diploma(db.Model):
             raise ValueError("Comité no válido.")
         # Unir la lista filtrada en caso de que haya espacios extra
         return " | ".join(comite_list)
-
+    
     @classmethod
     def from_excel_row(cls, row):
         def to_float(value):
@@ -451,7 +454,13 @@ class Diploma(db.Model):
             evidencias_registradas=to_int(row["Evidencias registradas"]),
             horas_de_evidencias=to_float(row["Horas de evidencias"]),
             horas_en_total=to_float(row["Horas en total"]),
+            file_path=generate_file_path(row["Uvus"])
         )
+    
+ # método para generar la ruta del diploma
+def generate_file_path(uvus):
+    random_str = ''.join(random.choices(string.ascii_letters + string.digits, k=10))
+    return f"diplomas/{uvus}_{random_str}.pdf"
         
 # función realizará la validación de la estructura del archivo y los datos específicos de cada campo. Si se detecta algún error, 
 # lanzará una excepción y no guardará los datos.
