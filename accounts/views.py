@@ -20,7 +20,7 @@ from accounts.email_utils import (
     send_reset_email,
 )
 from accounts.extensions import database as db
-from accounts.models import User, validate_and_save_excel
+from accounts.models import User, validate_and_save_excel, Diploma
 from accounts.forms import (
     RegisterForm,
     LoginForm,
@@ -589,5 +589,6 @@ def generate_diplomas():
 @accounts.route("/choose_send_diplomas", methods=["GET", "POST"])
 @login_required
 def choose_send_diplomas():
-    return render_template("choose_send_diplomas.html")
+    todos_los_diplomas = Diploma.query.all()
+    return render_template('choose_send_diplomas.html', diplomas=todos_los_diplomas)
 

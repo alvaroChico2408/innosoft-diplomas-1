@@ -1,19 +1,64 @@
 {% extends "base.html" %}
-{% from 'bootstrap5/utils.html' import render_messages %}
 {% block title %}Choose and Send Diplomas{% endblock %}
 
 {% block body %}
-
 <div class="container my-4">
     <div class="card shadow-sm border-0">
         <div class="row justify-content-center">
             <div class="col-md-9 col-lg-9">
                 <div class="p-4 text-center">
                     <h1>🔍📩 Choose and Send Diplomas 📩🔍</h1>
+                    <button class="btn btn-primary my-3" onclick="toggleSelectAll()">Seleccionar Todo</button>
+                </div>
+                <style>
+                    td {
+                        text-align: center; /* Centra el contenido horizontalmente */
+                        vertical-align: middle; /* Centra el contenido verticalmente */
+                    }
+
+                    input[type="checkbox"] {
+                        transform: scale(1.2); /* Opcional: Ajusta el tamaño del checkbox */
+                    }
+                </style>
+                <div class="p-4">
+                    <table class="table table-bordered table-striped" style="background-color: #ffffff; color: #000000;">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Nombre</th>
+                                <th>Apellidos</th>
+                                <th>Correo</th>
+                                <th>UVUS</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for diploma in diplomas %}
+                                <tr>
+                                    <td>{{ diploma.id }}</td>
+                                    <td>{{ diploma.nombre }}</td>
+                                    <td>{{ diploma.apellidos }}</td>
+                                    <td>{{ diploma.correo }}</td>
+                                    <td>{{ diploma.uvus }}</td>
+                                    <td>
+                                        <input type="checkbox" name="select_diploma" value="{{ diploma.id }}">
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>
     </div>
 </div>
 
+<!-- JavaScript para seleccionar o deseleccionar todas las casillas -->
+<script>
+    function toggleSelectAll() {
+        const checkboxes = document.querySelectorAll('input[name="select_diploma"]');
+        const allChecked = Array.from(checkboxes).every(checkbox => checkbox.checked);
+        checkboxes.forEach(checkbox => checkbox.checked = !allChecked);
+    }
+</script>
 {% endblock %}
