@@ -31,11 +31,15 @@ def upgrade():
     )
     op.create_table('user',
     sa.Column('id', sa.Integer(), nullable=False),
-    sa.Column('email', sa.String(length=256), nullable=True),
+    sa.Column('username', sa.String(length=30), nullable=False, unique=True),
+    sa.Column('first_name', sa.String(length=25), nullable=False),
+    sa.Column('last_name', sa.String(length=25), nullable=False),
+    sa.Column('email', sa.String(length=120), nullable=False, unique=True),
     sa.Column('password', sa.String(length=256), nullable=False),
-    sa.Column('created_at', sa.DateTime(), nullable=False),
-    sa.Column('active', sa.Boolean(), nullable=False),
+    sa.Column('active', sa.Boolean(), nullable=False, server_default="0"),
+    sa.Column('change_email', sa.String(length=120), nullable=True, default=""),
     sa.PrimaryKeyConstraint('id'),
+    sa.UniqueConstraint('username'),
     sa.UniqueConstraint('email')
     )
     op.create_table('webhook',
