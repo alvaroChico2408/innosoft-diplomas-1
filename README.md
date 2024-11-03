@@ -1,45 +1,51 @@
-# Proceso para desplegarlo en local.
+<div align="center">
 
-## 1. Crear un entorno virtual.
+  <a href="">[![Pytest Testing Suite](https://github.com/drorganvidez/flask_base/actions/workflows/tests.yml/badge.svg?branch=main)](https://github.com/drorganvidez/flask_base/actions/workflows/tests.yml)</a>
+  <a href="">[![Commits Syntax Checker](https://github.com/drorganvidez/flask_base/actions/workflows/commits.yml/badge.svg?branch=main)](https://github.com/drorganvidez/flask_base/actions/workflows/commits.yml)</a>
+  
+</div>
 
-```bash
-python3 -m venv venv
+# flask_boilerplate
+
+Base project to work with the Python Flask framework in an easy way.
+
+## Set `.env` file in root with:
+
+Create an `.env` file in the root of the project with this information.
+
+```
+cp .env.docker.example .env
 ```
 
-## 2. Activar el entorno virtual.
+## Deploy in develop
 
-```bash
-source venv/bin/activate
+To deploy the software under development environment, run:
+
+```
+docker compose -f docker/docker-compose.dev.yml up -d 
 ```
 
-Para ejecutar este proyecto localmente, hay que crear el `.env` en el directorio base y configurar las variables de entorno.
+This will apply the migrations to the database and run the Flask application. Open `http://localhost` to play with your fantastic app!
 
-## 3. Instalar el paquete de dependencias.
+### Migrations
 
-```bash
-pip install -r requirements.txt
+However, if during development there are new changes in the model, run inside the `web_app_container` container:
+
 ```
-
-## 4. Migrar/crear base de datos.
-
-Inicializa el directorio de migraciones de la base de datos.
-
-```bash
-flask db init
-```
-
-Actualiza la base de datos con la última migración.
-
-```bash
+flask db migrate
 flask db upgrade
 ```
 
-## 5. Finalmente, ejecutar el servidor.
+### Tests
 
-Una vez que la base de datos esté configurada, puedes iniciar el servidor Flask para comenzar a usar la aplicación..
+To run unit test, please enter inside `web_app_container` container:
 
-```bash
-flask run
+```
+rosemary test
 ```
 
-Para acceder a esta aplicación, abre `http://localhost:5000`
+## Deploy in production (Docker Compose)
+
+```
+docker compose -f docker/docker-compose.prod.yml up -d 
+```
