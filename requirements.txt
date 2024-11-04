@@ -36,3 +36,5 @@ WTForms==3.0.1
 pandas
 reportlab
 openpyxl
+
+PyPDF2
