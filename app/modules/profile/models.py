@@ -21,12 +21,22 @@ class UserProfile(db.Model):
     __tablename__ = "user_profile"
 
     id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.String(38), db.ForeignKey("user.id", ondelete="CASCADE"), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey("user.id", ondelete="CASCADE"), nullable=False)
     name = db.Column(db.String(100), nullable=False)
     bio = db.Column(db.String(200), default="")
     surname = db.Column(db.String(100), nullable=False)
     avator = db.Column(db.String(250), default="")
-    user = db.Relationship("User", foreign_keys=[user_id])
+    user = db.relationship("User", foreign_keys=[user_id])
+
+
+    def save(self):
+            db.session.add(self)
+            db.session.commit()
+
+    def delete(self):
+        db.session.delete(self)
+        db.session.commit()
+        
 
     def set_avator(self, profile_image):
         """

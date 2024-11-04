@@ -60,6 +60,16 @@ class User(db.Model, UserMixin):
     created_at = db.Column(db.DateTime, default=datetime.now)
     updated_at = db.Column(db.DateTime, default=datetime.now, onupdate=datetime.now)
 
+
+    def save(self):
+            db.session.add(self)
+            db.session.commit()
+
+    def delete(self):
+        db.session.delete(self)
+        db.session.commit()
+        
+
     @classmethod
     def authenticate(
         cls, username: t.AnyStr = None, password: t.AnyStr = None
@@ -240,6 +250,16 @@ class UserSecurityToken(db.Model):
     updated_at = db.Column(db.DateTime, default=datetime.now, onupdate=datetime.now)
 
     user = db.relationship("User", foreign_keys=[user_id])
+
+
+    def save(self):
+            db.session.add(self)
+            db.session.commit()
+
+    def delete(self):
+        db.session.delete(self)
+        db.session.commit()
+        
 
     @classmethod
     def create_new(cls, **kwargs) -> t.AnyStr:
