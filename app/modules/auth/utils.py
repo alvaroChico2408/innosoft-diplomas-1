@@ -4,6 +4,7 @@ import secrets
 import os
 import uuid
 from werkzeug.utils import secure_filename
+from flask import current_app
 
 
 def unique_security_token() -> t.AnyStr:
@@ -47,3 +48,15 @@ def get_unique_filename(filename: t.Text = None) -> t.Text:
 
     filename = secure_filename(filename).split(".")
     return "{}.{}".format(str(uuid.uuid4()), filename[len(filename) - 1])
+
+
+def get_full_url(endpoint: str) -> str:
+    """
+    Construct a full url by combining the site `URL` from
+    configuration with a given endpoint.
+
+    Returns:
+        str: The full `URL`.
+    """
+    domain = current_app.config["SITE_URL"]
+    return "".join([domain, endpoint])

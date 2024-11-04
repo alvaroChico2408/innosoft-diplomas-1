@@ -198,15 +198,15 @@ class User(db.Model, UserMixin):
 
         return None
 
-    '''
+    
     def send_confirmation(self):
         """
         Sends user's account confirmation email.
         """
-        from accounts.email_utils import send_confirmation_mail
+        from app.modules.confirmemail.utils import send_confirmation_mail
 
         send_confirmation_mail(self)
-    '''
+    
 
     @property
     def is_active(self) -> bool:

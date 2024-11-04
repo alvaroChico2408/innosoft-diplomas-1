@@ -1,6 +1,6 @@
 {% extends "base_template.html" %}
 
-{% block title %}Sign up{% endblock %}
+{% block title %}Sign Up{% endblock %}
 
 {% block content %}
 
@@ -26,9 +26,9 @@
 
                     <div class="col-md-6 col-lg-6 col-xs-12">
                         <div class="mb-3">
-                            {{ form.name.label(class="form-label") }} *
-                            {{ form.name(class="form-control",placeholder="Enter name") }}
-                            {% for error in form.name.errors %}
+                            {{ form.username.label(class="form-label") }} *
+                            {{ form.username(class="form-control", placeholder="Enter username") }}
+                            {% for error in form.username.errors %}
                                 <span style="color: red;">{{ error }}</span>
                             {% endfor %}
                         </div>
@@ -40,14 +40,27 @@
 
                     <div class="col-md-6 col-lg-6 col-xs-12">
                         <div class="mb-3">
-                            {{ form.surname.label(class="form-label") }} *
-                            {{ form.surname(class="form-control",placeholder="Enter surname") }}
-                            {% for error in form.surname.errors %}
+                            {{ form.first_name.label(class="form-label") }} *
+                            {{ form.first_name(class="form-control", placeholder="Enter first name") }}
+                            {% for error in form.first_name.errors %}
                                 <span style="color: red;">{{ error }}</span>
                             {% endfor %}
                         </div>
                     </div>
 
+                </div>
+
+                <div class="row">
+
+                    <div class="col-md-6 col-lg-6 col-xs-12">
+                        <div class="mb-3">
+                            {{ form.last_name.label(class="form-label") }} *
+                            {{ form.last_name(class="form-control", placeholder="Enter last name") }}
+                            {% for error in form.last_name.errors %}
+                                <span style="color: red;">{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    </div>
 
                 </div>
 
@@ -56,7 +69,7 @@
                     <div class="col-md-6 col-lg-6 col-xs-12">
                         <div class="mb-3">
                             {{ form.email.label(class="form-label") }}
-                            {{ form.email(class="form-control",placeholder="Enter email") }}
+                            {{ form.email(class="form-control", placeholder="Enter email") }}
                             {% for error in form.email.errors %}
                                 <span style="color: red;">{{ error }}</span>
                             {% endfor %}
@@ -65,13 +78,12 @@
 
                 </div>
 
-
                 <div class="row">
 
                     <div class="col-md-6 col-lg-6 col-xs-12">
                         <div class="mb-3">
                             {{ form.password.label(class="form-label") }}
-                            {{ form.password(class="form-control",placeholder="Enter password") }}
+                            {{ form.password(class="form-control", placeholder="Enter password") }}
                             {% for error in form.password.errors %}
                                 <span style="color: red;">{{ error }}</span>
                             {% endfor %}
@@ -108,13 +120,12 @@
 
                     <div class="mt-3">
                         <div class="col-lg-6 col-12">
-                            Already an account? <a href="{{ url_for('auth.login') }}">Login</a>
+                            Already have an account? <a href="{{ url_for('auth.login') }}">Login</a>
                         </div>
                     </div>
 
                     <div class="mt-3">
                         <div class="col-lg-6 col-12">
-
                             Forgot your password? <a href="{{ url_for('reset.forgot') }}">Click here!</a>
                         </div>
                     </div>

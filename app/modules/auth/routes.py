@@ -1,13 +1,14 @@
-from flask import flash, render_template, redirect, url_for, request
+from flask import flash, render_template, redirect, url_for, request, Response
 from flask_login import current_user, logout_user
 from pymysql import IntegrityError
 
 from app.modules.auth import auth_bp
-from app.modules.auth.decorators import guest_required
+from app.modules.auth.decorators import guest_required, authentication_redirect
 from app.modules.auth.forms import SignupForm, LoginForm
 from app.modules.auth.services import AuthenticationService
 from app.modules.confirmemail.services import ConfirmemailService
 from app.modules.profile.services import UserProfileService
+from app.modules.auth.models import User
 
 from app import db
 
@@ -15,7 +16,7 @@ authentication_service = AuthenticationService()
 user_profile_service = UserProfileService()
 confirmemail_service = ConfirmemailService()
 
-
+'''
 @auth_bp.route("/signup/", methods=["GET", "POST"])
 def show_signup_form():
     if current_user.is_authenticated:
@@ -44,6 +45,55 @@ def show_signup_form():
         return redirect(url_for("public.index"))
 
     return render_template("auth/signup_form.html", form=form)
+'''
+@auth_bp.route("/signup", methods=["GET", "POST"])
+@authentication_redirect
+def show_signup_form() -> Response:
+    """
+    Handling user registration.
+    If the user is already authenticated, they are redirected to the index page.
+
+    This view handles both GET and POST requests:
+    - GET: Renders the registration form and template.
+    - POST: Processes the registration form, creates a new user, and sends a confirmation email.
+
+    :return: Renders the registration template on GET request
+    or redirects to login after successful registration.
+
+    """
+
+    if current_user.is_authenticated:
+        return redirect(url_for('public.index'))
+    
+    form = SignupForm()
+
+    if form.validate_on_submit():
+        username = form.data.get("username")
+        first_name = form.data.get("first_name")
+        last_name = form.data.get("last_name")
+        email = form.data.get("email")
+        password = form.data.get("password")
+
+        # Attempt to create a new user and save to the database.
+        user = User.create(
+            username=username,
+            first_name=first_name,
+            last_name=last_name,
+            email=email,
+            password=password,
+        )
+
+        # Sends account confirmation mail to the user.
+        user.send_confirmation()
+
+        flash(
+            "A confirmation link sent to your email. Please verify your account.",
+            "success",
+        )
+        return redirect(url_for("auth/login_form.html"))
+
+    return render_template("auth/signup_form.html", form=form)
+
 
 
 @auth_bp.route('/login', methods=['GET', 'POST'])
