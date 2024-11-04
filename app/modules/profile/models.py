@@ -26,7 +26,9 @@ class UserProfile(db.Model):
     bio = db.Column(db.String(200), default="")
     surname = db.Column(db.String(100), nullable=False)
     avator = db.Column(db.String(250), default="")
-    user = db.relationship("User", foreign_keys=[user_id])
+
+    user = db.relationship("User", backref="profile", foreign_keys=[user_id])
+    #user = db.relationship("User", foreign_keys=[user_id])
 
 
     def save(self):

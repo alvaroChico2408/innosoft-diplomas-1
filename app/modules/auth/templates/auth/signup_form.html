@@ -19,7 +19,7 @@
                 {% endif %}
             {% endwith %}
 
-            <form action="" method="post" novalidate>
+            <form action="{{ url_for('auth.show_signup_form') }}" method="post" novalidate>
                 {{ form.hidden_tag() }}
 
                 <div class="row">

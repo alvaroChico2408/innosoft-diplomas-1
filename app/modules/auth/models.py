@@ -54,7 +54,7 @@ class User(db.Model, UserMixin):
     last_name = db.Column(db.String(25), nullable=False)
     email = db.Column(db.String(120), unique=True, nullable=False)
     password = db.Column(db.String(256), nullable=False)
-    profile = db.relationship('UserProfile', backref='user', uselist=False)
+    #profile = db.relationship('UserProfile', backref='user', uselist=False)
     active = db.Column(db.Boolean, default=False, nullable=False, server_default="0")
     change_email = db.Column(db.String(120), default="")
     created_at = db.Column(db.DateTime, default=datetime.now)

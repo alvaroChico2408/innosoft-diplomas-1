@@ -61,19 +61,20 @@ def show_signup_form() -> Response:
     or redirects to login after successful registration.
 
     """
-
+    
     if current_user.is_authenticated:
         return redirect(url_for('public.index'))
-    
     form = SignupForm()
-
+    print(form.data)
+    print(form.errors)
+    print("----")
+    print(form.validate_on_submit())
     if form.validate_on_submit():
         username = form.data.get("username")
         first_name = form.data.get("first_name")
         last_name = form.data.get("last_name")
         email = form.data.get("email")
         password = form.data.get("password")
-
         # Attempt to create a new user and save to the database.
         user = User.create(
             username=username,

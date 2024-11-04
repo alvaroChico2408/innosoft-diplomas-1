@@ -1,8 +1,5 @@
 import os
-
-from flask_login import login_user
-from flask_login import current_user
-
+from flask_login import login_user, current_user
 from app.modules.auth.models import User
 from app.modules.auth.repositories import UserRepository
 from app.modules.profile.models import UserProfile
@@ -31,32 +28,36 @@ class AuthenticationService(BaseService):
         try:
             email = kwargs.pop("email", None)
             password = kwargs.pop("password", None)
-            name = kwargs.pop("name", None)
-            surname = kwargs.pop("surname", None)
+            first_name = kwargs.pop("first_name", None)
+            last_name = kwargs.pop("last_name", None)
 
             if not email:
                 raise ValueError("Email is required.")
             if not password:
                 raise ValueError("Password is required.")
-            if not name:
-                raise ValueError("Name is required.")
-            if not surname:
-                raise ValueError("Surname is required.")
+            if not first_name:
+                raise ValueError("First name is required.")
+            if not last_name:
+                raise ValueError("Last name is required.")
 
             user_data = {
                 "email": email,
                 "password": password,
+                "first_name": first_name,
+                "last_name": last_name,
                 "active": False,
             }
 
-            profile_data = {
-                "name": name,
-                "surname": surname,
-            }
+            user = self.repository.create(**user_data)
 
-            user = self.create(commit=False, **user_data)
-            profile_data["user_id"] = user.id
+            # Create the profile associated with the user
+            profile_data = {
+                "user_id": user.id,
+                "name": first_name,
+                "surname": last_name,
+            }
             self.user_profile_repository.create(**profile_data)
+
             self.repository.session.commit()
         except Exception as exc:
             self.repository.session.rollback()
@@ -65,7 +66,7 @@ class AuthenticationService(BaseService):
 
     def update_profile(self, user_profile_id, form):
         if form.validate():
-            updated_instance = self.update(user_profile_id, **form.data)
+            updated_instance = self.user_profile_repository.update(user_profile_id, **form.data)
             return updated_instance, None
 
         return None, form.errors
@@ -76,7 +77,7 @@ class AuthenticationService(BaseService):
         return None
 
     def get_authenticated_user_profile(self) -> UserProfile | None:
-        if current_user.is_authenticated:
+        if current_user.is_authenticated and current_user.profile:
             return current_user.profile
         return None
 
