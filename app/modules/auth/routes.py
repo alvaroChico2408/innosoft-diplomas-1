@@ -65,10 +65,6 @@ def show_signup_form() -> Response:
     if current_user.is_authenticated:
         return redirect(url_for('public.index'))
     form = SignupForm()
-    print(form.data)
-    print(form.errors)
-    print("----")
-    print(form.validate_on_submit())
     if form.validate_on_submit():
         username = form.data.get("username")
         first_name = form.data.get("first_name")
@@ -85,14 +81,6 @@ def show_signup_form() -> Response:
         )
 
         # Sends account confirmation mail to the user.
-        user.send_confirmation()
-
-        flash(
-            "A confirmation link sent to your email. Please verify your account.",
-            "success",
-        )
-        return redirect(url_for("auth/login_form.html"))
-
     return render_template("auth/signup_form.html", form=form)
 
 

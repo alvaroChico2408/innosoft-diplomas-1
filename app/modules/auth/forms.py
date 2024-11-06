@@ -54,9 +54,6 @@ class SignupForm(FlaskForm):
     password = PasswordField(
         "Password", validators=[DataRequired(), Length(8, 20), StrongPassword()]
     )
-    remember = BooleanField(
-        "I agree & accept all terms of services. ", validators=[DataRequired()]
-    )
     submit = SubmitField("Continue")
 
 class LoginForm(FlaskForm):
