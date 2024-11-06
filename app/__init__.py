@@ -30,6 +30,14 @@ def create_app(config_name='development'):
     # Load configuration according to environment
     config_manager = ConfigManager(app)
     config_manager.load_config(config_name=config_name)
+    
+    # Configuración del pool de conexiones
+    app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {
+        "pool_size": 5,          # Limita el número de conexiones persistentes
+        "max_overflow": 10,      # Conexiones adicionales temporales
+        "pool_timeout": 30,      # Tiempo de espera para obtener una conexión del pool
+        "pool_recycle": 1800     # Reciclaje de conexiones cada 30 minutos
+    }
 
     # Initialize SQLAlchemy and Migrate with the app
     db.init_app(app)
