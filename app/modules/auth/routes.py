@@ -1,4 +1,5 @@
-from flask import flash, render_template, redirect, url_for, request, Response
+from flask import flash, render_template, redirect, url_for, request, Response, abort
+from flask_login import login_user
 from flask_login import current_user, logout_user
 from pymysql import IntegrityError
 
@@ -9,6 +10,10 @@ from app.modules.auth.services import AuthenticationService
 from app.modules.confirmemail.services import ConfirmemailService
 from app.modules.profile.services import UserProfileService
 from app.modules.auth.models import User
+from datetime import timedelta
+from http import HTTPStatus
+
+
 
 from app import db
 
@@ -83,7 +88,7 @@ def show_signup_form() -> Response:
     return render_template("auth/signup_form.html", form=form)
 
 
-
+'''
 @auth_bp.route('/login', methods=['GET', 'POST'])
 @guest_required
 def login():
@@ -99,7 +104,32 @@ def login():
         return render_template("auth/login_form.html", form=form, error='Invalid credentials')
 
     return render_template('auth/login_form.html', form=form)
+'''
 
+@auth_bp.route("/login", methods=["GET", "POST"])
+@guest_required
+def login() -> Response:
+    """
+    Log in as a guest user with limited access.
+
+    :return: Redirects to the homepage on success or the login page on failure.
+    """
+    if request.method == "POST":
+        # Fetch the predefined guest user instance by username.
+        test_user = User.get_user_by_username(username="test_user")
+
+        if test_user:
+            # Log in the guest user with a session duration of (1 day) only.
+            login_user(test_user, remember=True, duration=timedelta(days=1))
+
+            flash("You are logged in as a Guest User.", "success")
+            return redirect(url_for("public.index"))
+
+        flash("Something went wront.", "error")
+        return redirect(url_for("auth.login"))
+
+    # Return a 404 error if accessed via GET
+    return abort(HTTPStatus.NOT_FOUND)
 
 @auth_bp.route('/logout')
 def logout():
