@@ -79,8 +79,7 @@ def show_signup_form() -> Response:
             email=email,
             password=password,
         )
-
-        # Sends account confirmation mail to the user.
+        return redirect(url_for("auth.login"))
     return render_template("auth/signup_form.html", form=form)
 
 
