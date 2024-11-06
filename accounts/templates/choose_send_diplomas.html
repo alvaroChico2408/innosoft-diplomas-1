@@ -2,63 +2,134 @@
 {% block title %}Choose and Send Diplomas{% endblock %}
 
 {% block body %}
-<div class="container my-4">
-    <div class="card shadow-sm border-0">
-        <div class="row justify-content-center">
-            <div class="col-md-9 col-lg-9">
-                <div class="p-4 text-center">
-                    <h1>🔍📩 Choose and Send Diplomas 📩🔍</h1>
-                    <button class="btn btn-primary my-3" onclick="toggleSelectAll()">Seleccionar Todo</button>
-                </div>
-                <style>
-                    td {
-                        text-align: center; /* Centra el contenido horizontalmente */
-                        vertical-align: middle; /* Centra el contenido verticalmente */
-                    }
-
-                    input[type="checkbox"] {
-                        transform: scale(1.2); /* Opcional: Ajusta el tamaño del checkbox */
-                    }
-                </style>
-                <div class="p-4">
-                    <table class="table table-bordered table-striped" style="background-color: #ffffff; color: #000000;">
-                        <thead>
-                            <tr>
-                                <th>ID</th>
-                                <th>Nombre</th>
-                                <th>Apellidos</th>
-                                <th>Correo</th>
-                                <th>UVUS</th>
-                                <th>Acciones</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for diploma in diplomas %}
-                                <tr>
-                                    <td>{{ diploma.id }}</td>
-                                    <td>{{ diploma.nombre }}</td>
-                                    <td>{{ diploma.apellidos }}</td>
-                                    <td>{{ diploma.correo }}</td>
-                                    <td>{{ diploma.uvus }}</td>
-                                    <td>
-                                        <input type="checkbox" name="select_diploma" value="{{ diploma.id }}">
-                                    </td>
-                                </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
+<div class="d-flex flex-column min-vh-100">
+    <!-- Container for the title -->
+    <div class="container my-4">
+        <div class="card shadow-sm border-0">
+            <div class="row justify-content-center">
+                <div class="col-md-9 col-lg-9">
+                    <div class="p-4 text-center">
+                        <h1 class="mb-5">🔍📩 Choose and Send Diplomas 📩🔍</h1>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div class="d-flex align-items-center">
+                                <input type="text" id="uvusFilter" placeholder="Filter by UVUS" class="form-control me-2" style="width: auto;">
+                                <button class="btn btn-secondary me-1" onclick="filter_by_UVUS()">FILTER</button>
+                                <button class="btn btn-warning" onclick="reset_filter_UVUS()">RESET</button>
+                            </div>
+                            <div class="d-flex">
+                                <button class="btn btn-success me-2" onclick="send_diplomas_selected()">SEND DIPLOMAS SELECTED</button>
+                                <button class="btn btn-primary me-2" onclick="select_all()">SELECT ALL</button>
+                                <button class="btn btn-danger" onclick="deselect_all()">DESELECT ALL</button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
+    </div>
+
+    <!-- Container for the table with the information and actions -->
+    <div class="p-4">
+        <table class="table table-bordered table-striped" style="background-color: #ffffff; color: #000000;">
+            <thead style="background-color: #484646; color: #ffffff; text-align: center;">
+                <tr>
+                    <th>ID</th>
+                    <th>NAME</th>
+                    <th>SURNAME</th>
+                    <th>EMAIL</th>
+                    <th>UVUS</th>
+                    <th>SELECT</th>
+                </tr>
+            </thead>
+            <tbody id="diplomaTableBody" style="text-align: center;">
+                {% for diploma in diplomas %}
+                    <tr>
+                        <td>{{ diploma.id }}</td>
+                        <td>{{ diploma.nombre }}</td>
+                        <td>{{ diploma.apellidos }}</td>
+                        <td>{{ diploma.correo }}</td>
+                        <td>{{ diploma.uvus }}</td>
+                        <td>
+                            <div class="d-flex justify-content-center align-items-center" style="height: 100%;">
+                                <input type="checkbox" name="select_diploma" value="{{ diploma.id }}">
+                            </div>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
     </div>
 </div>
 
 <!-- JavaScript para seleccionar o deseleccionar todas las casillas -->
 <script>
-    function toggleSelectAll() {
+    function select_all() {
         const checkboxes = document.querySelectorAll('input[name="select_diploma"]');
-        const allChecked = Array.from(checkboxes).every(checkbox => checkbox.checked);
-        checkboxes.forEach(checkbox => checkbox.checked = !allChecked);
+        checkboxes.forEach(checkbox => checkbox.checked = true);
+    }
+
+    function deselect_all() {
+        const checkboxes = document.querySelectorAll('input[name="select_diploma"]');
+        checkboxes.forEach(checkbox => checkbox.checked = false);
+    }
+
+    function filter_by_UVUS() {
+        const filterValue = document.getElementById('uvusFilter').value.toLowerCase().trim();
+        const rows = document.querySelectorAll('#diplomaTableBody tr');
+        
+        rows.forEach(row => {
+            const uvusCell = row.cells[4]; // Columna de UVUS
+            if (uvusCell) {
+                const uvusText = uvusCell.textContent.toLowerCase().trim();
+                // Mostrar solo las filas que coinciden exactamente con el filtro
+                row.style.display = uvusText === filterValue ? '' : 'none';
+            }
+        });
+    }
+
+    function reset_filter_UVUS() {
+        document.getElementById('uvusFilter').value = ''; // Limpiar el campo de entrada
+        const rows = document.querySelectorAll('#diplomaTableBody tr');
+        rows.forEach(row => {
+            row.style.display = ''; // Mostrar todas las filas
+        });
+    }
+
+    function send_diplomas_selected() {
+        console.log('Sending diplomas selected');
+        /*
+        const selectedDiplomas = [];
+    const checkboxes = document.querySelectorAll('input[name="select_diploma"]:checked');
+    checkboxes.forEach(checkbox => {
+        selectedDiplomas.push(checkbox.value);
+    });
+
+    if (selectedDiplomas.length === 0) {
+        alert('Please select at least one diploma to send.');
+        return;
+    }
+
+    // Enviar los IDs seleccionados al servidor
+    fetch('/send_diplomas', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ diploma_ids: selectedDiplomas })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert('Diplomas sent successfully!');
+        } else {
+            alert('There was an error sending diplomas.');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('There was an error sending diplomas.');
+    });
+        */
     }
 </script>
 {% endblock %}
