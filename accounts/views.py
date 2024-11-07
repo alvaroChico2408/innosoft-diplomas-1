@@ -619,6 +619,16 @@ def delete_diploma(diploma_id):
         try:
             diploma = Diploma.query.get(diploma_id)
             if diploma:
+                # borramos el diploma que se haya generado 
+                file_path = os.path.join(current_app.root_path, "..", "diplomas", os.path.basename(diploma.file_path))
+                if os.path.exists(file_path):
+                    try:
+                        os.remove(file_path)
+                        print(f"Deleted file: {file_path}")
+                    except Exception as file_error:
+                        print(f"Error deleting file: {file_error}")
+                        flash("The diploma entry was deleted, but the file could not be deleted.", "warning")
+                # borramos la info de la base de datos
                 db.session.delete(diploma)
                 db.session.commit()
                 flash("Diploma deleted successfully.", "success")
