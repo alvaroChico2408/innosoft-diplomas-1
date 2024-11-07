@@ -17,7 +17,7 @@
                             <div class="d-flex align-items-center">
                                 <input type="text" id="uvusFilter" placeholder="Filter by UVUS" class="form-control me-2" style="width: auto;">
                                 <button class="btn btn-secondary me-1" onclick="filter_by_UVUS()">FILTER</button>
-                                <button class="btn btn-warning" onclick="reset_filter_UVUS()">RESET</button>
+                                <button class="btn btn-warning me-5" onclick="reset_filter_UVUS()">RESET</button>
                             </div>
                             <div class="d-flex align-items-center">
                                 <span class="me-2">Filter by Participation:</span>
@@ -30,7 +30,7 @@
                         <div class="d-flex justify-content-center mt-4">
                             <button class="btn btn-success me-2" onclick="send_diplomas_selected()">SEND DIPLOMAS SELECTED</button>
                             <button class="btn btn-primary me-2" onclick="select_all()">SELECT ALL</button>
-                            <button class="btn btn-danger" onclick="deselect_all()">DESELECT ALL</button>
+                            <button class="btn btn-secondary" onclick="deselect_all()">DESELECT ALL</button>
                         </div>
                     </div>
                 </div>
@@ -49,6 +49,7 @@
                     <th>EMAIL</th>
                     <th>UVUS</th>
                     <th>PARTICIPATION</th>
+                    <th>VIEW DIPLOMA</th>
                     <th>SELECT TO SEND</th>
                     <th>DELETE</th>
                 </tr>
@@ -62,6 +63,11 @@
                         <td>{{ diploma.correo }}</td>
                         <td>{{ diploma.uvus }}</td>
                         <td>{{ diploma.participacion }}</td>
+                        <td>
+                            <a href="{{ url_for('accounts.view_diploma', diploma_id=diploma.id) }}" target="_blank" class="btn btn-info">
+                                VIEW DIPLOMA
+                            </a>
+                        </td>
                         <td>
                             <div class="d-flex justify-content-center align-items-center" style="height: 100%;">
                                 <input type="checkbox" name="select_diploma" value="{{ diploma.id }}">
