@@ -78,11 +78,11 @@
         const rows = document.querySelectorAll('#diplomaTableBody tr');
         
         rows.forEach(row => {
-            const uvusCell = row.cells[4]; // Columna de UVUS
+            const uvusCell = row.cells[4]; // columna de UVUS
             if (uvusCell) {
                 const uvusText = uvusCell.textContent.toLowerCase().trim();
-                // Mostrar solo las filas que coinciden exactamente con el filtro
-                row.style.display = uvusText === filterValue ? '' : 'none';
+                // mostramos solo las filas que coinciden con el uvus en cualquier parte
+                row.style.display = uvusText.includes(filterValue) ? '' : 'none';
             }
         });
     }
