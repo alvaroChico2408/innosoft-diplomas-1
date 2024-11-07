@@ -38,7 +38,9 @@
                     <th>SURNAME</th>
                     <th>EMAIL</th>
                     <th>UVUS</th>
-                    <th>SELECT</th>
+                    <th>PARTICIPATION</th>
+                    <th>SELECT TO SEND</th>
+                    <th>DELETE</th>
                 </tr>
             </thead>
             <tbody id="diplomaTableBody" style="text-align: center;">
@@ -49,9 +51,15 @@
                         <td>{{ diploma.apellidos }}</td>
                         <td>{{ diploma.correo }}</td>
                         <td>{{ diploma.uvus }}</td>
+                        <td>{{ diploma.participacion }}</td>
                         <td>
                             <div class="d-flex justify-content-center align-items-center" style="height: 100%;">
                                 <input type="checkbox" name="select_diploma" value="{{ diploma.id }}">
+                            </div>
+                        </td>
+                        <td>
+                            <div class="d-flex justify-content-center align-items-center" style="height: 100%;">
+                                <button class="btn btn-danger">DELETE</button>
                             </div>
                         </td>
                     </tr>
