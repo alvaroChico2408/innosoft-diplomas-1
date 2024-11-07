@@ -26,9 +26,9 @@
 
                         <div class="col-md-6 col-lg-6 col-xs-12">
                             <div class="mb-3">
-                                {{ form.email.label(class="form-label") }}
-                                {{ form.email(class="form-control",placeholder="Enter email") }}
-                                {% for error in form.email.errors %}
+                                {{ form.username.label(class="form-label") }}
+                                {{ form.username(class="form-control",placeholder="Enter username") }}
+                                {% for error in form.username.errors %}
                                 <span style="color: red;">{{ error }}</span>
                                 {% endfor %}
                             </div>
@@ -55,8 +55,8 @@
 
                         <div class="col-md-6 col-lg-6 col-xs-12">
                             <div class="mb-2">
-                                {{ form.remember_me(class="form-check-input") }}
-                                {{ form.remember_me.label(class="form-check-label") }}
+                                {{ form.remember(class="form-check-input") }}
+                                {{ form.remember.label(class="form-check-label") }}
                             </div>
                         </div>
 
