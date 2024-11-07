@@ -21,54 +21,16 @@ authentication_service = AuthenticationService()
 user_profile_service = UserProfileService()
 confirmemail_service = ConfirmemailService()
 
-'''
-@auth_bp.route("/signup/", methods=["GET", "POST"])
-def show_signup_form():
-    if current_user.is_authenticated:
-        return redirect(url_for('public.index'))
-
-    form = SignupForm()
-    if form.validate_on_submit():
-
-        email = form.email.data
-        if not authentication_service.is_email_available(email):
-            flash(f'Email {email} is already in use', 'danger')
-            return render_template("auth/signup_form.html", form=form)
-
-        try:
-            # We try to create the user
-            user = authentication_service.create_with_profile(**form.data)
-            confirmemail_service.send_confirmation_email(user.email)
-        except IntegrityError as exc:
-            db.session.rollback()
-            if 'Duplicate entry' in str(exc):
-                flash(f'Email {email} is already in use', 'danger')
-            else:
-                flash(f'Error creating user: {exc}', 'danger')
-            return render_template("auth/signup_form.html", form=form)
-
-        return redirect(url_for("public.index"))
-
-    return render_template("auth/signup_form.html", form=form)
-'''
 @auth_bp.route("/signup", methods=["GET", "POST"])
 @authentication_redirect
 def show_signup_form() -> Response:
     """
-    Handling user registration.
-    If the user is already authenticated, they are redirected to the index page.
-
-    This view handles both GET and POST requests:
-    - GET: Renders the registration form and template.
-    - POST: Processes the registration form, creates a new user, and sends a confirmation email.
-
-    :return: Renders the registration template on GET request
-    or redirects to login after successful registration.
-
+        Registro de usuarios, borrar cuando vayamos a entregar
     """
     
     if current_user.is_authenticated:
         return redirect(url_for('public.index'))
+    
     form = SignupForm()
     if form.validate_on_submit():
         username = form.data.get("username")
@@ -114,22 +76,27 @@ def login() -> Response:
 
     :return: Redirects to the homepage on success or the login page on failure.
     """
-    if request.method == "POST":
-        # Fetch the predefined guest user instance by username.
-        test_user = User.get_user_by_username(username="test_user")
 
-        if test_user:
-            # Log in the guest user with a session duration of (1 day) only.
-            login_user(test_user, remember=True, duration=timedelta(days=1))
+    if current_user.is_authenticated:
+        return redirect(url_for('public.index'))
 
-            flash("You are logged in as a Guest User.", "success")
-            return redirect(url_for("public.index"))
+    form = LoginForm()
+    if request.method == 'POST' and form.validate_on_submit():
 
-        flash("Something went wront.", "error")
-        return redirect(url_for("auth.login"))
+        if authentication_service.login(form.username.data, form.password.data):
+            return redirect(url_for('public.index'))
+
+        return render_template("auth/login_form.html", form=form, error='Invalid credentials')
+
+    return render_template('auth/login_form.html', form=form)
+        
+
+        
 
     # Return a 404 error if accessed via GET
     return abort(HTTPStatus.NOT_FOUND)
+    
+
 
 @auth_bp.route('/logout')
 def logout():
