@@ -40,52 +40,58 @@
 
     <!-- Container for the table with the information and actions -->
     <div class="p-4">
-        <table class="table table-bordered table-striped" style="background-color: #ffffff; color: #000000;">
-            <thead style="background-color: #484646; color: #ffffff; text-align: center;">
-                <tr>
-                    <th>ID</th>
-                    <th>NAME</th>
-                    <th>SURNAME</th>
-                    <th>EMAIL</th>
-                    <th>UVUS</th>
-                    <th>PARTICIPATION</th>
-                    <th>VIEW DIPLOMA</th>
-                    <th>SELECT TO SEND</th>
-                    <th>DELETE</th>
-                </tr>
-            </thead>
-            <tbody id="diplomaTableBody" style="text-align: center;">
-                {% for diploma in diplomas %}
+        {% if diplomas %}
+            <table class="table table-bordered table-striped" style="background-color: #ffffff; color: #000000;">
+                <thead style="background-color: #484646; color: #ffffff; text-align: center;">
                     <tr>
-                        <td>{{ diploma.id }}</td>
-                        <td>{{ diploma.nombre }}</td>
-                        <td>{{ diploma.apellidos }}</td>
-                        <td>{{ diploma.correo }}</td>
-                        <td>{{ diploma.uvus }}</td>
-                        <td>{{ diploma.participacion }}</td>
-                        <td>
-                            <a href="{{ url_for('accounts.view_diploma', diploma_id=diploma.id) }}" target="_blank" class="btn btn-info">
-                                VIEW DIPLOMA
-                            </a>
-                        </td>
-                        <td>
-                            <div class="d-flex justify-content-center align-items-center" style="height: 100%;">
-                                <input type="checkbox" name="select_diploma" value="{{ diploma.id }}">
-                            </div>
-                        </td>
-                        <td>
-                            <form action="{{ url_for('accounts.delete_diploma', diploma_id=diploma.id) }}" method="post" style="display:inline;">
-                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                                <input type="hidden" name="_method" value="DELETE">
-                                <button type="submit" class="btn btn-danger" onclick="return confirm('Are you sure you want to delete this diploma?');">
-                                    DELETE
-                                </button>
-                            </form>
-                        </td>
+                        <th>ID</th>
+                        <th>NAME</th>
+                        <th>SURNAME</th>
+                        <th>EMAIL</th>
+                        <th>UVUS</th>
+                        <th>PARTICIPATION</th>
+                        <th>VIEW DIPLOMA</th>
+                        <th>SELECT TO SEND</th>
+                        <th>DELETE</th>
                     </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+                </thead>
+                <tbody id="diplomaTableBody" style="text-align: center;">
+                    {% for diploma in diplomas %}
+                        <tr>
+                            <td>{{ diploma.id }}</td>
+                            <td>{{ diploma.nombre }}</td>
+                            <td>{{ diploma.apellidos }}</td>
+                            <td>{{ diploma.correo }}</td>
+                            <td>{{ diploma.uvus }}</td>
+                            <td>{{ diploma.participacion }}</td>
+                            <td>
+                                <a href="{{ url_for('accounts.view_diploma', diploma_id=diploma.id) }}" target="_blank" class="btn btn-info">
+                                    VIEW DIPLOMA
+                                </a>
+                            </td>
+                            <td>
+                                <div class="d-flex justify-content-center align-items-center" style="height: 100%;">
+                                    <input type="checkbox" name="select_diploma" value="{{ diploma.id }}">
+                                </div>
+                            </td>
+                            <td>
+                                <form action="{{ url_for('accounts.delete_diploma', diploma_id=diploma.id) }}" method="post" style="display:inline;">
+                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                    <input type="hidden" name="_method" value="DELETE">
+                                    <button type="submit" class="btn btn-danger" onclick="return confirm('Are you sure you want to delete this diploma?');">
+                                        DELETE
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            <div class="alert alert-info text-center">
+                <strong>No diplomas generated yet.</strong>
+            </div>
+        {% endif %}
     </div>
 </div>
 
