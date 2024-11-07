@@ -4,8 +4,7 @@ from http import HTTPStatus
 from datetime import timedelta
 from werkzeug.exceptions import InternalServerError
 
-from flask import Blueprint, Response
-from flask import abort, current_app, render_template, request, redirect, url_for, flash
+from flask import Blueprint, Response, jsonify, abort, current_app, render_template, request, redirect, url_for, flash
 from flask_login import current_user, login_required, login_user, logout_user
 from wtforms import ValidationError
 
@@ -592,4 +591,27 @@ def choose_send_diplomas():
     todos_los_diplomas = Diploma.query.all()
     participaciones = ["ORGANIZATION", "INTERMEDIATE", "ASSISTANCE"]
     return render_template('choose_send_diplomas.html', diplomas=todos_los_diplomas, participaciones=participaciones)
+
+
+@accounts.route('/delete_diploma/<int:diploma_id>', methods=['POST'])
+@login_required
+def delete_diploma(diploma_id):
+    if request.form.get('_method') == 'DELETE':
+        try:
+            diploma = Diploma.query.get(diploma_id)
+            if diploma:
+                db.session.delete(diploma)
+                db.session.commit()
+                flash("Diploma deleted successfully.", "success")
+                return redirect(url_for("accounts.choose_send_diplomas")) 
+            else:
+                flash("Diploma not found.", "error")
+        except Exception as e:
+            print(f"Error deleting diploma: {e}")
+            flash(f"There was an error deleting the diploma: {str(e)}", "error")
+    else:
+        flash("Invalid method", "error")
+
+    return redirect(url_for("accounts.choose_send_diplomas")) 
+
 
