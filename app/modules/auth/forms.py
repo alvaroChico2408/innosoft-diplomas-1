@@ -14,14 +14,6 @@ from flask_wtf.form import FlaskForm
 from flask_wtf.file import FileAllowed, FileSize
 from app.modules.auth.models import User
 
-'''
-class SignupForm(FlaskForm):
-    name = StringField('Name', validators=[DataRequired(), Length(max=100)])
-    surname = StringField('Surname', validators=[DataRequired(), Length(max=100)])
-    password = PasswordField('Password', validators=[DataRequired()])
-    email = StringField('Email', validators=[DataRequired(), Email()])
-    submit = SubmitField('Submit')
-'''
 
 class SignupForm(FlaskForm):
 
@@ -56,14 +48,7 @@ class SignupForm(FlaskForm):
     )
     submit = SubmitField("Continue")
 
-'''
-class LoginForm(FlaskForm):
-    email = StringField('Email', validators=[DataRequired()])
-    password = PasswordField('Password', validators=[DataRequired()])
-    remember_me = BooleanField('Remember me')
-    submit = SubmitField('Login')
-    
-'''
+
 
 class LoginForm(FlaskForm):
 
