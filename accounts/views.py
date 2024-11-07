@@ -590,5 +590,6 @@ def generate_diplomas():
 @login_required
 def choose_send_diplomas():
     todos_los_diplomas = Diploma.query.all()
-    return render_template('choose_send_diplomas.html', diplomas=todos_los_diplomas)
+    participaciones = ["ORGANIZATION", "INTERMEDIATE", "ASSISTANCE"]
+    return render_template('choose_send_diplomas.html', diplomas=todos_los_diplomas, participaciones=participaciones)
 

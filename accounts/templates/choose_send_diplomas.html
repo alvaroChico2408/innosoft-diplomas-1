@@ -10,17 +10,24 @@
                 <div class="col-md-9 col-lg-9">
                     <div class="p-4 text-center">
                         <h1 class="mb-5">🔍📩 Choose and Send Diplomas 📩🔍</h1>
-                        <div class="d-flex justify-content-between align-items-center">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
                             <div class="d-flex align-items-center">
                                 <input type="text" id="uvusFilter" placeholder="Filter by UVUS" class="form-control me-2" style="width: auto;">
                                 <button class="btn btn-secondary me-1" onclick="filter_by_UVUS()">FILTER</button>
                                 <button class="btn btn-warning" onclick="reset_filter_UVUS()">RESET</button>
                             </div>
-                            <div class="d-flex">
-                                <button class="btn btn-success me-2" onclick="send_diplomas_selected()">SEND DIPLOMAS SELECTED</button>
-                                <button class="btn btn-primary me-2" onclick="select_all()">SELECT ALL</button>
-                                <button class="btn btn-danger" onclick="deselect_all()">DESELECT ALL</button>
+                            <div class="d-flex align-items-center">
+                                <span class="me-2">Filter by Participation:</span>
+                                {% for participacion in participaciones %}
+                                    <button class="btn btn-outline-secondary me-2" onclick="filter_by_participation('{{ participacion }}')">{{ participacion }}</button>
+                                {% endfor %}
+                                <button class="btn btn-warning" onclick="reset_filter_participation()">RESET</button>
                             </div>
+                        </div>
+                        <div class="d-flex justify-content-center mt-4">
+                            <button class="btn btn-success me-2" onclick="send_diplomas_selected()">SEND DIPLOMAS SELECTED</button>
+                            <button class="btn btn-primary me-2" onclick="select_all()">SELECT ALL</button>
+                            <button class="btn btn-danger" onclick="deselect_all()">DESELECT ALL</button>
                         </div>
                     </div>
                 </div>
@@ -96,10 +103,28 @@
     }
 
     function reset_filter_UVUS() {
-        document.getElementById('uvusFilter').value = ''; // Limpiar el campo de entrada
+        document.getElementById('uvusFilter').value = ''; 
         const rows = document.querySelectorAll('#diplomaTableBody tr');
         rows.forEach(row => {
-            row.style.display = ''; // Mostrar todas las filas
+            row.style.display = ''; // mostrar todas las filas
+        });
+    }
+
+    function filter_by_participation(participation) {
+        const rows = document.querySelectorAll('#diplomaTableBody tr');
+        rows.forEach(row => {
+            const participationCell = row.cells[5]; 
+            if (participationCell) {
+                const participationText = participationCell.textContent.trim();
+                row.style.display = participationText === participation ? '' : 'none';
+            }
+        });
+    }
+
+    function reset_filter_participation() {
+        const rows = document.querySelectorAll('#diplomaTableBody tr');
+        rows.forEach(row => {
+            row.style.display = '';   // mostrar todas las filas
         });
     }
 
