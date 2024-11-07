@@ -1,17 +1,16 @@
 import re
+import os
 
 from http import HTTPStatus
 from datetime import timedelta
 from werkzeug.exceptions import InternalServerError
 
-from flask import Blueprint, Response
-from flask import abort, current_app, render_template, request, redirect, url_for, flash
+from flask import Blueprint, Response, abort, current_app, render_template, request, redirect, url_for, flash, send_file
 from flask_login import current_user, login_required, login_user, logout_user
 from wtforms import ValidationError
 
 from .extensions import database as db 
 
-from reportlab.lib.pagesizes import A4
 from accounts.forms import EnterExcelHours
 
 from accounts.decorators import authentication_redirect, guest_user_exempt
@@ -20,7 +19,7 @@ from accounts.email_utils import (
     send_reset_email,
 )
 from accounts.extensions import database as db
-from accounts.models import User, validate_and_save_excel
+from accounts.models import User, validate_and_save_excel, Diploma
 from accounts.forms import (
     RegisterForm,
     LoginForm,
@@ -589,5 +588,59 @@ def generate_diplomas():
 @accounts.route("/choose_send_diplomas", methods=["GET", "POST"])
 @login_required
 def choose_send_diplomas():
-    return render_template("choose_send_diplomas.html")
+    todos_los_diplomas = Diploma.query.all()
+    participaciones = ["ORGANIZATION", "INTERMEDIATE", "ASSISTANCE"]
+    return render_template('choose_send_diplomas.html', diplomas=todos_los_diplomas, participaciones=participaciones)
+
+
+@accounts.route('/view_diploma/<int:diploma_id>', methods=['GET'])
+@login_required
+def view_diploma(diploma_id):
+    diploma = Diploma.query.get(diploma_id)
+    if diploma and diploma.file_path:
+        # construimos la ruta absoluta al archivo
+        file_path = os.path.join(current_app.root_path, "..", "diplomas", os.path.basename(diploma.file_path))
+        # comprobamos si el archivo existe antes de enviarlo
+        if os.path.exists(file_path):
+            return send_file(file_path)
+        else:
+            print("File not found:", file_path)
+            flash("The diploma file could not be found.", "error")
+            return redirect(url_for("accounts.choose_send_diplomas"))
+    else:
+        flash("The diploma could not be found.", "error")
+        return redirect(url_for("accounts.choose_send_diplomas"))
+
+
+@accounts.route('/delete_diploma/<int:diploma_id>', methods=['POST'])
+@login_required
+def delete_diploma(diploma_id):
+    if request.form.get('_method') == 'DELETE':
+        try:
+            diploma = Diploma.query.get(diploma_id)
+            if diploma:
+                # borramos el diploma que se haya generado 
+                file_path = os.path.join(current_app.root_path, "..", "diplomas", os.path.basename(diploma.file_path))
+                if os.path.exists(file_path):
+                    try:
+                        os.remove(file_path)
+                        print(f"Deleted file: {file_path}")
+                    except Exception as file_error:
+                        print(f"Error deleting file: {file_error}")
+                        flash("The diploma entry was deleted, but the file could not be deleted.", "warning")
+                # borramos la info de la base de datos
+                db.session.delete(diploma)
+                db.session.commit()
+                flash("Diploma deleted successfully.", "success")
+                return redirect(url_for("accounts.choose_send_diplomas")) 
+            else:
+                flash("Diploma not found.", "error")
+        except Exception as e:
+            print(f"Error deleting diploma: {e}")
+            flash(f"There was an error deleting the diploma: {str(e)}", "error")
+    else:
+        flash("Invalid method", "error")
+
+    return redirect(url_for("accounts.choose_send_diplomas")) 
+
 
