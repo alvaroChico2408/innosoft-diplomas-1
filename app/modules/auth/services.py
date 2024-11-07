@@ -7,6 +7,8 @@ from app.modules.profile.repositories import UserProfileRepository
 from core.configuration.configuration import uploads_folder_name
 from core.services.BaseService import BaseService
 
+from flask import flash
+
 
 class AuthenticationService(BaseService):
 
@@ -14,11 +16,14 @@ class AuthenticationService(BaseService):
         super().__init__(UserRepository())
         self.user_profile_repository = UserProfileRepository()
 
-    def login(self, email, password, remember=True):
-        user = self.repository.get_by_email(email)
+    def login(self, username, password, remember=True):
+        user = self.repository.get_by_username(username)
         if user is not None and user.check_password(password):
             login_user(user, remember=remember)
+            print(current_user.is_authenticated)
+
             return True
+
         return False
 
     def is_email_available(self, email: str) -> bool:

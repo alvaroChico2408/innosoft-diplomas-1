@@ -53,7 +53,7 @@ class SignupForm(FlaskForm):
 class LoginForm(FlaskForm):
 
     username = StringField(
-        "Username or Email Address", validators=[DataRequired(), Length(5, 150)]
+        "Username", validators=[DataRequired(), Length(1, 30)]
     )
     password = PasswordField("Password", validators=[DataRequired(), Length(8, 20)])
     remember = BooleanField("Remember me", validators=[DataRequired()])

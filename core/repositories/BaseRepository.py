@@ -22,6 +22,10 @@ class BaseRepository(Generic[T]):
     def get_by_id(self, id: int) -> Optional[T]:
         instance: Optional[T] = self.model.query.get(id)
         return instance
+    
+    def get_by_username(self, username: str) -> Optional[T]:
+        instance: Optional[T] = self.session.query(self.model).filter_by(username=username).first()
+        return instance
 
     def get_by_column(self, column_name: str, value) -> List[T]:
         instances: List[T] = self.session.query(self.model).filter(getattr(self.model, column_name) == value).all()

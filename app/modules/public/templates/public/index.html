@@ -5,11 +5,17 @@
 {% block content %}
 
     <h1 class="h2 mb-3">
-        <b>Home</b>
+        <b>
+            {% if current_user.is_authenticated %}
+                Home autenticado
+            {% else %}
+                Home sin autenticar
+            {% endif %}
+        </b>
     </h1>
 
     <div class="row">
-
+        <!-- Otros contenidos de la página principal -->
     </div>
 
 {% endblock %}

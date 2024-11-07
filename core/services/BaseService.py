@@ -13,6 +13,9 @@ class BaseService:
 
     def get_by_id(self, id):
         return self.repository.get_by_id(id)
+    
+    def get_by_username(self, username):
+        return self.repository.get_by_username(username)
 
     def get_or_404(self, id):
         return self.repository.get_or_404(id)

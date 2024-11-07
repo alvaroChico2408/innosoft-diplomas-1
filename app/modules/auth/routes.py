@@ -76,17 +76,23 @@ def login() -> Response:
 
     :return: Redirects to the homepage on success or the login page on failure.
     """
-
     if current_user.is_authenticated:
         return redirect(url_for('public.index'))
 
     form = LoginForm()
-    if request.method == 'POST' and form.validate_on_submit():
+    print("hola1")
 
-        if authentication_service.login(form.username.data, form.password.data):
-            return redirect(url_for('public.index'))
+    if request.method == 'POST': #and form.validate_on_submit():
+        
+        test_user = User.get_user_by_username(username=form.username.data)
 
-        return render_template("auth/login_form.html", form=form, error='Invalid credentials')
+        if test_user:
+            if authentication_service.login(form.username.data, form.password.data):
+                print(current_user.is_authenticated)
+                print("hola3")
+                return redirect(url_for('public.index'))
+        else:
+            return render_template("auth/login_form.html", form=form, error='Invalid credentials')
 
     return render_template('auth/login_form.html', form=form)
         
