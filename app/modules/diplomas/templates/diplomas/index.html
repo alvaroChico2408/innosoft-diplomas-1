@@ -9,6 +9,9 @@
     <div class="mb-3">
         {{ form.hours_excel.label }}
         {{ form.hours_excel(class="form-control") }}
+        {% for error in form.hours_excel.errors %}
+            <span style="color: red;">{{ error }}</span>
+        {% endfor %}
     </div>
     <button type="submit" class="btn btn-primary">{{ form.submit.label }}</button>
 </form>
