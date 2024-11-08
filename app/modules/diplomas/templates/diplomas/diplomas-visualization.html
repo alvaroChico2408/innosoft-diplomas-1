@@ -3,7 +3,31 @@
 {% block title %}View diplomas{% endblock %}
 
 {% block content %}
-<h2>Diplomas Visualization</h2>
+<div class="container my-4 p-4 bg-white shadow rounded">
+    <h2 class="text-center mb-4">Choose and Send Diplomas</h2>
+    
+    <div class="filter-container text-center mb-4">
+        <div class="search-bar d-inline-block">
+            <input type="text" id="uvus-filter" placeholder="Filter by UVUS" class="form-control d-inline-block w-auto">
+            <button class="btn btn-secondary" onclick="filterByUVUS()">FILTER</button>
+            <button class="btn btn-warning" onclick="resetFilters()">RESET</button>
+        </div>
+        <div class="participation-filter d-inline-block ms-3">
+            <span>Filter by Participation:</span>
+            <button class="btn btn-light" onclick="filterByParticipation('ORGANIZATION')">ORGANIZATION</button>
+            <button class="btn btn-light" onclick="filterByParticipation('INTERMEDIATE')">INTERMEDIATE</button>
+            <button class="btn btn-light" onclick="filterByParticipation('ASSISTANCE')">ASSISTANCE</button>
+            <button class="btn btn-warning" onclick="resetParticipationFilter()">RESET</button>
+        </div>
+    </div>
+
+    <div class="actions text-center mb-4">
+        <button class="btn btn-success" onclick="sendSelectedDiplomas()">SEND DIPLOMAS SELECTED</button>
+        <button class="btn btn-dark" onclick="selectAll()">SELECT ALL</button>
+        <button class="btn btn-dark" onclick="deselectAll()">DESELECT ALL</button>
+    </div>
+</div>
+
 
 {% with messages = get_flashed_messages(with_categories=true) %}
 {% if messages %}
