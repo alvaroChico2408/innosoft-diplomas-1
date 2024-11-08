@@ -19,7 +19,7 @@ def index():
                 flash("Diplomas generados con éxito", "success")
             except Exception as e:
                 flash(f"Error al procesar el archivo: {str(e)}", "error")
-        return redirect(url_for('diplomas.index'))
+        return render_template('diplomas/index.html', form=form)
     
     return render_template('diplomas/index.html', form=form)
 
