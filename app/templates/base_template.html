@@ -75,6 +75,18 @@
                 {% else %}
 
                     <li class="sidebar-header">
+                        Functionality
+                    </li>
+
+                    <li class="sidebar-item {{ 'active' if request.endpoint == 'diplomas.index' else '' }}">
+                        <a class="sidebar-link" href="{{ url_for('diplomas.index') }}">
+                            <i class="align-middle" data-feather="file-text"></i>
+                            <span class="align-middle">Certificate generator</span>
+                        </a>
+                    </li>
+
+
+                    <li class="sidebar-header">
                         Options
                     </li>
 
