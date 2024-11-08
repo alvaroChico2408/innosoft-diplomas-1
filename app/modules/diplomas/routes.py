@@ -62,18 +62,32 @@ def view_diploma(diploma_id):
 def delete_diploma(diploma_id):
     if request.form.get('_method') == 'DELETE':
         try:
+            # Obtener el diploma por su ID
             diploma = Diploma.query.get(diploma_id)
             if diploma:
-                file_path = os.path.join(current_app.root_path, "..", "diplomas", os.path.basename(diploma.file_path))
+                # Generar la ruta completa del archivo PDF basado en el uvus
+                pdf_filename = f"{diploma.uvus}.pdf"
+                file_path = os.path.join(current_app.root_path, "../docs", "diplomas", pdf_filename)
+                
+                # Eliminar el archivo PDF si existe
                 if os.path.exists(file_path):
-                    os.remove(file_path)
+                    try:
+                        os.remove(file_path)
+                        print(f"Deleted file: {file_path}")
+                    except Exception as file_error:
+                        flash("The diploma entry was deleted, but the file could not be deleted.", "warning")
+                        print(f"Error deleting file: {file_error}")
+                
+                # Eliminar el registro del diploma de la base de datos
                 db.session.delete(diploma)
                 db.session.commit()
                 flash("Diploma deleted successfully.", "success")
             else:
                 flash("Diploma not found.", "error")
         except Exception as e:
+            print(f"Error deleting diploma: {e}")
             flash(f"Error deleting diploma: {e}", "error")
     return redirect(url_for("diplomas.diplomas_visualization"))
+
 
 
