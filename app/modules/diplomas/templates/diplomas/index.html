@@ -3,7 +3,10 @@
 {% block title %}View diplomas{% endblock %}
 
 {% block content %}
-
+<h2>Generador de Diplomas</h2>
+<form method="post" action="{{ url_for('diplomas.generate') }}">
+    <button type="submit" class="btn btn-primary">Generar Diploma</button>
+</form>
 {% endblock %}
 
 {% block scripts %}
