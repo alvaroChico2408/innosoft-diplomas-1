@@ -1,0 +1,45 @@
+{% extends "base_template.html" %}
+
+{% block title %}View diplomas{% endblock %}
+
+{% block content %}
+<h2>Diplomas Visualization</h2>
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Surname</th>
+            <th>Email</th>
+            <th>uvus</th>
+            <th>Participation</th>
+            <th>View Diploma</th>
+            <th>Select to Send</th>
+            <th>Delete</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for diploma in diplomas %}
+        <tr>
+            <td>{{ diploma.id }}</td>
+            <td>{{ diploma.name }}</td>
+            <td>{{ diploma.surname }}</td>
+            <td>{{ diploma.email }}</td>
+            <td>{{ diploma.uvus }}</td>
+            <td>{{ diploma.participation }}</td>
+            <td><button class="btn btn-info">View Diploma</button></td>
+            <td><input type="checkbox"></td>
+            <td><button class="btn btn-danger">Delete</button></td>
+        </tr>
+        {% else %}
+        <tr>
+            <td colspan="9" class="text-center">No diplomas available</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}
+
+{% block scripts %}
+    <script src="{{ url_for('diplomas.assets', subfolder='js', filename='scripts.js') }}"></script>
+{% endblock %}
