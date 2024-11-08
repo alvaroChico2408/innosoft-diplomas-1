@@ -40,16 +40,22 @@ def diplomas_visualization():
 @diplomas_bp.route('/view_diploma/<int:diploma_id>', methods=['GET'])
 @login_required
 def view_diploma(diploma_id):
+    # Buscar el diploma por su ID
     diploma = Diploma.query.get(diploma_id)
-    if diploma and diploma.file_path:
-        file_path = os.path.join(current_app.root_path, "..", "diplomas", os.path.basename(diploma.file_path))
-        if os.path.exists(file_path):
-            return send_file(file_path)
-        else:
-            flash("The diploma file could not be found.", "error")
+    if not diploma:
+        flash("Diploma not found.", "error")
+        return redirect(url_for('diplomas.diplomas_visualization'))
+
+    # Construir la ruta al archivo PDF usando el UVUS
+    file_path = os.path.join(current_app.root_path, "../docs", "diplomas", f"{diploma.uvus}.pdf")
+    
+    # Verificar si el archivo existe
+    if os.path.exists(file_path):
+        return send_file(file_path, as_attachment=False)
     else:
-        flash("The diploma could not be found.", "error")
-    return redirect(url_for("diplomas.diplomas_visualization"))
+        flash("Diploma file not found.", "error")
+        return redirect(url_for('diplomas.diplomas_visualization'))
+    
 
 @diplomas_bp.route('/delete_diploma/<int:diploma_id>', methods=['POST'])
 @login_required

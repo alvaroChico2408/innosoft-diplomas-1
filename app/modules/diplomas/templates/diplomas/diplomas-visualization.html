@@ -4,6 +4,29 @@
 
 {% block content %}
 <h2>Diplomas Visualization</h2>
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+{% if messages %}
+{% for category, message in messages %}
+<div class="row">
+    <div class="col-12 mb-3">
+        <!-- Aquí se elige la clase en función de la categoría del mensaje -->
+        <div class="alert alert-{{ category }}" role="alert">
+            <div class="alert-message">
+                {% if category == 'success' %}
+                <h4 class="alert-heading"><i class="align-middle" data-feather="check-circle"></i> Success</h4>
+                {% elif category == 'error' %}
+                <h4 class="alert-heading"><i class="align-middle" data-feather="x-circle"></i> Error</h4>
+                {% endif %}
+                <p style="margin-bottom: 0px">{{ message }}</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endfor %}
+{% endif %}
+{% endwith %}
+
 <table class="table table-striped">
     <thead>
         <tr>
@@ -27,16 +50,31 @@
             <td>{{ diploma.email }}</td>
             <td>{{ diploma.uvus }}</td>
             <td>{{ diploma.participation }}</td>
-            <td><button class="btn btn-info">View Diploma</button></td>
-            <td><input type="checkbox"></td>
-            <td><button class="btn btn-danger">Delete</button></td>
-        </tr>
-        {% else %}
-        <tr>
-            <td colspan="9" class="text-center">No diplomas available</td>
-        </tr>
-        {% endfor %}
-    </tbody>
+            
+         <!-- Botón para ver el diploma -->
+         <td>
+            <a href="{{ url_for('diplomas.view_diploma', diploma_id=diploma.id) }}" target="_blank" class="btn btn-info">
+                View Diploma
+            </a>
+        </td>
+
+        <!-- Checkbox para seleccionar para enviar -->
+        <td><input type="checkbox" class="send-checkbox"></td>
+
+        <!-- Botón para eliminar el diploma -->
+        <td>
+            <form method="POST" action="{{ url_for('diplomas.delete_diploma', diploma_id=diploma.id) }}" onsubmit="return confirm('Are you sure you want to delete this diploma?');">
+                <input type="hidden" name="_method" value="DELETE">
+                <button type="submit" class="btn btn-danger">Delete</button>
+            </form>
+        </td>
+    </tr>
+    {% else %}
+    <tr>
+        <td colspan="9" class="text-center">No diplomas available</td>
+    </tr>
+    {% endfor %}
+</tbody>
 </table>
 {% endblock %}
 

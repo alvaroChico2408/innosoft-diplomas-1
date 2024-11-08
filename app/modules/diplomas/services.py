@@ -76,7 +76,7 @@ class DiplomasService(BaseService):
         writer.add_page(pagina)
 
         # creamos la ruta de la carpeta donde se guardarán los diplomas
-        folder_path = os.path.join(current_app.root_path, "docs", "diplomas")
+        folder_path = os.path.join(current_app.root_path, "../docs", "diplomas")
         folder_path = os.path.abspath(folder_path)
         if not os.path.exists(folder_path):
             os.makedirs(folder_path, exist_ok=True)
