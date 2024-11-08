@@ -4,8 +4,13 @@
 
 {% block content %}
 <h2>Generador de Diplomas</h2>
-<form method="post" action="{{ url_for('diplomas.generate') }}">
-    <button type="submit" class="btn btn-primary">Generar Diploma</button>
+<form method="post" enctype="multipart/form-data">
+    {{ form.hidden_tag() }}
+    <div class="mb-3">
+        {{ form.hours_excel.label }}
+        {{ form.hours_excel(class="form-control") }}
+    </div>
+    <button type="submit" class="btn btn-primary">{{ form.submit.label }}</button>
 </form>
 {% endblock %}
 
