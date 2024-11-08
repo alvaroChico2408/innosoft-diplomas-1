@@ -1,7 +1,7 @@
-from app.modules.diplomas.models import Diplomas
+from app.modules.diplomas.models import Diploma
 from core.repositories.BaseRepository import BaseRepository
 
 
 class DiplomasRepository(BaseRepository):
     def __init__(self):
-        super().__init__(Diplomas)
+        super().__init__(Diploma)
