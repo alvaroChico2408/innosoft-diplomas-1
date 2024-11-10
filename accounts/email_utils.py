@@ -3,6 +3,7 @@ import typing as t
 import smtplib
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
+from email.mime.application import MIMEApplication
 from werkzeug.exceptions import ServiceUnavailable
 
 from flask import current_app, render_template, url_for
@@ -10,7 +11,8 @@ from accounts.models import User
 from accounts.utils import get_full_url
 
 
-def send_mail(subject: t.AnyStr, recipients: t.List[str], body: t.Text):
+
+def send_mail(subject: t.AnyStr, recipients: t.List[str], body: t.Text, attachment_path: str = None):
     """
     Sends an email using Gmail SMTP.
 
@@ -37,6 +39,13 @@ def send_mail(subject: t.AnyStr, recipients: t.List[str], body: t.Text):
     message["To"] = ", ".join(recipients)
     message["Subject"] = subject
     message.attach(MIMEText(body, "html"))
+    
+    # attachement file if it exists
+    if attachment_path and os.path.exists(attachment_path):
+        with open(attachment_path, "rb") as file:
+            attachment = MIMEApplication(file.read())
+            attachment.add_header('Content-Disposition', 'attachment', filename=os.path.basename(attachment_path))
+            message.attach(attachment)
 
     try:
         # Connect to the SMTP server and send the email

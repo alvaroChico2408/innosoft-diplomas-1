@@ -51,6 +51,7 @@
                         <th>UVUS</th>
                         <th>PARTICIPATION</th>
                         <th>VIEW DIPLOMA</th>
+                        <th>SENT?</th>
                         <th>SELECT TO SEND</th>
                         <th>DELETE</th>
                     </tr>
@@ -70,8 +71,15 @@
                                 </a>
                             </td>
                             <td>
+                                {% if diploma.sent %}
+                                    <span class="badge bg-success">✔</span>
+                                {% else %}
+                                    <span class="badge bg-danger">✖</span>
+                                {% endif %}
+                            </td>
+                            <td>
                                 <div class="d-flex justify-content-center align-items-center" style="height: 100%;">
-                                    <input type="checkbox" name="select_diploma" value="{{ diploma.id }}">
+                                    <input type="checkbox" name="select-diploma" class="select-diploma" value="{{ diploma.id }}">
                                 </div>
                             </td>
                             <td>
@@ -98,12 +106,12 @@
 <!-- JavaScript para seleccionar o deseleccionar todas las casillas -->
 <script>
     function select_all() {
-        const checkboxes = document.querySelectorAll('input[name="select_diploma"]');
+        const checkboxes = document.querySelectorAll('input[name="select-diploma"]');
         checkboxes.forEach(checkbox => checkbox.checked = true);
     }
 
     function deselect_all() {
-        const checkboxes = document.querySelectorAll('input[name="select_diploma"]');
+        const checkboxes = document.querySelectorAll('input[name="select-diploma"]');
         checkboxes.forEach(checkbox => checkbox.checked = false);
     }
 
@@ -147,41 +155,47 @@
         });
     }
 
-    function send_diplomas_selected() {
-        console.log('Sending diplomas selected');
-        /*
-        const selectedDiplomas = [];
-    const checkboxes = document.querySelectorAll('input[name="select_diploma"]:checked');
-    checkboxes.forEach(checkbox => {
+    function getSelectedDiplomas() {
+    const selectedDiplomas = [];
+    document.querySelectorAll('input[name="select-diploma"]:checked').forEach(checkbox => {
         selectedDiplomas.push(checkbox.value);
     });
+    return selectedDiplomas;
+}
 
-    if (selectedDiplomas.length === 0) {
-        alert('Please select at least one diploma to send.');
-        return;
-    }
+    function send_diplomas_selected() {
+        const selectedDiplomas = getSelectedDiplomas();
 
-    // Enviar los IDs seleccionados al servidor
-    fetch('/send_diplomas', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ diploma_ids: selectedDiplomas })
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            alert('Diplomas sent successfully!');
-        } else {
-            alert('There was an error sending diplomas.');
+        if (selectedDiplomas.length === 0) {
+            alert("Please select at least one diploma.");
+            return;
         }
-    })
-    .catch(error => {
-        console.error('Error:', error);
-        alert('There was an error sending diplomas.');
-    });
-        */
+
+        if (!confirm(`Are you sure you want to send ${selectedDiplomas.length} diplomas?`)) {
+            return;
+        }
+        console.log(selectedDiplomas);
+        fetch('{{ url_for("accounts.send_diplomas") }}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': '{{ csrf_token() }}'
+            },
+            body: JSON.stringify({ diploma_ids: selectedDiplomas })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert("Diplomas sent successfully!");
+                location.reload();
+            } else {
+                alert("Error sending diplomas: " + data.message);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert("There was an error sending diplomas.");
+        });
     }
 </script>
 {% endblock %}

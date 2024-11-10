@@ -5,10 +5,9 @@ from http import HTTPStatus
 from datetime import timedelta
 from werkzeug.exceptions import InternalServerError
 
-from flask import Blueprint, Response, abort, current_app, render_template, request, redirect, url_for, flash, send_file
+from flask import Blueprint, Response, abort, current_app, render_template, request, redirect, url_for, flash, send_file, jsonify
 from flask_login import current_user, login_required, login_user, logout_user
 from wtforms import ValidationError
-
 from .extensions import database as db 
 
 from accounts.forms import EnterExcelHours
@@ -17,6 +16,7 @@ from accounts.decorators import authentication_redirect, guest_user_exempt
 from accounts.email_utils import (
     send_reset_password,
     send_reset_email,
+    send_mail,
 )
 from accounts.extensions import database as db
 from accounts.models import User, validate_and_save_excel, Diploma
@@ -642,5 +642,36 @@ def delete_diploma(diploma_id):
         flash("Invalid method", "error")
 
     return redirect(url_for("accounts.choose_send_diplomas")) 
+
+
+@accounts.route('/send_diplomas', methods=['POST'])
+@login_required
+def send_diplomas():
+    data = request.get_json()
+    selected_ids = data.get('diploma_ids', [])
+
+    if not selected_ids:
+        return jsonify({'success': False, 'message': 'Please select at least one diploma.'})
+
+    # Obtener los diplomas seleccionados
+    diplomas = Diploma.query.filter(Diploma.id.in_(selected_ids)).all()
+
+    for diploma in diplomas:
+        file_path = os.path.join(current_app.root_path, "..", "diplomas", os.path.basename(diploma.file_path))
+        if file_path and os.path.exists(file_path):
+            try:
+                send_mail(
+                    subject="Your Diploma from Innosoft",
+                    recipients=[diploma.correo],
+                    body="Congratulations! Here is your diploma for participating in the InnoSoft Days.",
+                    attachment_path=file_path
+                )
+                diploma.sent = True
+            except Exception as e:
+                print(f"Error sending email to {diploma.correo}: {e}")
+                return jsonify({'success': False, 'message': f"Failed to send email to {diploma.nombre}"})
+    db.session.commit()
+
+    return jsonify({'success': True, 'message': f"Successfully sent {len(diplomas)} diplomas."})
 
 
