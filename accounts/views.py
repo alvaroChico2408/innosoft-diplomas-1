@@ -666,9 +666,11 @@ def send_diplomas():
                     body="Congratulations! Here is your diploma for participating in the InnoSoft Days.",
                     attachment_path=file_path
                 )
+                diploma.sent = True
             except Exception as e:
                 print(f"Error sending email to {diploma.correo}: {e}")
                 return jsonify({'success': False, 'message': f"Failed to send email to {diploma.nombre}"})
+    db.session.commit()
 
     return jsonify({'success': True, 'message': f"Successfully sent {len(diplomas)} diplomas."})
 

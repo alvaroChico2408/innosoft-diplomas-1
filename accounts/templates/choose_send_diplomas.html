@@ -51,6 +51,7 @@
                         <th>UVUS</th>
                         <th>PARTICIPATION</th>
                         <th>VIEW DIPLOMA</th>
+                        <th>SENT?</th>
                         <th>SELECT TO SEND</th>
                         <th>DELETE</th>
                     </tr>
@@ -68,6 +69,13 @@
                                 <a href="{{ url_for('accounts.view_diploma', diploma_id=diploma.id) }}" target="_blank" class="btn btn-info">
                                     VIEW DIPLOMA
                                 </a>
+                            </td>
+                            <td>
+                                {% if diploma.sent %}
+                                    <span class="badge bg-success">✔</span>
+                                {% else %}
+                                    <span class="badge bg-danger">✖</span>
+                                {% endif %}
                             </td>
                             <td>
                                 <div class="d-flex justify-content-center align-items-center" style="height: 100%;">

@@ -394,6 +394,7 @@ class Diploma(db.Model):
     horas_de_evidencias = db.Column(db.Float, nullable=True)
     horas_en_total = db.Column(db.Float, nullable=True)
     file_path = db.Column(db.String(255), unique=True, nullable=False)
+    sent = db.Column(db.Boolean, default=False, nullable=False, server_default="0")
 
     @validates('correo')
     def validate_correo(self, key, correo):
