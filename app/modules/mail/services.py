@@ -31,3 +31,25 @@ class MailService(BaseService):
             msg.html = html_body
 
         self.mail.send(msg)
+        
+    def send_email_with_attachment(self, subject, recipients, body, attachment_path_pdf, image_path=None):
+        # Crear el mensaje
+        msg = Message(subject, sender=self.sender, recipients=recipients)
+        msg.body = body
+        
+        # Adjuntar el archivo PDF
+        if attachment_path_pdf and os.path.exists(attachment_path_pdf):
+            with open(attachment_path_pdf, 'rb') as f:
+                pdf_data = f.read()
+                filename_pdf = os.path.basename(attachment_path_pdf)
+                msg.attach(filename_pdf, 'application/pdf', pdf_data)
+        
+        # Adjuntar la imagen (si se proporciona)
+        if image_path and os.path.exists(image_path):
+            with open(image_path, 'rb') as f:
+                image_data = f.read()
+                filename_image = os.path.basename(image_path)
+                msg.attach(filename_image, 'image/jpeg', image_data)
+
+        # Enviar el correo
+        self.mail.send(msg)
