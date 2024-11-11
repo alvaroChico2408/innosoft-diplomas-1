@@ -8,7 +8,7 @@
     
     <div class="filter-container text-center mb-4">
         <div class="search-bar d-inline-block">
-            <input type="text" id="uvus-filter" placeholder="Filter by UVUS" class="form-control d-inline-block w-auto">
+            <input type="text" id="uvusFilter" placeholder="Filter by UVUS" class="form-control d-inline-block w-auto">
             <button class="btn btn-secondary" onclick="filterByUVUS()">FILTER</button>
             <button class="btn btn-warning" onclick="resetFilters()">RESET</button>
         </div>
@@ -28,13 +28,11 @@
     </div>
 </div>
 
-
 {% with messages = get_flashed_messages(with_categories=true) %}
 {% if messages %}
 {% for category, message in messages %}
 <div class="row">
     <div class="col-12 mb-3">
-        <!-- Aquí se elige la clase en función de la categoría del mensaje -->
         <div class="alert alert-{{ category }}" role="alert">
             <div class="alert-message">
                 {% if category == 'success' %}
@@ -58,7 +56,7 @@
             <th>Name</th>
             <th>Surname</th>
             <th>Email</th>
-            <th>uvus</th>
+            <th>UVUS</th>
             <th>Participation</th>
             <th>View Diploma</th>
             <th>SENT?</th>
@@ -66,7 +64,7 @@
             <th>Delete</th>
         </tr>
     </thead>
-    <tbody>
+    <tbody id="diplomaTableBody">
         {% for diploma in diplomas %}
         <tr>
             <td>{{ diploma.id }}</td>
@@ -75,41 +73,35 @@
             <td>{{ diploma.correo }}</td>
             <td>{{ diploma.uvus }}</td>
             <td>{{ diploma.participacion }}</td>
-            
-         <!-- Botón para ver el diploma -->
-         <td>
-            <a href="{{ url_for('diplomas.view_diploma', diploma_id=diploma.id) }}" target="_blank" class="btn btn-info">
-                View Diploma
-            </a>
-        </td>
-        <td>
-            {% if diploma.sent %}
-                <span class="badge bg-success">✔</span>
-            {% else %}
-                <span class="badge bg-danger">✖</span>
-            {% endif %}
-        </td>
-
-        <!-- Checkbox para seleccionar para enviar -->
-        <td><input type="checkbox" class="send-checkbox"></td>
-
-        <!-- Botón para eliminar el diploma -->
-        <td>
-            <form method="POST" action="{{ url_for('diplomas.delete_diploma', diploma_id=diploma.id) }}" onsubmit="return confirm('Are you sure you want to delete this diploma?');">
-                <input type="hidden" name="_method" value="DELETE">
-                <button type="submit" class="btn btn-danger">Delete</button>
-            </form>
-        </td>
-    </tr>
-    {% else %}
-    <tr>
-        <td colspan="9" class="text-center">No diplomas available</td>
-    </tr>
-    {% endfor %}
-</tbody>
+            <td>
+                <a href="{{ url_for('diplomas.view_diploma', diploma_id=diploma.id) }}" target="_blank" class="btn btn-info">
+                    View Diploma
+                </a>
+            </td>
+            <td>
+                {% if diploma.sent %}
+                    <span class="badge bg-success">✔</span>
+                {% else %}
+                    <span class="badge bg-danger">✖</span>
+                {% endif %}
+            </td>
+            <td><input type="checkbox" class="send-checkbox"></td>
+            <td>
+                <form method="POST" action="{{ url_for('diplomas.delete_diploma', diploma_id=diploma.id) }}" onsubmit="return confirm('Are you sure you want to delete this diploma?');">
+                    <input type="hidden" name="_method" value="DELETE">
+                    <button type="submit" class="btn btn-danger">Delete</button>
+                </form>
+            </td>
+        </tr>
+        {% else %}
+        <tr>
+            <td colspan="9" class="text-center">No diplomas available</td>
+        </tr>
+        {% endfor %}
+    </tbody>
 </table>
 {% endblock %}
 
 {% block scripts %}
-    <script src="{{ url_for('diplomas.assets', subfolder='js', filename='scripts.js') }}"></script>
+<script src="{{ url_for('diplomas.assets', subfolder='js', filename='scripts.js') }}"></script>
 {% endblock %}
