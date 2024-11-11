@@ -7,7 +7,7 @@ from app.modules.diplomas.services import DiplomasService
 import os
 from flask import send_file
 from flask import current_app
-from app import db
+from app import db, mail_service
 
 diplomas_service = DiplomasService()
 
@@ -99,26 +99,29 @@ def send_diplomas():
     if not selected_ids:
         return jsonify({'success': False, 'message': 'Please select at least one diploma.'})
 
-    # Obtener los diplomas seleccionados
+    # Filtrar los diplomas seleccionados
     diplomas = Diploma.query.filter(Diploma.id.in_(selected_ids)).all()
+    sent_count = 0
 
     for diploma in diplomas:
         file_path = os.path.join(current_app.root_path, "..", "diplomas", os.path.basename(diploma.file_path))
         if file_path and os.path.exists(file_path):
             try:
-                send_mail(
+                mail_service.send_mail(
                     subject="Your Diploma from Innosoft",
                     recipients=[diploma.correo],
                     body="Congratulations! Here is your diploma for participating in the InnoSoft Days.",
                     attachment_path=file_path
                 )
                 diploma.sent = True
+                sent_count += 1
             except Exception as e:
                 print(f"Error sending email to {diploma.correo}: {e}")
                 return jsonify({'success': False, 'message': f"Failed to send email to {diploma.nombre}"})
-    db.session.commit()
 
-    return jsonify({'success': True, 'message': f"Successfully sent {len(diplomas)} diplomas."})
+    db.session.commit()
+    return jsonify({'success': True, 'message': f"Successfully sent {sent_count} diplomas."})
+
 
 
 
