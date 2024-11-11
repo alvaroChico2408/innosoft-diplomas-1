@@ -1,40 +1,49 @@
-// Obtener los IDs de los diplomas seleccionados
-function getSelectedDiplomaIds() {
-    const checkboxes = document.querySelectorAll('.send-checkbox:checked');
-    const selectedIds = Array.from(checkboxes).map(checkbox => checkbox.getAttribute('data-id'));
-    return selectedIds;
+// Función para obtener los IDs de los diplomas seleccionados
+function getSelectedDiplomas() {
+    const selectedDiplomas = [];
+    document.querySelectorAll('.send-checkbox:checked').forEach(checkbox => {
+        // Obtener el ID desde la primera columna de la fila
+        selectedDiplomas.push(checkbox.closest('tr').querySelector('td:first-child').textContent.trim());
+    });
+    return selectedDiplomas;
 }
 
-// Enviar diplomas seleccionados al backend
+// Función para enviar los diplomas seleccionados
 function sendSelectedDiplomas() {
-    const selectedIds = getSelectedDiplomaIds();
+    const selectedDiplomas = getSelectedDiplomas();
 
-    if (selectedIds.length === 0) {
-        alert("Please select at least one diploma to send.");
+    if (selectedDiplomas.length === 0) {
+        alert("Please select at least one diploma.");
         return;
     }
 
-    fetch('/diplomas/send_diplomas', {
+    if (!confirm(`Are you sure you want to send ${selectedDiplomas.length} diplomas?`)) {
+        return;
+    }
+
+    // Mostrar en consola los diplomas seleccionados para debug
+    console.log("Selected diplomas: ", selectedDiplomas);
+
+    fetch('/send_diplomas', {
         method: 'POST',
         headers: {
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
+            'X-CSRFToken': '{{ csrf_token() }}'
         },
-        body: JSON.stringify({ diploma_ids: selectedIds })
+        body: JSON.stringify({ diploma_ids: selectedDiplomas })
     })
-    .then(response => response.json())
+    .then(response => response.text())  // Cambiar a `response.text()` ya que el backend usa `flash`
     .then(data => {
-        if (data.success) {
-            alert(data.message);
-            location.reload(); // Recargar la página para actualizar el estado de los diplomas
-        } else {
-            alert(data.message);
-        }
+        // Aquí gestionamos la respuesta
+        alert(data);  // Se asume que el servidor enviará un mensaje de éxito o error con `flash`
+        location.reload(); // Recargamos la página para reflejar los cambios
     })
     .catch(error => {
-        console.error("Error sending diplomas:", error);
-        alert("An error occurred while sending diplomas.");
+        console.error('Error:', error);
+        alert("There was an error sending diplomas.");
     });
 }
+
 
 // Seleccionar todos los checkboxes
 function selectAll() {

@@ -104,14 +104,14 @@ def send_diplomas():
     sent_count = 0
 
     for diploma in diplomas:
-        file_path = os.path.join(current_app.root_path, "..", "diplomas", os.path.basename(diploma.file_path))
+        file_path = os.path.join(current_app.root_path, "../docs", "diplomas", os.path.basename(diploma.file_path))
         if file_path and os.path.exists(file_path):
             try:
-                mail_service.send_mail(
+                mail_service.send_email_with_attachment(
                     subject="Your Diploma from Innosoft",
                     recipients=[diploma.correo],
                     body="Congratulations! Here is your diploma for participating in the InnoSoft Days.",
-                    attachment_path=file_path
+                    attachment_path_pdf=file_path
                 )
                 diploma.sent = True
                 sent_count += 1
