@@ -1,4 +1,4 @@
-from flask import render_template, redirect, url_for, flash, request
+from flask import render_template, redirect, url_for, flash, request, jsonify
 from flask_login import login_required
 from app.modules.diplomas.models import Diploma
 from app.modules.diplomas import diplomas_bp
@@ -88,6 +88,37 @@ def delete_diploma(diploma_id):
             print(f"Error deleting diploma: {e}")
             flash(f"Error deleting diploma: {e}", "error")
     return redirect(url_for("diplomas.diplomas_visualization"))
+
+
+@diplomas_bp.route('/send_diplomas', methods=['POST'])
+@login_required
+def send_diplomas():
+    data = request.get_json()
+    selected_ids = data.get('diploma_ids', [])
+
+    if not selected_ids:
+        return jsonify({'success': False, 'message': 'Please select at least one diploma.'})
+
+    # Obtener los diplomas seleccionados
+    diplomas = Diploma.query.filter(Diploma.id.in_(selected_ids)).all()
+
+    for diploma in diplomas:
+        file_path = os.path.join(current_app.root_path, "..", "diplomas", os.path.basename(diploma.file_path))
+        if file_path and os.path.exists(file_path):
+            try:
+                send_mail(
+                    subject="Your Diploma from Innosoft",
+                    recipients=[diploma.correo],
+                    body="Congratulations! Here is your diploma for participating in the InnoSoft Days.",
+                    attachment_path=file_path
+                )
+                diploma.sent = True
+            except Exception as e:
+                print(f"Error sending email to {diploma.correo}: {e}")
+                return jsonify({'success': False, 'message': f"Failed to send email to {diploma.nombre}"})
+    db.session.commit()
+
+    return jsonify({'success': True, 'message': f"Successfully sent {len(diplomas)} diplomas."})
 
 
 
