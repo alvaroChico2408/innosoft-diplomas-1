@@ -61,6 +61,7 @@
             <th>uvus</th>
             <th>Participation</th>
             <th>View Diploma</th>
+            <th>SENT?</th>
             <th>Select to Send</th>
             <th>Delete</th>
         </tr>
@@ -80,6 +81,13 @@
             <a href="{{ url_for('diplomas.view_diploma', diploma_id=diploma.id) }}" target="_blank" class="btn btn-info">
                 View Diploma
             </a>
+        </td>
+        <td>
+            {% if diploma.sent %}
+                <span class="badge bg-success">✔</span>
+            {% else %}
+                <span class="badge bg-danger">✖</span>
+            {% endif %}
         </td>
 
         <!-- Checkbox para seleccionar para enviar -->
