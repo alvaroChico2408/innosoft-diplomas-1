@@ -23,11 +23,11 @@
 
 ## Resumen de Total de Reuniones
 
-- **Total de reuniones**: 2
+- **Total de reuniones**: 6
 - **Total de reuniones presenciales**: 0
-- **Total de reuniones virtuales**: 2
+- **Total de reuniones virtuales**: 6
 - **Total de tiempo empleado en reuniones presenciales**: 0
-- **Total de tiempo empleado en reuniones virtuales**: 2,2
+- **Total de tiempo empleado en reuniones virtuales**: 6,5
 
 *Nota: El tiempo se mide en horas.*
 ## Actas de Acuerdos de las Reuniones Importantes
@@ -49,4 +49,33 @@
 **Fecha:** 19/10/2024  
 **Asistentes**: Álvaro Jiménez Osuna, David Guillén Fernández, Jaime Linares Barrera.   
 **Acuerdos tomados**:
-- **Acuerdo 2024-02-01:** Se concluyó la asignación de issues y su correspondiente creación en GitHub.
+- **Acuerdo 2024-02-01:** Se concluyó la división de issues y su correspondiente creación en GitHub.
+
+
+### ACTA 2024-03
+
+**Fecha:** 23/10/2024  
+**Asistentes**: Álvaro Jiménez Osuna, David Guillén Fernández, Alejandro Aragón Sánchez, Álvaro Chico Castellano, Jaime Linares Barrera.   
+**Acuerdos tomados**:
+- **Acuerdo 2024-03-01:** Se concluyó la asignación de issues.
+
+### ACTA 2024-04
+
+**Fecha:** 27/10/2024  
+**Asistentes**: David Guillén Fernández, Jaime Linares Barrera.   
+**Acuerdos tomados**:
+- **Acuerdo 2024-04-01:** Se tomó la decisión de modificar la funcionalidad previamente desarrollada, adaptándola al repositorio proporcionado por los profesores, y se llevó a cabo un análisis exhaustivo para determinar la mejor forma de implementar este cambio.
+- **Acuerdo 2024-04-02** Se acordó una nueva distribución de issues para el nuevo repositorio.
+
+### ACTA 2024-05
+
+**Fecha:** 28/10/2024  
+**Asistentes**: David Guillén Fernández, Jaime Linares Barrera.   
+**Acuerdos tomados**: No se realizó ningún acuerdo.
+
+### ACTA 2024-06
+
+**Fecha:** 31/10/2024  
+**Asistentes**: David Guillén Fernández, Jaime Linares Barrera.   
+**Acuerdos tomados**:  
+- **Acuerdo 2024-06-01:** Se confirmó con el profesor la estructura visual del proyecto.
