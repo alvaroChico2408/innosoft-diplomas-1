@@ -1,6 +1,8 @@
 import os
 
 from flask_login import login_user
+from sqlalchemy.exc import IntegrityError
+from werkzeug.security import generate_password_hash
 from flask_login import current_user
 
 from app.modules.auth.models import User
@@ -42,6 +44,56 @@ class AuthenticationService(BaseService):
                 raise ValueError("Name is required.")
             if not surname:
                 raise ValueError("Surname is required.")
+            
+            if not self.is_email_available(email):
+                return None, "The email address is already registered."
+            
+            #password = generate_password_hash(password)
+
+            user_data = {
+                "email": email,
+                "password": password,
+                "active": False,
+            }
+
+            profile_data = {
+                "name": name,
+                "surname": surname,
+                "email": email,
+                "password": password,
+            }
+
+            user = self.create(commit=False, **user_data)
+            profile_data["user_id"] = user.id
+            self.user_profile_repository.create(**profile_data)
+            self.repository.session.commit()
+        except IntegrityError as e:
+            self.repository.session.rollback()
+            if "Duplicate entry" in str(e):
+                return None, "The email address is already registered."
+            return None, "An error occurred while creating the profile."
+        except Exception as e:
+            self.repository.session.rollback()
+            return None, "Unexpected error occurred."
+        return user
+
+
+    '''
+    def create_with_profile(self, **kwargs):
+        try:
+            email = kwargs.pop("email", None)
+            password = kwargs.pop("password", None)
+            name = kwargs.pop("name", None)
+            surname = kwargs.pop("surname", None)
+
+            if not email:
+                raise ValueError("Email is required.")
+            if not password:
+                raise ValueError("Password is required.")
+            if not name:
+                raise ValueError("Name is required.")
+            if not surname:
+                raise ValueError("Surname is required.")
 
             user_data = {
                 "email": email,
@@ -63,6 +115,14 @@ class AuthenticationService(BaseService):
             raise exc
         return user
 
+    '''
+    def update_profile(self, user_id, email, password, form):
+        if form.validate():
+            updated_instance = self.update(user_id, **form.data)
+            return updated_instance, None
+
+        return None, form.errors
+    '''
     def update_profile(self, user_profile_id, form):
         if form.validate():
             updated_instance = self.update(user_profile_id, **form.data)
@@ -70,6 +130,9 @@ class AuthenticationService(BaseService):
 
         return None, form.errors
 
+
+    '''
+    
     def get_authenticated_user(self) -> User | None:
         if current_user.is_authenticated:
             return current_user

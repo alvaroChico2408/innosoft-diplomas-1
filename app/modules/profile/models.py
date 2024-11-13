@@ -8,3 +8,5 @@ class UserProfile(db.Model):
 
     name = db.Column(db.String(100), nullable=False)
     surname = db.Column(db.String(100), nullable=False)
+    email = db.Column(db.String(256), unique=True, nullable=True)
+    password = db.Column(db.String(256), nullable=False)
