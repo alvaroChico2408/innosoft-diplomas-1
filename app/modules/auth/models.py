@@ -4,9 +4,9 @@ from datetime import datetime
 from flask_login import UserMixin
 import pytz
 from werkzeug.security import generate_password_hash, check_password_hash
+import hashlib
 
 from app import db
-
 
 class User(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
@@ -27,10 +27,11 @@ class User(db.Model, UserMixin):
         return f'<User {self.email}>'
 
     def set_password(self, password):
-        self.password = generate_password_hash(password)
+        self.password = hashlib.sha256(password.encode()).hexdigest()
 
     def check_password(self, password):
-        return check_password_hash(self.password, password)
+        password_introduced = hashlib.sha256(password.encode()).hexdigest()
+        return self.password == password_introduced
 
     def temp_folder(self) -> str:
         from app.modules.auth.services import AuthenticationService
