@@ -9,6 +9,8 @@ from flask import send_file
 from flask import current_app
 from app import db, mail_service
 
+
+
 diplomas_service = DiplomasService()
 
 
@@ -43,11 +45,11 @@ def view_diploma(diploma_id):
     # Buscar el diploma por su ID
     diploma = Diploma.query.get(diploma_id)
     if not diploma:
-        flash("Diploma not found.", "error")
+        flash("Diploma   not found.", "error")
         return redirect(url_for('diplomas.diplomas_visualization'))
 
-    # Construir la ruta al archivo PDF usando el UVUS
-    file_path = os.path.join(current_app.root_path, "../docs", "diplomas", f"{diploma.uvus}.pdf")
+    # Construir la ruta al archivo PDF
+    file_path = os.path.abspath(diploma.file_path)
     
     # Verificar si el archivo existe
     if os.path.exists(file_path):
@@ -66,14 +68,12 @@ def delete_diploma(diploma_id):
             diploma = Diploma.query.get(diploma_id)
             if diploma:
                 # Generar la ruta completa del archivo PDF basado en el uvus
-                pdf_filename = f"{diploma.uvus}.pdf"
-                file_path = os.path.join(current_app.root_path, "../docs", "diplomas", pdf_filename)
+                file_path = os.path.abspath(diploma.file_path)
                 
                 # Eliminar el archivo PDF si existe
                 if os.path.exists(file_path):
                     try:
                         os.remove(file_path)
-                        print(f"Deleted file: {file_path}")
                     except Exception as file_error:
                         flash("The diploma entry was deleted, but the file could not be deleted.", "warning")
                         print(f"Error deleting file: {file_error}")
@@ -121,7 +121,6 @@ def send_diplomas():
 
     db.session.commit()
     return jsonify({'success': True, 'message': f"Successfully sent {sent_count} diplomas."})
-
 
 
 

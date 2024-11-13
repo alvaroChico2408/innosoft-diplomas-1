@@ -3,6 +3,7 @@ from wtforms import FileField, SubmitField
 from wtforms.validators import DataRequired
 from flask_wtf.file import FileAllowed, FileSize
 
+
 class UploadExcelForm(FlaskForm):
     hours_excel = FileField(
         "Excel to generate diplomas",

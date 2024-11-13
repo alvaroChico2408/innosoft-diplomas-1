@@ -14,93 +14,13 @@ from reportlab.pdfgen import canvas
 
 
 class DiplomasService(BaseService):
+    
     def __init__(self):
         super().__init__(DiplomasRepository())
 
-    def text_pdf_format(self, texto, ancho_maximo, can):
-        palabras = texto.split()
-        lineas = []
-        linea_actual = ""
 
-        for palabra in palabras:
-            if can.stringWidth(linea_actual + " " + palabra) <= ancho_maximo:
-                linea_actual += (palabra + " ")
-            else:
-                lineas.append(linea_actual.strip())
-                linea_actual = palabra + " "
-
-        if linea_actual:
-            lineas.append(linea_actual.strip())
-
-        return lineas
-
-    def generate_pdf(self, diploma, plantilla_pdf):
-        # leemos el PDF plantilla para obtener sus dimensiones
-        lector = PdfReader(plantilla_pdf)
-        pagina = lector.pages[0]
-        ancho = float(pagina.mediabox.width)
-        alto = float(pagina.mediabox.height)
-
-        # creamos un PDF temporal con el texto deseado
-        packet = io.BytesIO()
-        can = canvas.Canvas(packet, pagesize=(ancho, alto))
-        texto = f"Enhorabuena {diploma.nombre} {diploma.apellidos}, has participado en las jornadas Innosoft como {diploma.participacion}"
-
-        # configuramos la fuente y el tamaño
-        can.setFont("Times-Roman", 26)
-
-        # calculamos el ancho máximo disponible y dividir el texto en líneas
-        ancho_maximo = ancho * 0.60
-        lineas = self.text_pdf_format(texto, ancho_maximo, can)
-
-        # calculamos la posición inicial para centrar el texto verticalmente
-        altura_total_texto = len(lineas) * 40
-        coordenada_y = (alto / 2.25) + (altura_total_texto / 2)
-
-        # dibujamos cada línea centrada
-        for linea in lineas:
-            ancho_texto = can.stringWidth(linea)
-            coordenada_x = (ancho - ancho_texto) / 2
-            can.drawString(coordenada_x, coordenada_y, linea)
-            coordenada_y -= 40
-
-        can.save()
-
-        # movemos a la posición del principio
-        packet.seek(0)
-        nuevo_pdf = PdfReader(packet)
-
-        # añadimos texto sobre la plantilla
-        writer = PdfWriter()
-        pagina.merge_page(nuevo_pdf.pages[0])
-        writer.add_page(pagina)
-
-        # creamos la ruta de la carpeta donde se guardarán los diplomas
-        folder_path = os.path.join(current_app.root_path, "../docs", "diplomas")
-        folder_path = os.path.abspath(folder_path)
-        if not os.path.exists(folder_path):
-            os.makedirs(folder_path, exist_ok=True)
-
-        # usamos el nombre de archivo de la función generate_pdf
-        file_path = os.path.join(folder_path, os.path.basename(diploma.file_path))
-
-        # guardamos el nuevo diploma con el nombre de archivo deseado
-        with open(file_path, "wb") as output_pdf:
-            writer.write(output_pdf)
-
-        # función para generar los PDFs para todos los diplomas
-    def generate_all_pdfs(self):
-        # creamos la ruta de la carpeta donde se guardarán los diplomas
-        folder_path = os.path.join(current_app.root_path, "..", "diplomas")
-        folder_path = os.path.abspath(folder_path)
-        # eliminamos la carpeta si ya existe y tiene contenido
-        if os.path.exists(folder_path) and os.listdir(folder_path):
-            shutil.rmtree(folder_path)
-
-        diplomas = Diploma.query.all()
-        for diploma in diplomas:
-            self.generate_pdf(diploma, "docs/Plantilla diploma.pdf")
-
+    # función realizará la validación de la estructura del archivo y los datos específicos de cada campo. Si se detecta algún error, 
+    # lanzará una excepción y no guardará los datos.
     def validate_and_save_excel(self, file):
         try:
             df = pd.read_excel(file)
@@ -166,3 +86,90 @@ class DiplomasService(BaseService):
             db.session.rollback()
             print("Error inesperado al guardar los datos:", e)
             raise ValidationError("An error occurred while saving data to the database.")
+
+
+    # función para generar los PDFs para todos los diplomas
+    def generate_all_pdfs(self):
+        # creamos la ruta de la carpeta donde se guardarán los diplomas
+        folder_path = os.path.join(current_app.root_path, "..", "diplomas")
+        folder_path = os.path.abspath(folder_path)
+        # eliminamos la carpeta si ya existe y tiene contenido
+        if os.path.exists(folder_path) and os.listdir(folder_path):
+            shutil.rmtree(folder_path)
+
+        diplomas = Diploma.query.all()
+        for diploma in diplomas:
+            self.generate_pdf(diploma, "docs/Plantilla diploma.pdf")
+            
+            
+    def generate_pdf(self, diploma, plantilla_pdf):
+        # leemos el PDF plantilla para obtener sus dimensiones
+        lector = PdfReader(plantilla_pdf)
+        pagina = lector.pages[0]
+        ancho = float(pagina.mediabox.width)
+        alto = float(pagina.mediabox.height)
+
+        # creamos un PDF temporal con el texto deseado
+        packet = io.BytesIO()
+        can = canvas.Canvas(packet, pagesize=(ancho, alto))
+        texto = f"Enhorabuena {diploma.nombre} {diploma.apellidos}, has participado en las jornadas Innosoft como {diploma.participacion}"
+
+        # configuramos la fuente y el tamaño
+        can.setFont("Times-Roman", 26)
+
+        # calculamos el ancho máximo disponible y dividir el texto en líneas
+        ancho_maximo = ancho * 0.60
+        lineas = self.text_pdf_format(texto, ancho_maximo, can)
+
+        # calculamos la posición inicial para centrar el texto verticalmente
+        altura_total_texto = len(lineas) * 40
+        coordenada_y = (alto / 2.25) + (altura_total_texto / 2)
+
+        # dibujamos cada línea centrada
+        for linea in lineas:
+            ancho_texto = can.stringWidth(linea)
+            coordenada_x = (ancho - ancho_texto) / 2
+            can.drawString(coordenada_x, coordenada_y, linea)
+            coordenada_y -= 40
+
+        can.save()
+
+        # movemos a la posición del principio
+        packet.seek(0)
+        nuevo_pdf = PdfReader(packet)
+
+        # añadimos texto sobre la plantilla
+        writer = PdfWriter()
+        pagina.merge_page(nuevo_pdf.pages[0])
+        writer.add_page(pagina)
+
+        # creamos la ruta de la carpeta donde se guardarán los diplomas
+        folder_path = os.path.join(current_app.root_path, "../docs", "diplomas")
+        folder_path = os.path.abspath(folder_path)
+        if not os.path.exists(folder_path):
+            os.makedirs(folder_path, exist_ok=True)
+
+        # usamos el nombre de archivo de la función generate_pdf
+        file_path = os.path.join(folder_path, os.path.basename(diploma.file_path))
+
+        # guardamos el nuevo diploma con el nombre de archivo deseado
+        with open(file_path, "wb") as output_pdf:
+            writer.write(output_pdf)
+            
+            
+    def text_pdf_format(self, texto, ancho_maximo, can):
+        palabras = texto.split()
+        lineas = []
+        linea_actual = ""
+
+        for palabra in palabras:
+            if can.stringWidth(linea_actual + " " + palabra) <= ancho_maximo:
+                linea_actual += (palabra + " ")
+            else:
+                lineas.append(linea_actual.strip())
+                linea_actual = palabra + " "
+
+        if linea_actual:
+            lineas.append(linea_actual.strip())
+
+        return lineas
