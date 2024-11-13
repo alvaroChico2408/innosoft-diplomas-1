@@ -77,61 +77,27 @@ class AuthenticationService(BaseService):
             return None, "Unexpected error occurred."
         return user
 
+    def update_profile(self, user_id, email, password, **kwargs):
+        user = self.repository.get_by_id(user_id)
+        if not user:
+            return None, "User not found."
 
-    '''
-    def create_with_profile(self, **kwargs):
-        try:
-            email = kwargs.pop("email", None)
-            password = kwargs.pop("password", None)
-            name = kwargs.pop("name", None)
-            surname = kwargs.pop("surname", None)
+        if email:
+            user.email = email
+        if password:
+            user.set_password(password)
 
-            if not email:
-                raise ValueError("Email is required.")
-            if not password:
-                raise ValueError("Password is required.")
-            if not name:
-                raise ValueError("Name is required.")
-            if not surname:
-                raise ValueError("Surname is required.")
+        for key, value in kwargs.items():
+            if hasattr(user.profile, key):
+                setattr(user.profile, key, value)
 
-            user_data = {
-                "email": email,
-                "password": password,
-                "active": False,
-            }
-
-            profile_data = {
-                "name": name,
-                "surname": surname,
-            }
-
-            user = self.create(commit=False, **user_data)
-            profile_data["user_id"] = user.id
-            self.user_profile_repository.create(**profile_data)
-            self.repository.session.commit()
-        except Exception as exc:
-            self.repository.session.rollback()
-            raise exc
+        print("Hola1")
+        self.repository.session.add(user)
+        print("Hola2")
+        self.repository.session.commit()
+        print("Hola3")
         return user
 
-    '''
-    def update_profile(self, user_id, email, password, form):
-        if form.validate():
-            updated_instance = self.update(user_id, **form.data)
-            return updated_instance, None
-
-        return None, form.errors
-    '''
-    def update_profile(self, user_profile_id, form):
-        if form.validate():
-            updated_instance = self.update(user_profile_id, **form.data)
-            return updated_instance, None
-
-        return None, form.errors
-
-
-    '''
     
     def get_authenticated_user(self) -> User | None:
         if current_user.is_authenticated:
