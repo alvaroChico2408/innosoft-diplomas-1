@@ -1,0 +1,57 @@
+name: Codacy CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    services:
+      mysql:
+        image: mariadb:10.5
+        env:
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: InnosoftPrueba_everybody
+          MYSQL_USER: InnosoftPrueba_everybody
+          MYSQL_PASSWORD: 07328b8f633ace227ba17e96c42ba9aff96a69a9
+        ports:
+          - 3306:3306
+        options: --health-cmd="mysqladmin ping -h localhost" --health-interval=10s --health-timeout=5s --health-retries=3
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.12'
+
+    - name: Copy .env file
+      run: cp .env.example .env
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+
+    - name: Run tests and upload coverage to Codacy
+      env:
+        FLASK_ENV: testing
+        FLASK_APP: app
+        MARIADB_HOSTNAME: 127.0.0.1
+        MARIADB_PORT: 3306
+        MARIADB_TEST_DATABASE: InnosoftPrueba_everybody
+        MARIADB_USER: InnosoftPrueba_everybody
+        MARIADB_PASSWORD: 07328b8f633ace227ba17e96c42ba9aff96a69a9
+        CODACY_PROJECT_TOKEN: ${{ secrets.CODACY_PROJECT_TOKEN }}
+      run: |
+        pip install codacy-coverage
+        coverage run -m pytest app/modules/ --ignore-glob='*selenium*'
+        coverage xml 
+        python-codacy-coverage -r coverage.xml
