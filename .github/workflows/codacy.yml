@@ -60,7 +60,7 @@ jobs:
           MARIADB_TEST_DATABASE: InnosoftPrueba_everybody
           MARIADB_USER: InnosoftPrueba_everybody
           MARIADB_PASSWORD: 07328b8f633ace227ba17e96c42ba9aff96a69a9
-          CODACY_PROJECT_TOKEN: ${{ secrets.CODACY_PROJECT_TOKEN }}
+          CODACY_PROJECT_TOKEN: ${{ secrets.CODACY_INNOSOFT_DIPLOMAS }}
         run: |
           pip install codacy-coverage
           coverage run -m pytest app/modules/ --ignore-glob='*selenium*'
