@@ -96,3 +96,9 @@ class Diploma(db.Model):
         )
         
         
+class DiplomaTemplate(db.Model):
+    __tablename__ = 'diploma_templates'
+    id = db.Column(db.Integer, primary_key=True)
+    filename = db.Column(db.String(100), nullable=False)
+    custom_text = db.Column(db.String(500), nullable=True)
+    file_path = db.Column(db.String(200), nullable=False)

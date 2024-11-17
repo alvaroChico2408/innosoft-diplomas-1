@@ -1,12 +1,10 @@
-from flask import render_template, redirect, url_for, flash, request, jsonify
+from flask import render_template, redirect, url_for, flash, request, jsonify, send_file, current_app
 from flask_login import login_required
-from app.modules.diplomas.models import Diploma
+from app.modules.diplomas.models import Diploma, DiplomaTemplate
 from app.modules.diplomas import diplomas_bp
-from app.modules.diplomas.forms import UploadExcelForm
+from app.modules.diplomas.forms import UploadExcelForm, UploadTemplateForm
 from app.modules.diplomas.services import DiplomasService
 import os
-from flask import send_file
-from flask import current_app
 from app import db, mail_service
 
 
@@ -123,4 +121,69 @@ def send_diplomas():
     return jsonify({'success': True, 'message': f"Successfully sent {sent_count} diplomas."})
 
 
+@diplomas_bp.route('/manage-templates', methods=['GET', 'POST'])
+@login_required
+def manage_templates():
+    form = UploadTemplateForm()
+    templates_dir = os.path.join(current_app.root_path, "diplomas/templates")
+    
+    if not os.path.exists(templates_dir):
+        os.makedirs(templates_dir)
+    
+    if form.validate_on_submit():
+        pdf_file = form.pdf_file.data
+        custom_text = form.custom_text.data
+        
+        # Validar el tipo de archivo
+        if not pdf_file.filename.lower().endswith('.pdf'):
+            flash("Error: Solo se permiten archivos PDF", "error")
+            return redirect(url_for('diplomas.manage_templates'))
 
+        if pdf_file:
+            filename = pdf_file.filename
+            save_path = os.path.join(templates_dir, filename)
+            
+            try:
+                pdf_file.save(save_path)
+                template = DiplomaTemplate(filename=filename, custom_text=custom_text, file_path=save_path)
+                db.session.add(template)
+                db.session.commit()
+                flash("Plantilla subida con éxito", "success")
+            except Exception as e:
+                flash(f"Error al guardar la plantilla: {str(e)}", "error")
+    
+    templates = DiplomaTemplate.query.all()
+    return render_template('diplomas/manage-templates.html', form=form, templates=templates)
+
+
+
+@diplomas_bp.route('/view_template/<int:template_id>', methods=['GET'])
+@login_required
+def view_template(template_id):
+    template = DiplomaTemplate.query.get(template_id)
+    if not template:
+        flash("Plantilla no encontrada", "error")
+        return redirect(url_for('diplomas.manage_templates'))
+
+    file_path = os.path.abspath(template.file_path)
+    if os.path.exists(file_path):
+        return send_file(file_path, as_attachment=False)
+    else:
+        flash("Archivo no encontrado", "error")
+        return redirect(url_for('diplomas.manage_templates'))
+
+
+@diplomas_bp.route('/delete_template/<int:template_id>', methods=['POST'])
+@login_required
+def delete_template(template_id):
+    template = DiplomaTemplate.query.get(template_id)
+    if template:
+        file_path = os.path.abspath(template.file_path)
+        if os.path.exists(file_path):
+            os.remove(file_path)
+        db.session.delete(template)
+        db.session.commit()
+        flash("Plantilla eliminada con éxito", "success")
+    else:
+        flash("Plantilla no encontrada", "error")
+    return redirect(url_for('diplomas.manage_templates'))

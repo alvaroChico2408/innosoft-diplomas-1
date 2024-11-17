@@ -92,6 +92,12 @@
                         </a>
                     </li>
 
+                    <li class="sidebar-item {{ 'active' if request.endpoint == 'diplomas.manage_templates' else '' }}">
+                        <a class="sidebar-link" href="{{ url_for('diplomas.manage_templates') }}">
+                            <i class="align-middle" data-feather="file-text"></i>
+                            <span class="align-middle">Template Management</span>
+                        </a>
+                    </li>                    
                     
 
 

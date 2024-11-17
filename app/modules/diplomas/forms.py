@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import FileField, SubmitField
+from wtforms import FileField, StringField, SubmitField
 from wtforms.validators import DataRequired
 from flask_wtf.file import FileAllowed, FileSize
 
@@ -17,3 +17,11 @@ class UploadExcelForm(FlaskForm):
         ],
     )
     submit = SubmitField("Generate Diplomas")
+
+class UploadTemplateForm(FlaskForm):
+    pdf_file = FileField('Plantilla PDF', validators=[
+        DataRequired(),
+        FileAllowed(['pdf'], 'Solo se permiten archivos PDF')
+    ])
+    custom_text = StringField('Texto personalizado', validators=[DataRequired()])
+    submit = SubmitField('Subir plantilla')
