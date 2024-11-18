@@ -85,7 +85,7 @@
                         </a>
                     </li>
 
-                    <li class="sidebar-item {{ 'active' if request.endpoint == 'diplomas.diplomas_visualization' else '' }}"></li>
+                    <li class="sidebar-item {{ 'active' if request.endpoint == 'diplomas.diplomas_visualization' else '' }}">
                         <a class="sidebar-link" href="{{ url_for('diplomas.diplomas_visualization')  }}">
                             <i class="align-middle" data-feather="eye"></i>
                             <span class="align-middle">Diplomas visualization</span>
