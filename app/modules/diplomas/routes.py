@@ -19,14 +19,15 @@ def index():
     
     if form.validate_on_submit():
         file = form.hours_excel.data
-        if file:
+        selected_template_id = form.template.data
+        if file and selected_template_id:
             try:
-                diplomas_service.validate_and_save_excel(file)
+                template = DiplomaTemplate.query.get(selected_template_id)
+                diplomas_service.validate_and_save_excel(file, template)
                 flash("Diplomas generados con éxito", "success")
             except Exception as e:
                 flash(f"Error al procesar el archivo: {str(e)}", "error")
-        return render_template('diplomas/index.html', form=form)
-    
+        return redirect(url_for('diplomas.index'))
     return render_template('diplomas/index.html', form=form)
 
 
@@ -125,7 +126,7 @@ def send_diplomas():
 @login_required
 def manage_templates():
     form = UploadTemplateForm()
-    templates_dir = os.path.join(current_app.root_path, "diplomas/templates")
+    templates_dir = os.path.join('docs', 'plantillas')
     
     if not os.path.exists(templates_dir):
         os.makedirs(templates_dir)
@@ -142,10 +143,11 @@ def manage_templates():
         if pdf_file:
             filename = pdf_file.filename
             save_path = os.path.join(templates_dir, filename)
-            
+
             try:
                 pdf_file.save(save_path)
-                template = DiplomaTemplate(filename=filename, custom_text=custom_text, file_path=save_path)
+                relative_path = os.path.join('docs', 'plantillas', filename)
+                template = DiplomaTemplate(filename=filename, custom_text=custom_text, file_path=relative_path)
                 db.session.add(template)
                 db.session.commit()
                 flash("Plantilla subida con éxito", "success")
@@ -164,7 +166,6 @@ def view_template(template_id):
     if not template:
         flash("Plantilla no encontrada", "error")
         return redirect(url_for('diplomas.manage_templates'))
-
     file_path = os.path.abspath(template.file_path)
     if os.path.exists(file_path):
         return send_file(file_path, as_attachment=False)

@@ -21,7 +21,7 @@ class DiplomasService(BaseService):
 
     # función realizará la validación de la estructura del archivo y los datos específicos de cada campo. Si se detecta algún error, 
     # lanzará una excepción y no guardará los datos.
-    def validate_and_save_excel(self, file):
+    def validate_and_save_excel(self, file, template):
         try:
             df = pd.read_excel(file)
             print("Archivo Excel leído exitosamente.")
@@ -74,7 +74,7 @@ class DiplomasService(BaseService):
             db.session.commit()
             print("Datos guardados exitosamente en la base de datos.")
             try:
-                self.generate_all_pdfs()
+                self.generate_all_pdfs(template)
             except Exception as e:
                 print("Error al generar los PDFs:", e)
                 raise ValidationError("Error generating PDFs. Please try again.")
@@ -89,7 +89,7 @@ class DiplomasService(BaseService):
 
 
     # función para generar los PDFs para todos los diplomas
-    def generate_all_pdfs(self):
+    def generate_all_pdfs(self,plantilla_pdf):
         # creamos la ruta de la carpeta donde se guardarán los diplomas
         folder_path = os.path.join(current_app.root_path, "..", "diplomas")
         folder_path = os.path.abspath(folder_path)
@@ -99,12 +99,19 @@ class DiplomasService(BaseService):
 
         diplomas = Diploma.query.all()
         for diploma in diplomas:
-            self.generate_pdf(diploma, "docs/Plantilla diploma.pdf")
+            self.generate_pdf(diploma, plantilla_pdf)            
             
             
     def generate_pdf(self, diploma, plantilla_pdf):
+        # obtenemos la ruta completa del archivo PDF de la plantilla
+        plantilla_pdf_path = os.path.abspath(plantilla_pdf.file_path)
+        
+        # verificamos que el archivo exista antes de intentar abrirlo
+        if not os.path.exists(plantilla_pdf_path):
+            raise FileNotFoundError(f"El archivo de plantilla no se encontró en {plantilla_pdf_path}")
+        
         # leemos el PDF plantilla para obtener sus dimensiones
-        lector = PdfReader(plantilla_pdf)
+        lector = PdfReader(plantilla_pdf_path)
         pagina = lector.pages[0]
         ancho = float(pagina.mediabox.width)
         alto = float(pagina.mediabox.height)
@@ -144,7 +151,7 @@ class DiplomasService(BaseService):
         writer.add_page(pagina)
 
         # creamos la ruta de la carpeta donde se guardarán los diplomas
-        folder_path = os.path.join(current_app.root_path, "../docs", "diplomas")
+        folder_path = os.path.join(current_app.root_path, "../docs/diplomas")
         folder_path = os.path.abspath(folder_path)
         if not os.path.exists(folder_path):
             os.makedirs(folder_path, exist_ok=True)

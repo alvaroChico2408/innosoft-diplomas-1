@@ -37,6 +37,10 @@
                     <span style="color: red;">{{ error }}</span>
                 {% endfor %}
             </div>
+            <div class="mb-4">
+                {{ form.template.label }}
+                {{ form.template(class="form-control") }}
+            </div>
             <button type="submit" class="btn btn-primary">{{ form.submit.label }}</button>
         </form>
     </div>
