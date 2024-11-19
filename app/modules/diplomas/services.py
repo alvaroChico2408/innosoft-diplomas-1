@@ -119,14 +119,16 @@ class DiplomasService(BaseService):
         # creamos un PDF temporal con el texto deseado
         packet = io.BytesIO()
         can = canvas.Canvas(packet, pagesize=(ancho, alto))
-        texto = f"Enhorabuena {diploma.nombre} {diploma.apellidos}, has participado en las jornadas Innosoft como {diploma.participacion}"
-
+        
+        # generamos el texto personalizado reemplazando los marcadores
+        texto_personalizado = self.generate_custom_text(plantilla_pdf.custom_text, diploma)
+        
         # configuramos la fuente y el tamaño
         can.setFont("Times-Roman", 26)
 
         # calculamos el ancho máximo disponible y dividir el texto en líneas
         ancho_maximo = ancho * 0.60
-        lineas = self.text_pdf_format(texto, ancho_maximo, can)
+        lineas = self.text_pdf_format(texto_personalizado, ancho_maximo, can)
 
         # calculamos la posición inicial para centrar el texto verticalmente
         altura_total_texto = len(lineas) * 40
@@ -162,6 +164,35 @@ class DiplomasService(BaseService):
         # guardamos el nuevo diploma con el nombre de archivo deseado
         with open(file_path, "wb") as output_pdf:
             writer.write(output_pdf)
+
+
+    def generate_custom_text(self, custom_text, diploma):
+        """
+        Reemplaza los marcadores en el texto personalizado con los valores del diploma.
+        Los marcadores están definidos entre corchetes, e.g., [nombre], [apellidos].
+        """
+        if not custom_text:
+            # Texto predeterminado si no hay texto personalizado
+            return f"Enhorabuena {diploma.nombre} {diploma.apellidos}, has participado en las jornadas Innosoft como {diploma.participacion}"
+        
+        # Diccionario con los atributos del diploma
+        atributos = {
+            "nombre": diploma.nombre,
+            "apellidos": diploma.apellidos,
+            "uvus": diploma.uvus,
+            "correo": diploma.correo,
+            "perfil": diploma.perfil,
+            "participacion": diploma.participacion,
+            "comite": diploma.comite
+        }
+
+        # Reemplazar cada marcador en el texto personalizado
+        for marcador, valor in atributos.items():
+            marcador_formateado = f"[{marcador}]"
+            custom_text = custom_text.replace(marcador_formateado, str(valor))
+        
+        return custom_text
+
             
             
     def text_pdf_format(self, texto, ancho_maximo, can):
