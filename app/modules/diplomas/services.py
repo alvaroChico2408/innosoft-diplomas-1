@@ -180,3 +180,56 @@ class DiplomasService(BaseService):
             lineas.append(linea_actual.strip())
 
         return lineas
+
+    def generate_preview_with_text(self, template_path, custom_text):
+        try:
+            # Leer el archivo de plantilla
+            reader = PdfReader(template_path)
+            page = reader.pages[0]
+
+            # Obtener dimensiones de la página
+            width = float(page.mediabox.width)
+            height = float(page.mediabox.height)
+
+            # Crear un PDF temporal con el texto superpuesto
+            packet = io.BytesIO()
+            can = canvas.Canvas(packet, pagesize=(width, height))
+
+            # Configuración del texto
+            can.setFont("Times-Roman", 26)
+            text_width = width * 0.8
+            text_lines = self.text_pdf_format(custom_text, text_width, can)
+
+            # Posicionar el texto centrado verticalmente
+            y_position = height / 2 + len(text_lines) * 15
+            for line in text_lines:
+                text_x = (width - can.stringWidth(line)) / 2
+                can.drawString(text_x, y_position, line)
+                y_position -= 30
+
+            can.save()
+            packet.seek(0)
+
+            # Leer el PDF temporal con el texto
+            temp_pdf = PdfReader(packet)
+            temp_page = temp_pdf.pages[0]
+
+            # Combinar la página temporal con el texto en la plantilla original
+            page.merge_page(temp_page)
+
+            # Crear un archivo temporal para guardar el PDF final
+            temp_dir = os.path.join(current_app.root_path, "docs")
+            if not os.path.exists(temp_dir):
+                os.makedirs(temp_dir, exist_ok=True)
+
+            temp_path = os.path.join(temp_dir, "temp_preview.pdf")
+            writer = PdfWriter()
+            writer.add_page(page)
+
+            with open(temp_path, "wb") as output_file:
+                writer.write(output_file)
+
+            return temp_path
+        except Exception as e:
+            print(f"Error al generar vista previa: {e}")
+            raise

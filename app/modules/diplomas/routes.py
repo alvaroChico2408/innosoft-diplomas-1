@@ -167,10 +167,16 @@ def view_template(template_id):
         flash("Plantilla no encontrada", "error")
         return redirect(url_for('diplomas.manage_templates'))
     file_path = os.path.abspath(template.file_path)
-    if os.path.exists(file_path):
-        return send_file(file_path, as_attachment=False)
-    else:
+    if not os.path.exists(file_path):
         flash("Archivo no encontrado", "error")
+        return redirect(url_for('diplomas.manage_templates'))
+
+    # Crear un archivo temporal con el texto personalizado
+    try:
+        output_path = diplomas_service.generate_preview_with_text(file_path, template.custom_text)
+        return send_file(output_path, as_attachment=False)
+    except Exception as e:
+        flash(f"Error al generar la vista previa: {str(e)}", "error")
         return redirect(url_for('diplomas.manage_templates'))
 
 
