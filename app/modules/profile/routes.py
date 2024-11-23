@@ -15,7 +15,13 @@ def edit_profile():
     if not profile:
         return redirect(url_for("public.index"))
 
-    form = UserProfileForm()
+    form = UserProfileForm(
+        name=profile.name,
+        surname=profile.surname,
+        email=profile.email,
+        password=profile.password,
+    )
+
     if request.method == "POST":
         service = UserProfileService()
         result, errors = service.update_profile(profile.id, form)

@@ -15,14 +15,18 @@ class UserProfileService(BaseService):
     
     def update_profile(self, user_profile_id, form):
         if form.validate():
-            updated_instance = self.update(user_profile_id, **form.data)
+            updated_data = {key: value for key, value in form.data.items() if value}
+            updated_instance = self.update(user_profile_id, **updated_data)
+
             user_profile = self.get_by_id(user_profile_id)
             email = form.email.data
             password = form.password.data if form.password.data else None
+            
             self.auth_service.update_profile(current_user.id, email, password)
             self.repository.session.add(user_profile)
             self.repository.session.commit()
             return updated_instance, None
 
         return None, form.errors
+
         
