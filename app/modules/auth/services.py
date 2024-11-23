@@ -77,6 +77,8 @@ class AuthenticationService(BaseService):
 
     def update_profile(self, user_id, email, password, **kwargs):
         user = self.repository.get_by_id(user_id)
+        user_profile = self.user_profile_repository.get_by_user_id(user_id)
+
         if not user:
             return None, "User not found."
 
@@ -84,18 +86,16 @@ class AuthenticationService(BaseService):
             user.email = email
         if password:
             user.set_password(password)
-            
-            user_profile.set_password(password)
-
+            user_profile.set_password(password)            
 
         for key, value in kwargs.items():
             if hasattr(user.profile, key):
                 setattr(user.profile, key, value)
 
         self.repository.session.add(user)
-        self.repository.session.add(user.profile)
+        self.user_profile_repository.session.add(user.profile)
         self.repository.session.commit()
-        self.repository.session.commit()
+        self.user_profile_repository.session.commit()
         return user
 
     

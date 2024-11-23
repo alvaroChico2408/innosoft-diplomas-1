@@ -17,10 +17,8 @@ class UserProfileService(BaseService):
         if form.validate():
             updated_instance = self.update(user_profile_id, **form.data)
             user_profile = self.get_by_id(user_profile_id)
-            
             email = form.email.data
             password = form.password.data if form.password.data else None
-            password = hashlib.sha256(password.encode()).hexdigest() if password else None
             self.auth_service.update_profile(current_user.id, email, password)
             self.repository.session.add(user_profile)
             self.repository.session.commit()

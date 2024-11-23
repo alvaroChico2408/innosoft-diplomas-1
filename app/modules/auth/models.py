@@ -3,7 +3,7 @@ from datetime import datetime
 
 from flask_login import UserMixin
 import pytz
-from werkzeug.security import generate_password_hash, check_password_hash
+from werkzeug.security import generate_password_hash
 import hashlib
 
 from app import db
@@ -30,7 +30,13 @@ class User(db.Model, UserMixin):
         self.password = hashlib.sha256(password.encode()).hexdigest()
 
     def check_password(self, password):
+        print(password)
         password_introduced = hashlib.sha256(password.encode()).hexdigest()
+        password2 = hashlib.sha256(password_introduced.encode()).hexdigest()
+        print(password2)
+        print(self.password)
+        print(password_introduced)
+        print(self.password==password_introduced)
         return self.password == password_introduced
 
     def temp_folder(self) -> str:
