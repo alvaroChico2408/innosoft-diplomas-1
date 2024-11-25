@@ -50,4 +50,4 @@ deployments.log
 node_modules/
 
 # pdf diplomas
-diplomas/
+docs/diplomas/
