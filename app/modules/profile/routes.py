@@ -15,7 +15,14 @@ def edit_profile():
     if not profile:
         return redirect(url_for("public.index"))
 
-    form = UserProfileForm()
+    # Mantener el campo de contraseña vacío al cargar el formulario
+    form = UserProfileForm(
+        name=profile.name,
+        surname=profile.surname,
+        email=profile.email,
+        password=""  # Dejar vacío para no mostrar la contraseña almacenada
+    )
+    
     if request.method == "POST":
         service = UserProfileService()
         result, errors = service.update_profile(profile.id, form)
@@ -24,3 +31,4 @@ def edit_profile():
         )
 
     return render_template("profile/edit.html", form=form, profile=profile)
+
