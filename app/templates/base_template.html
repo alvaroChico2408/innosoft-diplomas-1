@@ -10,12 +10,12 @@
     <meta name="author" content="David Romero">
 
     <link rel="preconnect" href="https://fonts.gstatic.com">
-    <link rel="shortcut icon" href="{{ url_for("static", filename="img/icons/icon-250x250.png") }}"/>
+    <link rel="shortcut icon" href="{{ url_for("static", filename="img/favicon.ico") }}"/>
 
 
     <link rel="canonical" href="https://www.flask_base.io"/>
 
-    <title>{{ FLASK_APP_NAME }}</title>
+    <title>Diplomas InnoSoft</title>
 
     <link rel="stylesheet" href="{{ url_for("static", filename="css/app.css") }}">
 
@@ -36,8 +36,9 @@
 
     <nav id="sidebar" class="sidebar js-sidebar">
         <div class="sidebar-content js-simplebar">
-            <a class="sidebar-brand" href="{{ url_for('public.index') }}">
-                {{ FLASK_APP_NAME }}
+            <a class="sidebar-brand" href="{{ url_for('public.index') }}" style="display: flex; align-items: center;">
+                <img src="{{ url_for('static', filename='img/logo.png') }}" alt="Logo" style="width: 25px; height: 25px; margin-right: 8px;">
+                Diplomas InnoSoft
             </a>
 
 
@@ -171,7 +172,7 @@
                 <div class="row text-muted">
                     <div class="col-6 text-start">
                         <p class="mb-0">
-                            <strong>{{ FLASK_APP_NAME }}</strong>
+                            <strong>Diplomas InnoSoft</strong>
                         </p>
                     </div>
                     <div class="col-6 text-end">
