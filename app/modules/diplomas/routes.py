@@ -1,13 +1,12 @@
-from flask import render_template, redirect, url_for, flash, request, jsonify
+import os
+from app import db, mail_service
+import json
+from flask import render_template, redirect, url_for, flash, request, jsonify, send_file, current_app
 from flask_login import login_required
 from app.modules.diplomas.models import Diploma
 from app.modules.diplomas import diplomas_bp
 from app.modules.diplomas.forms import UploadExcelForm
 from app.modules.diplomas.services import DiplomasService
-import os
-from flask import send_file
-from flask import current_app
-from app import db, mail_service
 
 
 
@@ -122,5 +121,29 @@ def send_diplomas():
     db.session.commit()
     return jsonify({'success': True, 'message': f"Successfully sent {sent_count} diplomas."})
 
+
+@diplomas_bp.route('/delete_selected_diplomas', methods=['POST'])
+@login_required
+def delete_selected_diplomas():
+    diploma_ids = request.form.get('diploma_ids')
+    if not diploma_ids:
+        flash('No diploma IDs provided.', 'error')
+        return redirect(url_for('diplomas.diplomas_visualization'))
+
+    try:
+        diploma_ids = json.loads(diploma_ids)
+        diplomas = Diploma.query.filter(Diploma.id.in_(diploma_ids)).all()
+        for diploma in diplomas:
+            file_path = os.path.abspath(diploma.file_path)
+            if os.path.exists(file_path):
+                os.remove(file_path)
+            db.session.delete(diploma)
+        db.session.commit()
+        flash('Selected diplomas deleted successfully.', 'success')
+    except Exception as e:
+        db.session.rollback()
+        flash(f'Error occurred: {e}', 'error')
+
+    return redirect(url_for('diplomas.diplomas_visualization'))
 
 
