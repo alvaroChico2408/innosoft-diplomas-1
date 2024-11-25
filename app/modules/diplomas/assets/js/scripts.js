@@ -8,6 +8,7 @@ function getSelectedDiplomas() {
     return selectedDiplomas;
 }
 
+
 // Función para enviar los diplomas seleccionados
 function sendSelectedDiplomas() {
     const selectedDiplomas = getSelectedDiplomas();
@@ -51,11 +52,13 @@ function selectAll() {
     checkboxes.forEach(checkbox => checkbox.checked = true);
 }
 
+
 // Deseleccionar todos los checkboxes
 function deselectAll() {
     const checkboxes = document.querySelectorAll('.send-checkbox');
     checkboxes.forEach(checkbox => checkbox.checked = false);
 }
+
 
 // Filtro por UVUS
 function filterByUVUS() {
@@ -72,6 +75,7 @@ function filterByUVUS() {
     });
 }
 
+
 // Restablecer filtro por UVUS
 function resetFilters() {
     document.getElementById('uvusFilter').value = ''; 
@@ -80,6 +84,7 @@ function resetFilters() {
         row.style.display = ''; // Mostrar todas las filas
     });
 }
+
 
 // Filtro por Participación
 function filterByParticipation(participation) {
@@ -94,10 +99,33 @@ function filterByParticipation(participation) {
     });
 }
 
+
 // Restablecer filtro por Participación
 function resetParticipationFilter() {
     const rows = document.querySelectorAll('#diplomaTableBody tr');
     rows.forEach(row => {
         row.style.display = '';   // Mostrar todas las filas
     });
+}
+
+
+// Manejo de eliminación de múltiples diplomas
+function handleDeleteSelected(event) {
+    const selectedDiplomas = [];
+    document.querySelectorAll('.send-checkbox:checked').forEach(checkbox => {
+        const diplomaIdCell = checkbox.closest('tr').querySelector('td:first-child');
+        if (diplomaIdCell) {
+            selectedDiplomas.push(diplomaIdCell.textContent.trim());
+        }
+    });
+
+    if (selectedDiplomas.length === 0) {
+        event.preventDefault(); // Detener envío del formulario
+        alert("Please select at least one diploma to delete.");
+        return false;
+    }
+
+    // Colocar los IDs en el campo oculto
+    document.getElementById('diplomaIdsInput').value = JSON.stringify(selectedDiplomas);
+    return true; // Permitir el envío del formulario
 }
