@@ -4,7 +4,7 @@
 
 {% block content %}
 <div class="container my-4 p-4 bg-white shadow rounded">
-    <h2 class="text-center mb-4">🎓📂 Generate Diplomas 📂🎓</h2>
+    <h1 class="text-center mb-4">🎓📂 Generate Diplomas 📂🎓</h1>
 </div>
 
 <div class="container d-flex justify-content-center align-items-center" style="height: 60vh;">
@@ -36,6 +36,10 @@
                 {% for error in form.hours_excel.errors %}
                     <span style="color: red;">{{ error }}</span>
                 {% endfor %}
+            </div>
+            <div class="mb-4">
+                {{ form.template.label }}
+                {{ form.template(class="form-control") }}
             </div>
             <button type="submit" class="btn btn-primary">{{ form.submit.label }}</button>
         </form>

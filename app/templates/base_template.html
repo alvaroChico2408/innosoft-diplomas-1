@@ -79,23 +79,27 @@
                         Functionality
                     </li>
 
-                    <li class="sidebar-item {{ 'active' if request.endpoint == 'diplomas.index' else '' }}">
-                        <a class="sidebar-link" href="{{ url_for('diplomas.index') }}">
+                    <li class="sidebar-item {{ 'active' if request.endpoint == 'diplomas.generate_diplomas' else '' }}">
+                        <a class="sidebar-link" href="{{ url_for('diplomas.generate_diplomas') }}">
                             <i class="align-middle" data-feather="award"></i>
                             <span class="align-middle">Diploma generator</span>
                         </a>
                     </li>
 
-                    <li class="sidebar-item {{ 'active' if request.endpoint == 'diplomas.diplomas_visualization' else '' }}"></li>
+                    <li class="sidebar-item {{ 'active' if request.endpoint == 'diplomas.diplomas_visualization' else '' }}">
                         <a class="sidebar-link" href="{{ url_for('diplomas.diplomas_visualization')  }}">
                             <i class="align-middle" data-feather="eye"></i>
                             <span class="align-middle">Diplomas visualization</span>
                         </a>
                     </li>
 
+                    <li class="sidebar-item {{ 'active' if request.endpoint == 'diplomas.manage_templates' else '' }}">
+                        <a class="sidebar-link" href="{{ url_for('diplomas.manage_templates') }}">
+                            <i class="align-middle" data-feather="file-text"></i>
+                            <span class="align-middle">Template Management</span>
+                        </a>
+                    </li>                    
                     
-
-
                     <li class="sidebar-header">
                         Options
                     </li>
