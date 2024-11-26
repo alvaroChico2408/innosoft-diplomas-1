@@ -4,7 +4,7 @@
 
 {% block content %}
 <div class="container my-4 p-4 bg-white shadow rounded">
-    <h2 class="text-center mb-4">📝📄 Gestión de Plantillas de Diplomas 📄📝</h2>
+    <h1 class="text-center mb-4">📝📄 Create your own Diplomas Templates 📄📝</h1>
 
     <!-- Mostrar mensajes flash -->
     {% with messages = get_flashed_messages(with_categories=true) %}
@@ -13,7 +13,7 @@
     <div class="alert alert-{{ category }} text-center" role="alert">
         <div class="alert-message">
             {% if category == 'success' %}
-            <h4 class="alert-heading"><i class="align-middle" data-feather="check-circle"></i> Éxito</h4>
+            <h4 class="alert-heading"><i class="align-middle" data-feather="check-circle"></i> Success</h4>
             {% elif category == 'error' %}
             <h4 class="alert-heading"><i class="align-middle" data-feather="x-circle"></i> Error</h4>
             {% endif %}
@@ -58,15 +58,16 @@
         </div>
         <button type="submit" class="btn btn-primary">Subir Plantilla</button>
     </form>
+</div>
 
-    <!-- Mostrar plantillas existentes -->
-    <h3 class="text-center mb-4">📂 Plantillas Existentes 📂</h3>
+<div class="container my-4 p-4 bg-white shadow rounded">
+    <h1 class="text-center mb-4">📂 Existing Diplomas Templates 📂</h1>
     <table class="table table-striped">
         <thead>
             <tr>
-                <th>Nombre del Archivo</th>
-                <th>Texto Personalizado</th>
-                <th>Acciones</th>
+                <th>File name</th>
+                <th>Custom text</th>
+                <th>Actions</th>
             </tr>
         </thead>
         <tbody>

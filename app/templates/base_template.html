@@ -79,8 +79,8 @@
                         Functionality
                     </li>
 
-                    <li class="sidebar-item {{ 'active' if request.endpoint == 'diplomas.index' else '' }}">
-                        <a class="sidebar-link" href="{{ url_for('diplomas.index') }}">
+                    <li class="sidebar-item {{ 'active' if request.endpoint == 'diplomas.generate_diplomas' else '' }}">
+                        <a class="sidebar-link" href="{{ url_for('diplomas.generate_diplomas') }}">
                             <i class="align-middle" data-feather="award"></i>
                             <span class="align-middle">Diploma generator</span>
                         </a>
@@ -100,8 +100,6 @@
                         </a>
                     </li>                    
                     
-
-
                     <li class="sidebar-header">
                         Options
                     </li>

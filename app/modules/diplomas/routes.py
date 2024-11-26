@@ -15,7 +15,7 @@ diplomas_service = DiplomasService()
 
 @diplomas_bp.route('/diplomas', methods=['GET', 'POST'])
 @login_required
-def index():
+def generate_diplomas():
     form = UploadExcelForm()
     
     if form.validate_on_submit():
@@ -28,8 +28,9 @@ def index():
                 flash("Diplomas generados con éxito", "success")
             except Exception as e:
                 flash(f"Error al procesar el archivo: {str(e)}", "error")
-        return redirect(url_for('diplomas.index'))
-    return render_template('diplomas/index.html', form=form)
+        return redirect(url_for('diplomas.generate_diplomas'))
+    
+    return render_template('diplomas/generate_diplomas.html', form=form)
 
 
 @diplomas_bp.route('/diplomas-visualization', methods=['GET'])
@@ -42,16 +43,13 @@ def diplomas_visualization():
 @diplomas_bp.route('/view_diploma/<int:diploma_id>', methods=['GET'])
 @login_required
 def view_diploma(diploma_id):
-    # Buscar el diploma por su ID
     diploma = Diploma.query.get(diploma_id)
     if not diploma:
-        flash("Diploma   not found.", "error")
+        flash("Diploma not found.", "error")
         return redirect(url_for('diplomas.diplomas_visualization'))
 
-    # Construir la ruta al archivo PDF
     file_path = os.path.abspath(diploma.file_path)
     
-    # Verificar si el archivo existe
     if os.path.exists(file_path):
         return send_file(file_path, as_attachment=False)
     else:
@@ -64,10 +62,8 @@ def view_diploma(diploma_id):
 def delete_diploma(diploma_id):
     if request.form.get('_method') == 'DELETE':
         try:
-            # Obtener el diploma por su ID
             diploma = Diploma.query.get(diploma_id)
             if diploma:
-                # Generar la ruta completa del archivo PDF basado en el uvus
                 file_path = os.path.abspath(diploma.file_path)
                 
                 # Eliminar el archivo PDF si existe
@@ -108,9 +104,9 @@ def send_diplomas():
         if file_path and os.path.exists(file_path):
             try:
                 mail_service.send_email_with_attachment(
-                    subject="Your Diploma from Innosoft",
+                    subject="Your Diploma from InnoSoft",
                     recipients=[diploma.correo],
-                    body="Congratulations! Here is your diploma for participating in the InnoSoft Days.",
+                    body="Congratulations! 🎉🏆 Here is your diploma for participating in the InnoSoft Days.",
                     attachment_path_pdf=file_path
                 )
                 diploma.sent = True
@@ -185,9 +181,11 @@ def view_template(template_id):
 def delete_template(template_id):
     template = DiplomaTemplate.query.get(template_id)
     if template:
+        # Eliminar el archivo PDF si existe
         file_path = os.path.abspath(template.file_path)
         if os.path.exists(file_path):
             os.remove(file_path)
+        # Eliminar el registro de la base de datos
         db.session.delete(template)
         db.session.commit()
         flash("Plantilla eliminada con éxito", "success")
