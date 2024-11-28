@@ -1,0 +1,101 @@
+{% extends 'base_template.html' %}
+
+{% block title %}Manage Templates{% endblock %}
+
+{% block content %}
+<div class="container my-4 p-4 bg-white shadow rounded">
+    <h1 class="text-center mb-4">📝📄 Create your own Diplomas Templates 📄📝</h1>
+
+    <!-- Mostrar mensajes flash -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+    {% for category, message in messages %}
+    <div class="alert alert-{{ category }} text-center" role="alert">
+        <div class="alert-message">
+            {% if category == 'success' %}
+            <h4 class="alert-heading"><i class="align-middle" data-feather="check-circle"></i> Success</h4>
+            {% elif category == 'error' %}
+            <h4 class="alert-heading"><i class="align-middle" data-feather="x-circle"></i> Error</h4>
+            {% endif %}
+            <p style="margin-bottom: 0;">{{ message }}</p>
+        </div>
+    </div>
+    {% endfor %}
+    {% endif %}
+    {% endwith %}
+
+    <!-- Formulario para subir una nueva plantilla PDF -->
+    <form method="post" enctype="multipart/form-data" action="{{ url_for('diplomas.manage_templates') }}" class="mb-5">
+        {{ form.hidden_tag() }}
+        <div class="mb-3">
+            <label>{{ form.pdf_file.label }}:</label>
+            {{ form.pdf_file(class="form-control") }}
+            {% for error in form.pdf_file.errors %}
+                <span class="text-danger">{{ error }}</span>
+            {% endfor %}
+        </div>
+        <div class="mb-3">
+            <label>{{ form.custom_text.label }}:</label>
+            {{ form.custom_text(class="form-control") }}
+            {% for error in form.custom_text.errors %}
+                <span class="text-danger">{{ error }}</span>
+            {% endfor %}
+            <div class="mt-2">
+                <small class="text-muted">
+                    Usa los siguientes placeholders para personalizar el texto: <br>
+                    - <code>[nombre]</code>: Nombre del participante<br>
+                    - <code>[apellidos]</code>: Apellidos del participante<br>
+                    - <code>[uvus]</code>: Identificador único<br>
+                    - <code>[correo]</code>: Dirección de correo electrónico<br>
+                    - <code>[perfil]</code>: Perfil del participante<br>
+                    - <code>[participacion]</code>: Tipo de participación<br>
+                    - <code>[comite]</code>: Comité asignado<br>
+                    - <code>[evidencias_registradas]</code>: Evidencias registradas<br>
+                    - <code>[horas_de_evidencias]</code>: Total de horas de evidencias<br>
+                    - <code>[horas_en_total]</code>: Total de horas registradas
+                </small>
+            </div>
+        </div>
+        <button type="submit" class="btn btn-primary">Subir Plantilla</button>
+    </form>
+</div>
+
+<div class="container my-4 p-4 bg-white shadow rounded">
+    <h1 class="text-center mb-4">📂 Existing Diplomas Templates 📂</h1>
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>File name</th>
+                <th>Custom text</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for template in templates %}
+            <tr>
+                <td>{{ template.filename }}</td>
+                <td>{{ template.custom_text }}</td>
+                <td>
+                    <!-- Botón para ver el PDF -->
+                    <a href="{{ url_for('diplomas.view_template', template_id=template.id) }}" target="_blank" class="btn btn-info">Ver</a>
+                    
+                    <!-- Botón para eliminar la plantilla -->
+                    <form method="post" action="{{ url_for('diplomas.delete_template', template_id=template.id) }}" style="display:inline;" onsubmit="return confirm('¿Estás seguro de eliminar esta plantilla?');">
+                        <input type="hidden" name="_method" value="DELETE">
+                        <button type="submit" class="btn btn-danger">Eliminar</button>
+                    </form>
+                </td>
+            </tr>
+            {% else %}
+            <tr>
+                <td colspan="3" class="text-center">No hay plantillas disponibles</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('diplomas.assets', subfolder='js', filename='scripts.js') }}"></script>
+{% endblock %}
