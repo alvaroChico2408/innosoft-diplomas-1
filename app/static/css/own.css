@@ -19,10 +19,83 @@
     color: #ffffff; /* Color del texto del ítem activo */
 }
 
+
+/*Cartel home*/
+
+.cartel{
+    max-width: 100%;  /* Limita el tamaño al 100% de su contenedor */
+    height: auto;     /* Mantiene la proporción de la imagen */
+    border-radius: 15px; /* Bordes redondeados */
+    margin-left: 250px;
+    margin-top: 10px;
+
+}
+
+.cartel2 {
+    display: flex;
+    justify-content: center; /* Centra horizontalmente */
+    align-items: center; /* Centra verticalmente */
+    margin-top: 20px;
+}
+
+.cartel2-img {
+    width: 10%; /* Ajusta el tamaño de la imagen al 50% del contenedor */
+    max-width: 50px; /* Tamaño máximo para la imagen (más pequeña) */
+    height: auto; /* Mantiene la proporción de la imagen */
+}
+
+.click-page{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 90%;
+    margin-left: 150px;
+
+}
+
+/*TESTO HOME*/
+
+/* Estilos para el contenedor principal */
+.welcome-box {
+    display: inline-block;
+    padding: 30px;
+    background-color: #ffffff; /* Fondo blanco */
+    border-radius: 15px; /* Bordes redondeados */
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); /* Sombra suave */
+    max-width: 600px;
+    margin-top: -10px;
+    text-align: center; /* Asegura que el texto se centre */
+    border: 1px solid #007bff; /* Borde azul alrededor */
+    transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out; /* Efecto de transición para hover */
+}
+
+/* Estilo para el hover del cuadro */
+.welcome-box:hover {
+    transform: translateY(-5px); /* Eleva el cuadro ligeramente */
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15); /* Aumenta la sombra */
+}
+
+/* Estilo para el título */
+.welcome-box h2 {
+    color: #007bff; /* Azul */
+    font-size: 2.5rem;
+    font-weight: bold;
+    margin-bottom: 15px;
+}
+
+
+
+
+strong {
+    font-weight: bold; /* Aplica negrita a la palabra INNOSOFT */
+}
+
+/*Alerta*/
 .alert-warning {
     background-color: #FFF3CD;
     padding: 20px;
     border-radius: 5px;
+
 }
 
 
@@ -45,11 +118,7 @@
 }
 
 /*Diploma*/
-.container-center {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
+
 .gray-box {
     border: 2px solid rgba(128, 128, 128, 0.699); /* Borde gris claro y transparente */
     background-color: rgba(144, 165, 189, 0.808); /* Fondo gris claro con transparencia */
@@ -61,7 +130,6 @@
     
 }
 
-/* Contenedor para la imagen izquierda */
 
 /* Contenedores para las imágenes */
 .image-container-left, .image-container-right {

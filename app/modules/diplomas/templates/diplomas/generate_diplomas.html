@@ -3,8 +3,12 @@
 {% block title %}View diplomas{% endblock %}
 
 {% block content %}
-<div class="container-center ">
-    <h1 class="text-center mb-4 gray-box" style="color: white;">Generate Diplomas</h1>
+<div class="container text-center mt-5">
+
+<div class="welcome-box ">
+    <h2 class="display-4 text-primary" style="color: white;">Generate Diplomas </h2>
+
+</div>
 </div>
 
 <div class="container d-flex justify-content-center align-items-center" style="height: 60vh;">  
@@ -51,7 +55,7 @@
         </form>
     </div>
     <div class="image-container-right">
-        <img src="{{ url_for('static', filename='img/logo.png') }}" alt="Imagen izquierda" class="image-circle">
+        <img src="{{ url_for('static', filename='img/ISD.png') }}" alt="Imagen izquierda" class="image-circle">
     </div>
 </div>
 {% endblock %}
