@@ -47,35 +47,6 @@
         </div>
     </div>
 
-    <!-- Contraseña y Confirmación -->
-    <div class="row mb-3">
-        <div class="col-6">
-            {{ form.password.label(class="form-label") }}
-            <div class="input-group">
-                <input
-                    type="password"
-                    class="form-control"
-                    id="password"
-                    name="password"
-                    placeholder="Enter new password"
-                    value="" <!-- Campo vacío -->
-                
-                <button type="button" class="btn btn-outline-secondary" id="toggle-password" tabindex="-1">
-                    <span id="toggle-password-text">Ver</span>
-                </button>
-            </div>
-            {% for error in form.password.errors %}
-            <span style="color: red;">{{ error }}</span><br>
-            {% endfor %}
-        </div>
-        <div class="col-6">
-            {{ form.confirm_password.label(class="form-label") }}
-            {{ form.confirm_password(class="form-control", placeholder="Confirm new password") }}
-            {% for error in form.confirm_password.errors %}
-            <span style="color: red;">{{ error }}</span><br>
-            {% endfor %}
-        </div>
-    </div>
 
     <!-- Botón de Actualizar -->
     <div class="mt-3">
@@ -83,19 +54,5 @@
     </div>
 </form>
 
-<!-- Script para alternar visibilidad de la contraseña -->
-<script>
-    document.getElementById('toggle-password').addEventListener('click', function () {
-        const passwordInput = document.getElementById('password');
-        const toggleText = document.getElementById('toggle-password-text');
-        
-        if (passwordInput.type === 'password') {
-            passwordInput.type = 'text';
-            toggleText.textContent = 'Ocultar'; // Cambiar texto del botón a "Ocultar"
-        } else {
-            passwordInput.type = 'password';
-            toggleText.textContent = 'Ver'; // Cambiar texto del botón a "Ver"
-        }
-    });
-</script>
+
 {% endblock %}

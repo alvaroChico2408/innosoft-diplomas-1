@@ -75,7 +75,7 @@ class AuthenticationService(BaseService):
             return None, "Unexpected error occurred."
         return user
 
-    def update_profile(self, user_id, email, password, **kwargs):
+    def update_profile(self, user_id, email, **kwargs):
         user = self.repository.get_by_id(user_id)
         user_profile = self.user_profile_repository.get_by_user_id(user_id)
 
@@ -84,9 +84,7 @@ class AuthenticationService(BaseService):
 
         if email:
             user.email = email
-        if password:
-            user.set_password(password)
-            user_profile.set_password(password)            
+           
 
         for key, value in kwargs.items():
             if hasattr(user.profile, key):

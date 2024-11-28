@@ -19,8 +19,7 @@ def edit_profile():
     form = UserProfileForm(
         name=profile.name,
         surname=profile.surname,
-        email=profile.email,
-        password=""  # Dejar vacío para no mostrar la contraseña almacenada
+        email=profile.email
     )
     
     if request.method == "POST":
