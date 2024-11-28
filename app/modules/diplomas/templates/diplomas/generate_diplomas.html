@@ -3,12 +3,18 @@
 {% block title %}View diplomas{% endblock %}
 
 {% block content %}
-<div class="container my-4 p-4 bg-white shadow rounded">
-    <h1 class="text-center mb-4">🎓📂 Generate Diplomas 📂🎓</h1>
+<div class="container-center ">
+    <h1 class="text-center mb-4 gray-box" style="color: white;">Generate Diplomas</h1>
 </div>
 
-<div class="container d-flex justify-content-center align-items-center" style="height: 60vh;">
-    <div class="text-center">
+<div class="container d-flex justify-content-center align-items-center" style="height: 60vh;">  
+    <!-- Imágenes añadidas a la izquierda y derecha -->
+    <div class="image-container-left">
+        <img src="{{ url_for('static', filename='img/logo.png') }}" alt="Imagen izquierda" class="image-circle">
+    </div>
+
+    <div class="text-center gray-box" style="color: white">
+        
         {% with messages = get_flashed_messages(with_categories=true) %}
         {% if messages %}
         {% for category, message in messages %}
@@ -43,6 +49,9 @@
             </div>
             <button type="submit" class="btn btn-primary">{{ form.submit.label }}</button>
         </form>
+    </div>
+    <div class="image-container-right">
+        <img src="{{ url_for('static', filename='img/logo.png') }}" alt="Imagen izquierda" class="image-circle">
     </div>
 </div>
 {% endblock %}
