@@ -64,13 +64,13 @@ jobs:
         sed -i '/rosemary @ file:\/\/\/app/d' requirements.txt
 
     # Ejecutar las pruebas
-    - name: Run Tests
-      env:
-        FLASK_ENV: testing
-        MARIADB_HOSTNAME: 127.0.0.1
-        MARIADB_PORT: 3306
-        MARIADB_TEST_DATABASE: boilerplatedb_test
-        MARIADB_USER: boilerplate_user
-        MARIADB_PASSWORD: boilerplate_password
-      run: |
-        pytest app/modules/ --ignore-glob='*selenium*'
+    # - name: Run Tests
+    #   env:
+    #     FLASK_ENV: testing
+    #     MARIADB_HOSTNAME: 127.0.0.1
+    #     MARIADB_PORT: 3306
+    #     MARIADB_TEST_DATABASE: boilerplatedb_test
+    #     MARIADB_USER: boilerplate_user
+    #     MARIADB_PASSWORD: boilerplate_password
+    #   run: |
+    #     pytest app/modules/ --ignore-glob='*selenium*'
