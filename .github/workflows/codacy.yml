@@ -29,28 +29,44 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      # Verificar si hay versiones desactualizadas de las dependencias
       - name: Check for outdated dependencies
         run: |
           pip list --outdated
 
-      - name: Set up Python
+      # Configuración para pruebas con diferentes versiones de Python
+      - name: Set up Python 3.10, 3.11, and 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+        
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      
+      - name: Set up Python 3.12
         uses: actions/setup-python@v5
         with:
           python-version: '3.12'
 
+      # Instalar dependencias
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
+      # Realizar un análisis de seguridad con pip-audit
       - name: Security audit with pip-audit
         run: |
           pip install pip-audit
           pip-audit || true
       
+      # Copiar archivo .env
       - name: Copy .env file
         run: cp .env.example .env
 
+      # Ejecutar las pruebas y cargar la cobertura en Codacy
       - name: Run tests and upload coverage to Codacy
         env:
           FLASK_ENV: testing
