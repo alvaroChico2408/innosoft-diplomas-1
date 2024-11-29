@@ -75,7 +75,7 @@ class AuthenticationService(BaseService):
             return None, "Unexpected error occurred."
         return user
 
-    def update_profile(self, user_id, email, password, **kwargs):
+    def update_profile(self, user_id, email, **kwargs):
         user = self.repository.get_by_id(user_id)
         user_profile = self.user_profile_repository.get_by_user_id(user_id)
 
@@ -84,9 +84,7 @@ class AuthenticationService(BaseService):
 
         if email:
             user.email = email
-        if password:
-            user.set_password(password)
-            user_profile.set_password(password)            
+           
 
         for key, value in kwargs.items():
             if hasattr(user.profile, key):
@@ -97,6 +95,31 @@ class AuthenticationService(BaseService):
         self.repository.session.commit()
         self.user_profile_repository.session.commit()
         return user
+
+    def change_password(self, user_id, new_password):
+            user = self.repository.get_by_id(user_id)
+            if not user:
+                return None, "User not found."
+
+            # Actualizar contraseña en el modelo User
+            user.set_password(new_password)
+
+            # Actualizar también la contraseña en el UserProfile
+            user_profile = user.profile
+            if user_profile:
+                user_profile.set_password(new_password)
+
+            # Guardar cambios en la base de datos
+            try:
+                self.repository.session.add(user)
+                if user_profile:
+                    self.user_profile_repository.session.add(user_profile)
+                self.repository.session.commit()
+                self.user_profile_repository.session.commit()
+                return user, None
+            except Exception as e:
+                self.repository.session.rollback()
+                return None, str(e)
 
     
     def get_authenticated_user(self) -> User | None:
