@@ -126,7 +126,7 @@
     </nav>
 
     <div class="main">
-        <nav class="navbar navbar-expand navbar-light navbar-bg">
+        <nav class="navbar navbar-expand navbar-light navbar-bg" >
             <a class="sidebar-toggle js-sidebar-toggle">
                 <i class="hamburger align-self-center"></i>
             </a>
@@ -139,15 +139,15 @@
                         </a>
 
                         {% if current_user.is_anonymous %}
-                            <a class="nav-link  d-none d-sm-inline-block" href="{{ url_for('auth.login') }}">Login</a>
-                            <a class="nav-link  d-none d-sm-inline-block" href="{{ url_for('auth.show_signup_form') }}">Sign
+                            <a class="nav-link  d-none d-sm-inline-block" style = "color: white" href="{{ url_for('auth.login') }}">Login</a>
+                            <a class="nav-link  d-none d-sm-inline-block" style = "color: white" href="{{ url_for('auth.show_signup_form') }}">Sign
                                 up</a>
 
                         {% else %}
 
                             <a class="nav-link dropdown-toggle d-none d-sm-inline-block" href="#"
                                data-bs-toggle="dropdown">
-                                <span class="text-dark">{{ current_user.profile.surname }}, {{ current_user.profile.name }}</span>
+                                <span class="text-light" style = "color: white">{{ current_user.profile.surname }}, {{ current_user.profile.name }}</span>
                             </a>
                             <div class="dropdown-menu dropdown-menu-end">
                                 <a class="dropdown-item" href="{{ url_for('auth.logout') }}"> <i
