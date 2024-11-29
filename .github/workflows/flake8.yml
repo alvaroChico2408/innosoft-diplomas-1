@@ -1,10 +1,14 @@
 name: Code Style Check
 
 on:
-  pull_request:
-    branches:
-      - main
-      - develop
+    push:
+      branches:
+        - main
+        - preproduction
+    pull_request:
+      branches:
+        - main
+        - preproduction
 
 jobs:
   lint:
