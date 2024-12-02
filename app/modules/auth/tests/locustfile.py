@@ -1,24 +1,6 @@
 from locust import HttpUser, TaskSet, task
-from core.locust.common import get_csrf_token, fake
+from core.locust.common import get_csrf_token
 from core.environment.host import get_host_for_locust_testing
-
-
-class SignupBehavior(TaskSet):
-    def on_start(self):
-        self.signup()
-
-    @task
-    def signup(self):
-        response = self.client.get("/signup")
-        csrf_token = get_csrf_token(response)
-
-        response = self.client.post("/signup", data={
-            "email": fake.email(),
-            "password": fake.password(),
-            "csrf_token": csrf_token
-        })
-        if response.status_code != 200:
-            print(f"Signup failed: {response.status_code}")
 
 
 class LoginBehavior(TaskSet):
@@ -52,7 +34,7 @@ class LoginBehavior(TaskSet):
 
 
 class AuthUser(HttpUser):
-    tasks = [SignupBehavior, LoginBehavior]
+    tasks = [LoginBehavior]
     min_wait = 5000
     max_wait = 9000
     host = get_host_for_locust_testing()
