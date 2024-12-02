@@ -4,12 +4,11 @@ from app.modules.auth import auth_bp
 from app.modules.auth.decorators import guest_required
 from app.modules.auth.forms import LoginForm
 from app.modules.auth.services import AuthenticationService
-from app.modules.confirmemail.services import ConfirmemailService
+
 from app.modules.profile.services import UserProfileService
 
 authentication_service = AuthenticationService()
 user_profile_service = UserProfileService()
-confirmemail_service = ConfirmemailService()
 
 
 @auth_bp.route('/login', methods=['GET', 'POST'])
