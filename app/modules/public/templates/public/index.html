@@ -1,0 +1,39 @@
+{% extends "base_template.html" %}
+
+{% block title %}Main page{% endblock %}
+
+{% block content %}
+
+
+<div class="container text-center mt-5">
+    <!-- Cuadro para el título y el texto -->
+    <div class="welcome-box">
+        <h2 class="display-4 text-primary">
+            Bienvenido a Diplomas <strong>INNOSOFT</strong>
+        </h2>        
+        <img src="{{ url_for('static', filename='img/mascotas.png') }}" class="homeTitle ">
+
+    </div>
+</div>
+
+
+<div class="click-page">
+    <a href="https://www.innosoftdays.com/" target="_blank">
+        <img src="{{ url_for('static', filename='img/click.png') }}" alt="Home Page" class="img-fluid mb-3">
+    </a>
+</div>
+
+<div class ="cartel">
+    <img src="{{ url_for('static', filename='img/image.png') }}" class="homeTitle mb-4">
+</div>
+
+<div class ="cartel2">
+    <img src="{{ url_for('static', filename='img/cartel2.png') }}" >
+</div>
+
+
+{% endblock %}
+
+{% block scripts %}
+    <script src="{{ url_for('public.assets', subfolder='js', filename='scripts.js') }}"></script>
+{% endblock %}

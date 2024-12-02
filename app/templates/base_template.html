@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description"
+          content="Base project to work with the Python Flask framework in an easy way.">
+    <meta name="author" content="David Romero">
+
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link rel="shortcut icon" href="{{ url_for("static", filename="img/favicon.ico") }}"/>
+
+
+    <link rel="canonical" href="https://www.flask_base.io"/>
+
+    <title>Diplomas InnoSoft</title>
+
+    <link rel="stylesheet" href="{{ url_for("static", filename="css/app.css") }}">
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+
+    <script src="https://unpkg.com/dropzone@5/dist/min/dropzone.min.js"></script>
+
+    <link rel="stylesheet" href="https://unpkg.com/dropzone@5/dist/min/dropzone.min.css" type="text/css"/>
+
+    <link rel="stylesheet" href="{{ url_for("static", filename="css/dropzone.css") }}">
+
+    <link rel="stylesheet" href="{{ url_for("static", filename="css/own.css") }}">
+
+</head>
+
+<body>
+<div class="wrapper">
+
+    <nav id="sidebar" class="sidebar js-sidebar">
+        <div class="sidebar-content js-simplebar">
+            <a class="sidebar-brand" href="{{ url_for('public.index') }}" style="display: flex; align-items: center;">
+                <img src="{{ url_for('static', filename='img/logo.png') }}" alt="Logo" style="width: 25px; height: 25px; margin-right: 8px;">
+                Diplomas InnoSoft
+            </a>
+
+
+            <ul class="sidebar-nav">
+
+                <li class="sidebar-header">
+                    Menu
+                </li>
+
+                <li class="sidebar-item {{ 'active' if request.endpoint == 'public.index' else '' }}">
+                    <a class="sidebar-link" href="{{ url_for('public.index') }}">
+                        <i class="align-middle" data-feather="home"></i> <span class="align-middle">Home</span>
+                    </a>
+                </li>
+
+                {% if current_user.is_anonymous %}
+
+                    <li class="sidebar-header">
+                        Let's get started!
+                    </li>
+
+                    <li class="sidebar-item {{ 'active' if request.endpoint == 'auth.login' else '' }}">
+                        <a class="sidebar-link" href="{{ url_for('auth.login') }}">
+                            <i class="align-middle" data-feather="log-in"></i> <span class="align-middle">Login</span>
+                        </a>
+                    </li>
+
+                    <li class="sidebar-item {{ 'active' if request.endpoint == 'auth.show_signup_form' else '' }}">
+                        <a class="sidebar-link" href="{{ url_for('auth.show_signup_form') }}">
+                            <i class="align-middle" data-feather="user-plus"></i> <span
+                                class="align-middle">Sign Up</span>
+                        </a>
+                    </li>
+
+                {% else %}
+
+                    <li class="sidebar-header">
+                        Functionality
+                    </li>
+
+                    <li class="sidebar-item {{ 'active' if request.endpoint == 'diplomas.generate_diplomas' else '' }}">
+                        <a class="sidebar-link" href="{{ url_for('diplomas.generate_diplomas') }}">
+                            <i class="align-middle" data-feather="award"></i>
+                            <span class="align-middle">Diploma generator</span>
+                        </a>
+                    </li>
+
+                    <li class="sidebar-item {{ 'active' if request.endpoint == 'diplomas.diplomas_visualization' else '' }}">
+                        <a class="sidebar-link" href="{{ url_for('diplomas.diplomas_visualization')  }}">
+                            <i class="align-middle" data-feather="eye"></i>
+                            <span class="align-middle">Diplomas visualization</span>
+                        </a>
+                    </li>
+
+                    <li class="sidebar-item {{ 'active' if request.endpoint == 'diplomas.manage_templates' else '' }}">
+                        <a class="sidebar-link" href="{{ url_for('diplomas.manage_templates') }}">
+                            <i class="align-middle" data-feather="file-text"></i>
+                            <span class="align-middle">Template Management</span>
+                        </a>
+                    </li>                    
+                    
+                    <li class="sidebar-header">
+                        Options
+                    </li>
+
+                    <li class="sidebar-item {{ 'active' if request.endpoint == 'profile.edit_profile' else '' }}">
+                        <a class="sidebar-link" href="{{ url_for('profile.edit_profile') }}">
+                            <i class="align-middle" data-feather="user"></i> <span
+                                class="align-middle">Edit profile</span>
+                        </a>
+                    </li>
+
+                    <li class="sidebar-item">
+                        <a class="sidebar-link" href="{{ url_for('auth.logout') }}">
+                            <i class="align-middle" data-feather="log-out"></i> <span
+                                class="align-middle">Log out</span>
+                        </a>
+                    </li>
+
+                {% endif %}
+
+            </ul>
+
+        </div>
+    </nav>
+
+    <div class="main">
+        <nav class="navbar navbar-expand navbar-light navbar-bg" >
+            <a class="sidebar-toggle js-sidebar-toggle">
+                <i class="hamburger align-self-center"></i>
+            </a>
+
+            <div class="navbar-collapse collapse">
+                <ul class="navbar-nav navbar-align">
+                    <li class="nav-item dropdown">
+                        <a class="nav-icon dropdown-toggle d-inline-block d-sm-none" href="#" data-bs-toggle="dropdown">
+                            <i class="align-middle" data-feather="user"></i>
+                        </a>
+
+                        {% if current_user.is_anonymous %}
+                            <a class="nav-link  d-none d-sm-inline-block" style = "color: white" href="{{ url_for('auth.login') }}">Login</a>
+                            <a class="nav-link  d-none d-sm-inline-block" style = "color: white" href="{{ url_for('auth.show_signup_form') }}">Sign
+                                up</a>
+
+                        {% else %}
+
+                            <a class="nav-link dropdown-toggle d-none d-sm-inline-block" href="#"
+                               data-bs-toggle="dropdown">
+                                <span class="text-light" style = "color: white">{{ current_user.profile.surname }}, {{ current_user.profile.name }}</span>
+                            </a>
+                            <div class="dropdown-menu dropdown-menu-end">
+                                <a class="dropdown-item" href="{{ url_for('auth.logout') }}"> <i
+                                        class="align-middle me-1"
+                                        data-feather="log-out"></i>Log out</a>
+                            </div>
+
+                        {% endif %}
+
+
+                    </li>
+                </ul>
+            </div>
+        </nav>
+
+        <main class="content">
+            <div class="container p-0">
+
+                {% block content %}{% endblock %}
+
+            </div>
+        </main>
+
+        <footer class="footer">
+            <div class="container-fluid">
+                <div class="row text-muted">
+                    <div class="col-6 text-start">
+                        <p class="mb-0">
+                            <strong>Diplomas InnoSoft</strong>
+                        </p>
+                    </div>
+                    <div class="col-6 text-end">
+                        <ul class="list-inline">
+                            <li class="list-inline-item">
+                                <a class="text-muted" href="https://github.com/alvaroChico2408/innosoft-diplomas-1"
+                                   target="_blank">
+                                    <i class="align-middle" data-feather="github"></i>
+                                    Repository on GitHub</a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </footer>
+    </div>
+</div>
+
+<script src="{{ url_for("static", filename="js/app.js") }}"></script>
+
+<script>
+
+    function submitSearchForm(event) {
+        event.preventDefault();
+        let query = document.getElementById('search-query').value;
+        window.location.href = '/explore?query=' + encodeURIComponent(query);
+    }
+
+    function copyText(div_identifier) {
+        let textToCopy = document.getElementById(div_identifier).textContent;
+        textToCopy = textToCopy.trim();
+        navigator.clipboard.writeText(textToCopy);
+    }
+
+</script>
+
+{% block scripts %}{% endblock %}
+</body>
+
+</html>

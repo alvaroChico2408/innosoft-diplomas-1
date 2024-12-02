@@ -1,0 +1,458 @@
+
+.main {
+    background-image: url("../img/FondoInnosoft1.png"); /* Ajusta la ruta según la ubicación del archivo */
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+    background-repeat: no-repeat;
+}
+
+.navbar-bg {
+    background-color: #22333a; /* Cambia a cualquier color que desees */
+    color: #ffffff; /* Color del texto, también puedes cambiarlo */
+}
+
+
+/* Barra lateral activa (cuando un ítem está seleccionado) */
+.sidebar .sidebar-item.active {
+    background-color: #477bb6; /* Color de fondo para ítem activo */
+    color: #ffffff; /* Color del texto del ítem activo */
+}
+
+
+/*Cartel home*/
+
+.cartel{
+    max-width: 100%;  /* Limita el tamaño al 100% de su contenedor */
+    height: auto;     /* Mantiene la proporción de la imagen */
+    border-radius: 15px; /* Bordes redondeados */
+    margin-left: 250px;
+    margin-top: 10px;
+
+}
+
+.cartel2 {
+    display: flex;
+    justify-content: center; /* Centra horizontalmente */
+    align-items: center; /* Centra verticalmente */
+    margin-top: 20px;
+}
+
+.cartel2-img {
+    width: 10%; /* Ajusta el tamaño de la imagen al 50% del contenedor */
+    max-width: 50px; /* Tamaño máximo para la imagen (más pequeña) */
+    height: auto; /* Mantiene la proporción de la imagen */
+}
+
+.click-page{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 90%;
+    margin-left: 150px;
+
+}
+
+/*TESTO HOME*/
+
+/* Estilos para el contenedor principal */
+.welcome-box {
+    display: inline-block;
+    padding: 30px;
+    background-color: #ffffff; /* Fondo blanco */
+    border-radius: 15px; /* Bordes redondeados */
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); /* Sombra suave */
+    max-width: 600px;
+    margin-top: -10px;
+    text-align: center; /* Asegura que el texto se centre */
+    border: 1px solid #007bff; /* Borde azul alrededor */
+    transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out; /* Efecto de transición para hover */
+}
+
+/* Estilo para el hover del cuadro */
+.welcome-box:hover {
+    transform: translateY(-5px); /* Eleva el cuadro ligeramente */
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15); /* Aumenta la sombra */
+}
+
+/* Estilo para el título */
+.welcome-box h2 {
+    color: #007bff; /* Azul */
+    font-size: 2.5rem;
+    font-weight: bold;
+    margin-bottom: 15px;
+}
+
+
+
+
+strong {
+    font-weight: bold; /* Aplica negrita a la palabra INNOSOFT */
+}
+
+/*Alerta*/
+.alert-warning {
+    background-color: #FFF3CD;
+    padding: 20px;
+    border-radius: 5px;
+
+}
+
+
+.alert-success {
+    background-color: #D4EDD9;
+    padding: 20px;
+    border-radius: 5px;
+}
+
+.alert-error {
+    background-color: #F9D6D9;
+    padding: 20px;
+    border-radius: 5px;
+}
+
+/*Base*/
+
+.SideBar{
+    color: rgba(35, 63, 141, 0.664);
+}
+
+/*Diploma*/
+
+.gray-box {
+    border: 2px solid rgba(128, 128, 128, 0.699); /* Borde gris claro y transparente */
+    background-color: rgba(144, 165, 189, 0.808); /* Fondo gris claro con transparencia */
+    border-radius: 8px; /* Bordes redondeados */
+    padding: 15px; /* Espaciado interno */
+    margin: 10px 0; /* Separación entre elementos */
+    width: 60%;
+ 
+    
+}
+
+
+/* Contenedores para las imágenes */
+.image-container-left, .image-container-right {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 0 10px; /* Separación entre las imágenes y el centro */
+}
+
+
+/* Estilo para las imágenes circulares */
+.image-circle {
+    width: 150px; /* Ajusta el tamaño de la imagen */
+    height: 150px;
+    border-radius: 50%; /* Hace que la imagen sea circular */
+    object-fit: cover; /* Asegura que la imagen se recorte correctamente */
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); /* Añade una sombra suave */
+}
+
+/*LOGIN Y SING UP */
+
+/* Estilos generales */
+body {
+    margin: 0;
+    padding: 0;
+    font-family: Arial, sans-serif;
+    background: #f0f0f0;
+}
+
+.login-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background-image: url("../img/FondoInnosoft1.png");
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+}
+
+.login-box {
+    background-color: rgba(255, 255, 255, 0.9);
+    padding: 40px;
+    border-radius: 10px;
+    box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.2);
+    width: 100%;
+    max-width: 400px;
+}
+
+.login-title {
+    text-align: center;
+    margin-bottom: 20px;
+    font-size: 24px;
+    color: #333;
+}
+
+.input-group {
+    margin-bottom: 20px;
+}
+
+.input-group label {
+    font-size: 16px;
+    color: #555;
+    display: block;
+    margin-bottom: 8px;
+}
+
+.input-group .form-control {
+    width: 100%;
+    padding: 10px;
+    font-size: 16px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+}
+
+.input-group .error {
+    color: red;
+    font-size: 14px;
+    margin-top: 5px;
+}
+
+.remember-me {
+    margin-bottom: 20px;
+}
+
+.remember-me .form-check-label {
+    font-size: 14px;
+    color: #555;
+}
+
+.submit-container {
+    display: flex;
+    justify-content: center;
+}
+
+.submit-container .btn {
+    width: 100%;
+    padding: 12px;
+    background-color: #477bb6;
+    color: white;
+    font-size: 16px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.submit-container .btn:hover {
+    background-color: #3e6f9e;
+}
+
+.extra-links {
+    margin-top: 20px;
+    text-align: center;
+}
+
+.extra-links a {
+    color: #477bb6;
+    text-decoration: none;
+}
+
+.extra-links a:hover {
+    text-decoration: underline;
+}
+
+/*DIPLOMAS*/
+/* Estilos generales para las cajas */
+.button-box {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    padding: 10px;
+    margin-top: 20px;
+}
+
+.bg-white {
+    background-color: white;
+}
+
+.rounded {
+    border-radius: 30px;
+}
+
+.shadow {
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.btn {
+    min-width: 150px;
+}
+
+/* Configuración para los cuadros dentro del contenedor */
+.row {
+    display: flex;
+    gap: 20px;
+}
+
+.col-6 {
+    flex: 1;
+    max-width: 50%;
+}
+
+/* Asegurarse que los botones no se estiren más de lo necesario */
+button {
+    min-width: 120px;
+}
+
+/*filters*/
+/* Estilos generales del modal */
+.modal{
+    width: 50%;
+    border-radius: 100px; /* Bordes redondeados para el contenido del modal */
+
+}
+.modal-content {
+    padding: 20px;
+}
+
+.modal-header {
+    background-color: #f0f8ff; /* Color de fondo de la cabecera */
+    border-bottom: 2px solid #e0e0e0; /* Línea de separación */
+    padding-bottom: 10px;
+}
+
+.modal-title {
+    color: #007bff; /* Color azul para el título */
+    font-weight: bold;
+}
+
+/* Contenedor de filtros */
+/* Filtros en la parte superior */
+.filter-container {
+    position: absolute;   /* Los coloca en una capa por encima de otros elementos */
+    top: 10px;            /* Distancia desde la parte superior */
+    left: 100%;            /* Centra el filtro horizontalmente */
+    transform: translateX(-50%); /* Ajuste para centrarlo completamente */
+    z-index: 1050;        /* Asegura que se muestre encima de los demás elementos */
+    width: 80%;          /* Ancho completo */
+    padding: 10px;        /* Espaciado interno */
+    background-color: #f8f9fa; /* Fondo ligeramente gris */
+    border-radius: 5px;   /* Bordes redondeados */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Sombra suave */
+}
+
+/* Modal de filtros */
+.modal-content {
+    position: relative;
+    z-index: 1000; /* Asegura que el modal tenga un índice más bajo que los filtros */
+}
+
+.filter-container input, .filter-container button {
+    margin: 5px 0; /* Espaciado entre los elementos */
+}
+
+
+
+/* Barra de búsqueda de UVUS */
+.search-bar {
+    margin-bottom: 15px;
+}
+
+.search-bar .form-control {
+    border-radius: 10px;
+    height: 40px;
+    font-size: 14px;
+    padding: 10px;
+}
+
+.search-bar button {
+    width: 100%;
+    padding: 12px;
+    border-radius: 8px;
+    font-size: 14px;
+}
+
+/* Botones de filtros de participación */
+.participation-filter {
+    margin-bottom: 15px;
+}
+
+.participation-filter span {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: bold;
+    color: #333;
+}
+
+.participation-filter .btn {
+    width: 100%;
+    padding: 10px;
+    border-radius: 8px;
+    font-size: 14px;
+    transition: background-color 0.3s;
+}
+
+.participation-filter .btn:hover {
+    background-color: #e6f0ff; /* Color de fondo al hacer hover */
+}
+
+/* Botón de reinicio de filtro */
+button.btn-warning {
+    background-color: #ffc107; /* Color amarillo */
+    border: none;
+    color: white;
+    font-weight: bold;
+    padding: 10px;
+    border-radius: 8px;
+    font-size: 14px;
+    transition: background-color 0.3s;
+}
+
+button.btn-warning:hover {
+    background-color: #e0a800;
+}
+
+/* Estilo general para los botones */
+button.btn {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+button.btn:hover {
+    transform: scale(1.05); /* Efecto de agrandar ligeramente */
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+/*DIPLOMAS*/
+.diploma-list-box {
+    background-color: white;
+    padding: 20px;
+    border-radius: 15px;
+    max-width: 1500px;
+    margin: auto;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    margin-top: 20px;
+}
+
+.diploma-scroll {
+    max-height: 400px;
+    overflow-y: auto;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    background-color: #f9f9f9;
+}
+
+.diploma-scroll::-webkit-scrollbar {
+    width: 8px;
+}
+
+.diploma-scroll::-webkit-scrollbar-thumb {
+    background-color: #007bff;
+    border-radius: 10px;
+}
+
+.diploma-scroll::-webkit-scrollbar-thumb:hover {
+    background-color: #0056b3;
+}
+.btn-sm {
+    padding: 5px 10px;  /* Reduce el padding */
+    font-size: 0.875rem; /* Reduce el tamaño de la fuente */
+}
+
+.table td .btn {
+    min-width: 80px;  /* Ajuste del ancho mínimo de los botones */
+    text-align: center; /* Centra el texto dentro de los botones */
+}
