@@ -20,9 +20,8 @@ class UserProfileService(BaseService):
 
             user_profile = self.get_by_id(user_profile_id)
             email = form.email.data
-            password = form.password.data if form.password.data else None
             
-            self.auth_service.update_profile(current_user.id, email, password)
+            self.auth_service.update_profile(current_user.id, email)
             self.repository.session.add(user_profile)
             self.repository.session.commit()
             return updated_instance, None
