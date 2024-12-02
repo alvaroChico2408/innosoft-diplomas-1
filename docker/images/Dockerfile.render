@@ -22,14 +22,17 @@ RUN apt-get clean \
 # Set the working directory in the container to /app
 WORKDIR /app
 
-# Copy files
+# Copy requirements.txt into the working directory /app
+COPY requirements.txt .
+
+# Copy setup.py into the working directory
+COPY setup.py ./
+
+# Copy other directories (app, core, rosemary, migrations)
 COPY app/ ./app
 COPY core/ ./core
 COPY rosemary/ ./rosemary
 COPY migrations/ ./migrations
-
-# Copy requirements.txt into the working directory /app
-COPY requirements.txt .
 
 # Removes cache at the build stage
 RUN find . -type d -name "__pycache__" -exec rm -r {} + && \
