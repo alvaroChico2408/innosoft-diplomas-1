@@ -8,7 +8,7 @@ RUN apt-get update \
     && apt-get install -y --no-install-recommends curl \
     && apt-get install -y --no-install-recommends bash \
     && apt-get install -y --no-install-recommends openrc \
-    && apt-get install -y --no-install-recommends build-essential 
+    && apt-get install -y --no-install-recommends build-essential
 
 # Install Node.js and NPM
 RUN curl -fsSL https://deb.nodesource.com/setup_18.x | bash - \
@@ -33,6 +33,9 @@ COPY app/ ./app
 COPY core/ ./core
 COPY rosemary/ ./rosemary
 COPY migrations/ ./migrations
+
+# Copy the docs folder into the container
+COPY docs/ ./docs/
 
 # Removes cache at the build stage
 RUN find . -type d -name "__pycache__" -exec rm -r {} + && \
