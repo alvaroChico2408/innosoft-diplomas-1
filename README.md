@@ -41,6 +41,10 @@ flask db upgrade
 To run unit test, please enter inside `web_app_container` container:
 
 ```
+python3.12 -m venv venv
+source venv/bin/activate
+pip install rosemary
+pip install -e ./
 rosemary test
 ```
 
