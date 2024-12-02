@@ -66,13 +66,6 @@
                         </a>
                     </li>
 
-                    <li class="sidebar-item {{ 'active' if request.endpoint == 'auth.show_signup_form' else '' }}">
-                        <a class="sidebar-link" href="{{ url_for('auth.show_signup_form') }}">
-                            <i class="align-middle" data-feather="user-plus"></i> <span
-                                class="align-middle">Sign Up</span>
-                        </a>
-                    </li>
-
                 {% else %}
 
                     <li class="sidebar-header">
@@ -140,8 +133,6 @@
 
                         {% if current_user.is_anonymous %}
                             <a class="nav-link  d-none d-sm-inline-block" style = "color: white" href="{{ url_for('auth.login') }}">Login</a>
-                            <a class="nav-link  d-none d-sm-inline-block" style = "color: white" href="{{ url_for('auth.show_signup_form') }}">Sign
-                                up</a>
 
                         {% else %}
 
