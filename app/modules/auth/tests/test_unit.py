@@ -94,4 +94,19 @@ def test_get_authenticated_user(authentication_service):
         result = authentication_service.get_authenticated_user()
 
         # Verificaciones
-        assert result == mock_user  # Aquí no debe ser `is`, ya que estamos comparando objetos
+        assert result == mock_user 
+ 
+'''
+# No funciona
+def test_get_authenticated_user_no_authenticated(authentication_service):
+    """Verifica que se retorne None si no hay usuario autenticado."""
+    with patch('flask_login.utils.current_user') as mock_current_user:
+
+        # Simulando que no hay usuario autenticado
+        mock_current_user.is_authenticated = False  
+
+        result = authentication_service.get_authenticated_user()
+
+        # Verificaciones
+        assert result is None  # Si no hay usuario, debe retornar None
+'''
