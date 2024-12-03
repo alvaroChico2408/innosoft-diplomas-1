@@ -55,3 +55,30 @@ def test_change_password(authentication_service):
         mock_change_password.assert_called_once_with(1, 'newpassword')
         assert result is mock_user
         assert error is None
+
+def test_create_user_with_profile(authentication_service):
+    """Verifica que un usuario se cree junto con su perfil."""
+    with patch.object(authentication_service, 'create_with_profile') as mock_create_with_profile:
+
+        # Simulando la creación de un usuario con perfil
+        mock_user = MagicMock()
+        mock_user.id = 1
+        mock_create_with_profile.return_value = (mock_user, None)
+
+        result, error = authentication_service.create_with_profile(
+            email='newuser@example.com',
+            password='password123',
+            name='John',
+            surname='Doe'
+        )
+
+        # Verificaciones
+        mock_create_with_profile.assert_called_once_with(
+            email='newuser@example.com',
+            password='password123',
+            name='John',
+            surname='Doe'
+        )
+        assert result is mock_user
+        assert error is None
+        
