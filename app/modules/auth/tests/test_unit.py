@@ -39,3 +39,19 @@ def test_login_valid_credentials(authentication_service):
 
         # Verificaciones
         assert result is True
+
+def test_change_password(authentication_service):
+    """Verifica que se cambie la contraseña correctamente."""
+    with patch.object(authentication_service, 'change_password') as mock_change_password:
+
+        # Simulando el cambio de contraseña
+        mock_user = MagicMock()
+        mock_user.id = 1
+        mock_change_password.return_value = (mock_user, None)
+
+        result, error = authentication_service.change_password(1, 'newpassword')
+
+        # Verificaciones
+        mock_change_password.assert_called_once_with(1, 'newpassword')
+        assert result is mock_user
+        assert error is None
