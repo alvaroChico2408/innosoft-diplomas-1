@@ -1,38 +1,41 @@
 import pytest
+from unittest.mock import patch, MagicMock
+from app.modules.profile.services import UserProfileService
+from werkzeug.datastructures import MultiDict
+from flask_login import current_user
 
-from app import db
-from app.modules.conftest import login, logout
-from app.modules.auth.models import User
-from app.modules.profile.models import UserProfile
+@pytest.fixture
+def user_profile_service():
+    """Fixture para inicializar UserProfileService."""
+    return UserProfileService()
 
+def test_update_profile_invalid_form(user_profile_service):
+    """Verifica que el perfil no se actualice cuando el formulario no es válido."""
+    with patch.object(user_profile_service, 'update') as mock_update, \
+         patch.object(user_profile_service, 'get_by_id') as mock_get_by_id, \
+         patch.object(user_profile_service.auth_service, 'update_profile') as mock_update_profile, \
+         patch('flask_login.utils._get_user') as mock_current_user:
 
-@pytest.fixture(scope="module")
-def test_client(test_client):
-    """
-    Extends the test_client fixture to add additional specific data for module testing.
-    for module testing (por example, new users)
-    """
-    with test_client.application.app_context():
-        user_test = User(email='user@example.com', password='test1234')
-        db.session.add(user_test)
-        db.session.commit()
+        # Simulando el objeto current_user
+        mock_user = MagicMock()
+        mock_user.id = 1  # Estableciendo el ID de current_user
+        mock_current_user.return_value = mock_user  # Reemplazamos current_user por el mock
 
-        profile = UserProfile(user_id=user_test.id, name="Name", surname="Surname")
-        db.session.add(profile)
-        db.session.commit()
+        # Simulando los datos
+        user_profile_mock = MagicMock()
+        user_profile_mock.id = 1
+        mock_get_by_id.return_value = user_profile_mock
 
-    yield test_client
+        form_mock = MagicMock()
+        form_mock.validate.return_value = False  # Formulario no válido
+        form_mock.errors = {'email': ['Invalid email address']}
 
+        # Llamando al método que estamos probando
+        result, message = user_profile_service.update_profile(1, form_mock)
 
-def test_edit_profile_page_get(test_client):
-    """
-    Tests access to the profile editing page via a GET request.
-    """
-    login_response = login(test_client, "user@example.com", "test1234")
-    assert login_response.status_code == 200, "Login was unsuccessful."
+        # Verificaciones
+        mock_update.assert_not_called()
+        mock_update_profile.assert_not_called()
 
-    response = test_client.get("/profile/edit")
-    assert response.status_code == 200, "The profile editing page could not be accessed."
-    assert b"Edit profile" in response.data, "The expected content is not present on the page"
-
-    logout(test_client)
+        assert result is None
+        assert message == form_mock.errors
