@@ -96,17 +96,50 @@ def test_get_authenticated_user(authentication_service):
         # Verificaciones
         assert result == mock_user 
  
-'''
-# No funciona
-def test_get_authenticated_user_no_authenticated(authentication_service):
-    """Verifica que se retorne None si no hay usuario autenticado."""
-    with patch('flask_login.utils.current_user') as mock_current_user:
 
-        # Simulando que no hay usuario autenticado
-        mock_current_user.is_authenticated = False  
+def test_get_authenticated_user_profile(authentication_service):
+    """Verifica que se obtenga el perfil del usuario autenticado correctamente."""
+    with patch('flask_login.utils._get_user') as mock_current_user:
 
-        result = authentication_service.get_authenticated_user()
+        # Simulando el usuario autenticado
+        mock_user = MagicMock()
+        mock_user.id = 1
+        mock_user.profile = MagicMock()
+        mock_current_user.return_value = mock_user
+
+        result = authentication_service.get_authenticated_user_profile()
 
         # Verificaciones
-        assert result is None  # Si no hay usuario, debe retornar None
-'''
+        assert result == mock_user.profile
+
+        
+def test_temp_folder_by_user(authentication_service): 
+    """Verifica que se obtenga la carpeta temporal del usuario correctamente."""
+    with patch('app.modules.auth.services.uploads_folder_name') as mock_uploads_folder_name:
+
+        # Simulando la carpeta temporal del usuario
+        mock_user = MagicMock()
+        mock_user.id = 1
+        mock_uploads_folder_name.return_value = '/uploads'
+
+        result = authentication_service.temp_folder_by_user(mock_user)
+
+        # Verificaciones
+        assert result == '/uploads/temp/1'
+
+
+def test_get_by_email(authentication_service):
+    """Verifica que se obtenga un usuario por email correctamente."""
+    with patch.object(authentication_service, 'get_by_email') as mock_get_by_email:
+
+        # Simulando la obtención de un usuario por email
+        mock_user = MagicMock()
+        mock_user.id = 1
+        mock_get_by_email.return_value = mock_user
+
+
+        result= authentication_service.get_by_email(' ')
+        
+        # Verificaciones
+        mock_get_by_email.assert_called_once_with(' ')
+        assert result == mock_user
