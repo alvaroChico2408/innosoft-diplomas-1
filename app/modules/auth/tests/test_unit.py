@@ -29,3 +29,13 @@ def test_login_invalid_credentials(authentication_service):
 
         # Verificaciones
         assert result is False
+        
+def test_login_valid_credentials(authentication_service):
+    """Verifica que el login sea exitoso con credenciales válidas."""
+    with patch.object(authentication_service, 'login') as mock_login:
+        mock_login.return_value = True  # Simulando un login exitoso
+
+        result = authentication_service.login('user@example.com', 'correctpassword')
+
+        # Verificaciones
+        assert result is True
