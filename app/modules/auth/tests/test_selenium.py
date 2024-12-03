@@ -17,5 +17,5 @@ class TestLogin():
         host = get_host_for_selenium_testing()
         self.driver.get(f'{host}/login')
         self.driver.find_element(By.ID, "email").send_keys("userCliente@gmail.com")
-        self.driver.find_element(By.ID, "password").send_keys("123456789!Aa")
+        self.driver.find_element(By.ID, "password").send_keys("12345678!Aa")
         self.driver.find_element(By.ID, "submit").click()
