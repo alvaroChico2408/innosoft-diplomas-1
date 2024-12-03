@@ -82,3 +82,16 @@ def test_create_user_with_profile(authentication_service):
         assert result is mock_user
         assert error is None
         
+def test_get_authenticated_user(authentication_service):
+    """Verifica que se obtenga el usuario autenticado correctamente."""
+    with patch('flask_login.utils._get_user') as mock_current_user:
+
+        # Simulando el usuario autenticado
+        mock_user = MagicMock()
+        mock_user.id = 1
+        mock_current_user.return_value = mock_user
+
+        result = authentication_service.get_authenticated_user()
+
+        # Verificaciones
+        assert result == mock_user  # Aquí no debe ser `is`, ya que estamos comparando objetos
