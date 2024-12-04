@@ -1,21 +1,18 @@
-name: Codacy CI
+name: Run tests
 
 on:
   push:
-    branches:
-      - main
-      - preproduction
+    branches: [main, preproduction]
   pull_request:
-    branches:
-      - main
-      - preproduction
+    branches: [main, preproduction]
 
 jobs:
-  build:
+  pytest:
     runs-on: ubuntu-latest
+
     services:
       mysql:
-        image: mariadb:10.5
+        image: mysql:5.7
         env:
           MYSQL_ROOT_PASSWORD: root
           MYSQL_DATABASE: InnosoftPrueba_everybody
@@ -24,23 +21,27 @@ jobs:
         ports:
           - 3306:3306
         options: --health-cmd="mysqladmin ping -h localhost" --health-interval=10s --health-timeout=5s --health-retries=3
-    
+
     strategy:
       matrix:
         python-version: ['3.11', '3.12']
-
+      
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-
+      
       - name: Check for outdated dependencies
         run: |
           pip list --outdated
-   
+         
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
+
+      - name: Prepare environment
+        run: |
+          sed -i '/rosemary @ file:\/\/\/app/d' requirements.txt
 
       - name: Install dependencies
         run: |
@@ -49,22 +50,22 @@ jobs:
 
       - name: Security audit with pip-audit
         run: |
-          pip install pip-audit
-          pip-audit || true
+            pip install pip-audit
+            pip-audit || true
 
-      # Ejecutar las pruebas y cargar la cobertura en Codacy
       - name: Run tests and upload coverage to Codacy
         env:
-          FLASK_ENV: testing
-          FLASK_APP: app
-          MARIADB_HOSTNAME: 127.0.0.1
-          MARIADB_PORT: 3306
-          MARIADB_TEST_DATABASE: InnosoftPrueba_everybody
-          MARIADB_USER: InnosoftPrueba_everybody
-          MARIADB_PASSWORD: 07328b8f633ace227ba17e96c42ba9aff96a69a9
-          CODACY_PROJECT_TOKEN: ${{ secrets.CODACY_INNOSOFT_DIPLOMAS }}
+            FLASK_ENV: testing
+            FLASK_APP: app
+            MARIADB_HOSTNAME: 127.0.0.1
+            MARIADB_PORT: 3306
+            MARIADB_TEST_DATABASE: InnosoftPrueba_everybody
+            MARIADB_USER: InnosoftPrueba_everybody
+            MARIADB_PASSWORD: 07328b8f633ace227ba17e96c42ba9aff96a69a9
+            CODACY_PROJECT_TOKEN: ${{ secrets.CODACY_INNOSOFT_DIPLOMAS }}
         run: |
-          pip install codacy-coverage
-          coverage run -m pytest app/modules/ --ignore-glob='*selenium*'
-          coverage xml 
-          python-codacy-coverage -r coverage.xml
+            pip install codacy-coverage
+            coverage run -m pytest app/modules/ --ignore-glob='*selenium*'
+            coverage xml 
+            python-codacy-coverage -r coverage.xml
+    
