@@ -3,105 +3,152 @@
 {% block title %}View diplomas{% endblock %}
 
 {% block content %}
-<div class="container my-4 p-4 bg-white shadow rounded">
-    <h2 class="text-center mb-4">Choose and Send Diplomas</h2>
-    
-    <div class="filter-container text-center mb-4">
-        <div class="search-bar d-inline-block">
-            <input type="text" id="uvusFilter" placeholder="Filter by UVUS" class="form-control d-inline-block w-auto">
-            <button class="btn btn-secondary" onclick="filterByUVUS()">FILTER</button>
-            <button class="btn btn-warning" onclick="resetFilters()">RESET</button>
-        </div>
-        <div class="participation-filter d-inline-block ms-3">
-            <span>Filter by Participation:</span>
-            <button class="btn btn-light" onclick="filterByParticipation('ORGANIZATION')">ORGANIZATION</button>
-            <button class="btn btn-light" onclick="filterByParticipation('INTERMEDIATE')">INTERMEDIATE</button>
-            <button class="btn btn-light" onclick="filterByParticipation('ASSISTANCE')">ASSISTANCE</button>
-            <button class="btn btn-warning" onclick="resetParticipationFilter()">RESET</button>
-        </div>
-    </div>
+<div class="container text-center mt-5">
 
-    <div class="actions text-center mb-4">
-        <button class="btn btn-success" onclick="sendSelectedDiplomas()">SEND DIPLOMAS SELECTED</button>
-        <button class="btn btn-dark" onclick="selectAll()">SELECT ALL</button>
-        <button class="btn btn-dark" onclick="deselectAll()">DESELECT ALL</button>
+    <div class="welcome-box ">
+        <h2 class="display-4 text-primary">Choose and Send Diplomas</h2>
+    
     </div>
 </div>
 
-{% with messages = get_flashed_messages(with_categories=true) %}
-{% if messages %}
-{% for category, message in messages %}
-<div class="row">
-    <div class="col-12 mb-3">
-        <div class="alert alert-{{ category }}" role="alert">
-            <div class="alert-message">
-                {% if category == 'success' %}
-                <h4 class="alert-heading"><i class="align-middle" data-feather="check-circle"></i> Success</h4>
-                {% elif category == 'error' %}
-                <h4 class="alert-heading"><i class="align-middle" data-feather="x-circle"></i> Error</h4>
-                {% endif %}
-                <p style="margin-bottom: 0px">{{ message }}</p>
+<!-- Main Content -->
+    <div class="row">
+        <!-- Left Box -->
+        <div class="col-6">
+            <div class="button-box p-3 bg-white shadow rounded">
+                <button class="btn btn-dark me-2" onclick="selectAll()">SELECT ALL</button>
+                <button class="btn btn-dark me-2" onclick="deselectAll()">DESELECT ALL</button>
+                <button type="button" class="btn btn-info" data-bs-toggle="modal" data-bs-target="#filterModal">
+                    Filters
+                </button>
+            </div>
+        </div>
+
+        <!-- Right Box -->
+        <div class="col-6">
+            <div class="button-box p-3 bg-white shadow rounded">
+                <button class="btn btn-success me-2" onclick="sendSelectedDiplomas()">SEND DIPLOMAS SELECTED</button>
+                <form id="deleteDiplomasForm" method="POST" action="{{ url_for('diplomas.delete_selected_diplomas') }}" onsubmit="return handleDeleteSelected(event);" style="display: inline;">
+                    <input type="hidden" name="_method" value="DELETE">
+                    <input type="hidden" name="diploma_ids" id="diplomaIdsInput">
+                    <button type="submit" class="btn btn-danger">DELETE SELECTED DIPLOMAS</button>
+                </form>
+            </div>
+        </div>
+    </div>
+<!-- Modal for Filters -->
+<div class="modal fade" id="filterModal" tabindex="-1" aria-labelledby="filterModalLabel">
+    <div class="modal-dialog modal-sm">
+        <div class="modal-content">  
+            <div class="modal-body">
+                <div class="filter-container p-3 bg-light rounded" >
+                    <div class="modal-header">
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="search-bar mb-3">
+                        <input type="text" id="uvusFilter" placeholder="Filter by UVUS" class="form-control mb-2">
+                        <button class="btn btn-secondary" onclick="filterByUVUS()">FILTER</button>
+                    </div>
+                    <div class="participation-filter mb-3">
+                        <span>Filter by Participation:</span>
+                        <div>
+                            <button class="btn btn-light" onclick="filterByParticipation('ORGANIZATION')">ORGANIZATION</button>
+                            <button class="btn btn-light" onclick="filterByParticipation('INTERMEDIATE')">INTERMEDIATE</button>
+                            <button class="btn btn-light" onclick="filterByParticipation('ASSISTANCE')">ASSISTANCE</button>
+                        </div>
+                    </div>
+                    <button class="btn btn-warning" onclick="resetParticipationFilter()">RESET</button>
+                </div>
             </div>
         </div>
     </div>
 </div>
-{% endfor %}
-{% endif %}
+
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+        {% for category, message in messages %}
+            <div class="row">
+                <div class="col-12 mb-3">
+                    <div class="alert alert-{{ category }}" role="alert">
+                        <div class="alert-message">
+                            {% if category == 'success' %}
+                                <h4 class="alert-heading"><i class="align-middle" data-feather="check-circle"></i> Success</h4>
+                            {% elif category == 'error' %}
+                                <h4 class="alert-heading"><i class="align-middle" data-feather="x-circle"></i> Error</h4>
+                            {% endif %}
+                            <p style="margin-bottom: 0px">{{ message }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    {% endif %}
 {% endwith %}
 
-<table class="table table-striped">
-    <thead>
-        <tr>
-            <th>ID</th>
-            <th>Name</th>
-            <th>Surname</th>
-            <th>Email</th>
-            <th>UVUS</th>
-            <th>Participation</th>
-            <th>View Diploma</th>
-            <th>SENT?</th>
-            <th>Select to Send</th>
-            <th>Delete</th>
-        </tr>
-    </thead>
-    <tbody id="diplomaTableBody">
-        {% for diploma in diplomas %}
-        <tr>
-            <td>{{ diploma.id }}</td>
-            <td>{{ diploma.nombre }}</td>
-            <td>{{ diploma.apellidos }}</td>
-            <td>{{ diploma.correo }}</td>
-            <td>{{ diploma.uvus }}</td>
-            <td>{{ diploma.participacion }}</td>
-            <td>
-                <a href="{{ url_for('diplomas.view_diploma', diploma_id=diploma.id) }}" target="_blank" class="btn btn-info">
-                    View Diploma
-                </a>
-            </td>
-            <td>
-                {% if diploma.sent %}
-                    <span class="badge bg-success">✔</span>
+<div class="container text-center mt-5">
+    <div class="diploma-list-box shadow rounded">
+        <h4 class="mb-3"><strong>Diplomas List</strong></h4>
+        <div class="diploma-scroll">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Surname</th>
+                    <th>Email</th>
+                    <th>UVUS</th>
+                    <th>Participation</th>
+                    <th>View</th>
+                    <th>SENT?</th>
+                    <th>Select Diploma</th>
+                    <th>Delete</th>
+                    </tr>
+                </thead>
+                <tbody id="diplomaTableBody">
+                {% for diploma in diplomas %}
+                <tr>
+                    <td>{{ diploma.id }}</td>
+                    <td>{{ diploma.nombre }}</td>
+                    <td>{{ diploma.apellidos }}</td>
+                    <td>{{ diploma.correo }}</td>
+                    <td>{{ diploma.uvus }}</td>
+                    <td>{{ diploma.participacion }}</td>
+                    <td>
+                        <a href="{{ url_for('diplomas.view_diploma', diploma_id=diploma.id) }}" target="_blank" class="btn btn-info btn-sm">
+                        View 
+                        </a>
+                    </td>
+                    <td>
+                        {% if diploma.sent %}
+                            <span class="badge bg-success">✔</span>
+                        {% else %}
+                            <span class="badge bg-danger">✖</span>
+                        {% endif %}
+                    </td>
+                    <td><input type="checkbox" class="send-checkbox"></td>
+                    <td>
+                        <form method="POST" action="{{ url_for('diplomas.delete_diploma', diploma_id=diploma.id) }}" onsubmit="return confirm('Are you sure you want to delete this diploma?');">
+                            <input type="hidden" name="_method" value="DELETE">
+                            <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                        </form>
+                    </td>
+                </tr>
                 {% else %}
-                    <span class="badge bg-danger">✖</span>
-                {% endif %}
-            </td>
-            <td><input type="checkbox" class="send-checkbox"></td>
-            <td>
-                <form method="POST" action="{{ url_for('diplomas.delete_diploma', diploma_id=diploma.id) }}" onsubmit="return confirm('Are you sure you want to delete this diploma?');">
-                    <input type="hidden" name="_method" value="DELETE">
-                    <button type="submit" class="btn btn-danger">Delete</button>
-                </form>
-            </td>
-        </tr>
-        {% else %}
-        <tr>
-            <td colspan="9" class="text-center">No diplomas available</td>
-        </tr>
-        {% endfor %}
-    </tbody>
-</table>
+                <tr>
+                    <td colspan="9" class="text-center">No diplomas available</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    </div>
+</div>
+    
 {% endblock %}
 
 {% block scripts %}
 <script src="{{ url_for('diplomas.assets', subfolder='js', filename='scripts.js') }}"></script>
+
+
 {% endblock %}

@@ -1,0 +1,65 @@
+{% extends "base_template.html" %}
+
+{% block title %}View diplomas{% endblock %}
+
+{% block content %}
+<div class="container text-center mt-5">
+
+<div class="welcome-box ">
+    <h2 class="display-4 text-primary" style="color: white;">Generate Diplomas </h2>
+
+</div>
+</div>
+
+<div class="container d-flex justify-content-center align-items-center" style="height: 60vh;">  
+    <!-- Imágenes añadidas a la izquierda y derecha -->
+    <div class="image-container-left">
+        <img src="{{ url_for('static', filename='img/logo.png') }}" alt="Imagen izquierda" class="image-circle">
+    </div>
+
+    <div class="text-center gray-box" style="color: white">
+        
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        {% for category, message in messages %}
+        <div class="mb-3">
+            <div class="alert alert-{{ category }}" role="alert">
+                <div class="alert-message">
+                    {% if category == 'success' %}
+                    <h4 class="alert-heading"><i class="align-middle" data-feather="check-circle"></i> Success</h4>
+                    {% elif category == 'error' %}
+                    <h4 class="alert-heading"><i class="align-middle" data-feather="x-circle"></i> Error</h4>
+                    {% endif %}
+                    <p style="margin-bottom: 0px">{{ message }}</p>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+        {% endif %}
+        {% endwith %}
+
+        <form method="post" enctype="multipart/form-data">
+            {{ form.hidden_tag() }}
+            <div class="mb-4">
+                {{ form.hours_excel.label }}
+                {{ form.hours_excel(class="form-control") }}
+                {% for error in form.hours_excel.errors %}
+                    <span style="color: red;">{{ error }}</span>
+                {% endfor %}
+            </div>
+            <div class="mb-4">
+                {{ form.template.label }}
+                {{ form.template(class="form-control") }}
+            </div>
+            <button type="submit" class="btn btn-primary">{{ form.submit.label }}</button>
+        </form>
+    </div>
+    <div class="image-container-right">
+        <img src="{{ url_for('static', filename='img/ISD.png') }}" alt="Imagen izquierda" class="image-circle">
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('diplomas.assets', subfolder='js', filename='scripts.js') }}"></script>
+{% endblock %}

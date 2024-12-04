@@ -9,6 +9,7 @@ from core.services.BaseService import BaseService
 from app import db
 from werkzeug.security import generate_password_hash
 from app import mail_service
+import hashlib
 
 
 class ResetService(BaseService):
@@ -57,7 +58,7 @@ class ResetService(BaseService):
         return reset_token and reset_token.used_at
 
     def reset_password(self, email: str, password: str):
-        hashed_password = generate_password_hash(password)
+        hashed_password = hashlib.sha256(password.encode()).hexdigest()
         user = User.query.filter_by(email=email).first()
         user.password = hashed_password
         db.session.commit()
