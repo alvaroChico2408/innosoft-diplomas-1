@@ -1,7 +1,7 @@
-# Manual de Uso para el Despliegue de la Aplicación
+# Manual de Uso para el Despliegue de la Aplicación en Local
 
 ## 1. Clonar el Repositorio
-Clonar el repositorio por las claves SSH e inicializarlo en el IDLE preferido.
+Clonar el repositorio por las claves SSH e inicializarlo en el IDE preferido.
 
 ## 2. Configuración de MariaDB
 
