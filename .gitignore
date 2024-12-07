@@ -48,3 +48,14 @@ deployments.log
 
 # Node.js dependencies
 node_modules/
+
+# diplomas generados
+docs/diplomas/
+
+# plantillas generadas, excepto la plantilla del comité de diseño
+docs/plantillas/
+!docs/plantillas/Plantilla diploma.pdf
+
+# temp_preview
+app/docs/
+

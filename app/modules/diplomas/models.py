@@ -1,9 +1,10 @@
 import re
 from datetime import datetime
-from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.orm import validates
 import pandas as pd
 from app import db
+import random
+import string
 
 
 class Diploma(db.Model):
@@ -59,6 +60,7 @@ class Diploma(db.Model):
         if not set(comite_list).issubset(valid_comites):
             raise ValueError("Comité no válido.")
         return " | ".join(comite_list)
+    
 
     @classmethod
     def from_excel_row(cls, row):
@@ -67,6 +69,10 @@ class Diploma(db.Model):
 
         def to_int(value):
             return int(value) if pd.notnull(value) else None
+        
+        def generate_file_path(uvus):
+            random_str = ''.join(random.choices(string.ascii_letters + string.digits, k=10))
+            return f"docs/diplomas/{uvus}_{random_str}.pdf"
 
         return cls(
             apellidos=row["Apellidos"],
@@ -86,5 +92,16 @@ class Diploma(db.Model):
             evidencias_registradas=to_int(row["Evidencias registradas"]),
             horas_de_evidencias=to_float(row["Horas de evidencias"]),
             horas_en_total=to_float(row["Horas en total"]),
-            file_path=f"diplomas/{row['Uvus']}.pdf"
+            file_path=generate_file_path(row["Uvus"])
         )
+        
+        
+        
+class DiplomaTemplate(db.Model):
+    __tablename__ = 'diploma_templates'
+    id = db.Column(db.Integer, primary_key=True)
+    filename = db.Column(db.String(100), unique=True, nullable=False)
+    custom_text = db.Column(db.String(500), nullable=False)
+    file_path = db.Column(db.String(200), nullable=False)
+    
+
