@@ -92,13 +92,38 @@ flask run
 ```
 El servidor se ejecutará en [http://127.0.0.1:5000/](http://127.0.0.1:5000/)
 
-## 7. Iniciar Sesión en el Proyecto
 
-### 7.1 Credenciales de Acceso:
+
+## 7. Iniciar el Proyecto en la Máquina Virtual
+### 7.1 Desplazarse a la carpeta vagrant
+```bash
+cd vagrant/
+```
+### 7.2 Levantar la máquina virtual
+```bash
+vagrant up
+```
+El servidor se ejecutará en [http://127.0.0.1:5000/](http://127.0.0.1:5000/)
+### 7.3 Conectar a la máquina virtual
+```bash
+vagrant ssh
+```
+### 7.4 Apagar la máquina virtual
+```bash
+vagrant halt
+```
+### 7.5 Para volver a ejecutar los scripts de provisión (por ejemplo, después de realizar cambios), utiliza:
+ - Si la máquina virtual está apagada: ```vagrant up --provision```
+ - Si la máquina virtual necesita reiniciarse: ```vagrant reload --provision```
+
+## 8. Iniciar Sesión en el Proyecto
+
+### 8.1 Credenciales de Acceso:
 - **Correo electrónico:** user1@example.com
 - **Contraseña:** password
-
-## 8. Otros Detalles Importantes
+## 9. Otros Detalles Importantes
 - Verificar que las bases de datos `diplomasdb` y `diplomasdb_test` estén configuradas correctamente.
 - Asegurarse de que estás utilizando la versión correcta de Python (Python 3.12).
 - Si encuentras problemas con las dependencias, revisa el archivo `requirements.txt` y actualiza las librerías.
+
+
