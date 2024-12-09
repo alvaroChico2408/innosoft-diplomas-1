@@ -24,7 +24,7 @@
         executable: /bin/bash
       environment: "{{ common_environment }}"
 
-    - name: Set database with Rosemary
+    - name: Set database
       shell: |
         source {{ working_dir }}venv/bin/activate
         cd {{ working_dir }}
