@@ -28,8 +28,7 @@
     <div class="col-6">
         <div class="button-box p-3 bg-white shadow rounded">
             <button class="btn btn-success me-2" onclick="sendSelectedDiplomas()">SEND DIPLOMAS SELECTED</button>
-            <form id="deleteDiplomasForm" method="POST" action="{{ url_for('diplomas.delete_selected_diplomas') }}" onsubmit="return handleDeleteSelected(event);" style="display: inline;">
-                <input type="hidden" name="_method" value="DELETE">
+            <form id="deleteDiplomasForm" method="POST" action="{{ url_for('diplomas.delete_selected_diplomas') }}" onsubmit="return confirm('Are you sure you want to delete the selected diplomas?');" style="display: inline;">                <input type="hidden" name="_method" value="DELETE">
                 <input type="hidden" name="diploma_ids" id="diplomaIdsInput">
                 <button type="submit" class="btn btn-danger">DELETE SELECTED DIPLOMAS</button>
             </form>
