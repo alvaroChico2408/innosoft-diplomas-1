@@ -117,8 +117,14 @@ vagrant ssh
 vagrant halt
 ```
 ### 7.6 Para volver a ejecutar los scripts de provisión (por ejemplo, después de realizar cambios), utiliza:
- - Si la máquina virtual está apagada: ```vagrant up --provision```
- - Si la máquina virtual necesita reiniciarse: ```vagrant reload --provision```
+ - **Si la máquina virtual está apagada:** ```vagrant up --provision```
+ - **Si la máquina virtual necesita reiniciarse:** ```vagrant reload --provision```
+
+**Notas:**
+
+- Para volver a desplegar el proyecto en **localhost** (usando `flask run`) o en **Docker**, se recomienda **eliminar el entorno virtual** y volver a crearlo siguiendo los pasos descritos en el **punto 3**.
+- Si la máquina virtual se apaga, para volverla a iniciar correctamente se deben usar los comandos descritos en el **punto 7.6**.
+
 
 ## 8. Iniciar Sesión en el Proyecto
 
