@@ -21,7 +21,7 @@ class DiplomasService(BaseService):
 
     # función realizará la validación de la estructura del archivo y los datos específicos de cada campo. Si se detecta algún error, 
     # lanzará una excepción y no guardará los datos.
-    def validate_and_save_excel(self, file):
+    def validate_and_save_excel(self, file, template):
         try:
             df = pd.read_excel(file)
             print("Archivo Excel leído exitosamente.")
@@ -74,7 +74,7 @@ class DiplomasService(BaseService):
             db.session.commit()
             print("Datos guardados exitosamente en la base de datos.")
             try:
-                self.generate_all_pdfs()
+                self.generate_all_pdfs(template)
             except Exception as e:
                 print("Error al generar los PDFs:", e)
                 raise ValidationError("Error generating PDFs. Please try again.")
@@ -89,7 +89,7 @@ class DiplomasService(BaseService):
 
 
     # función para generar los PDFs para todos los diplomas
-    def generate_all_pdfs(self):
+    def generate_all_pdfs(self,plantilla_pdf):
         # creamos la ruta de la carpeta donde se guardarán los diplomas
         folder_path = os.path.join(current_app.root_path, "..", "diplomas")
         folder_path = os.path.abspath(folder_path)
@@ -99,12 +99,19 @@ class DiplomasService(BaseService):
 
         diplomas = Diploma.query.all()
         for diploma in diplomas:
-            self.generate_pdf(diploma, "docs/Plantilla diploma.pdf")
+            self.generate_pdf(diploma, plantilla_pdf)            
             
             
     def generate_pdf(self, diploma, plantilla_pdf):
+        # obtenemos la ruta completa del archivo PDF de la plantilla
+        plantilla_pdf_path = os.path.abspath(plantilla_pdf.file_path)
+        
+        # verificamos que el archivo exista antes de intentar abrirlo
+        if not os.path.exists(plantilla_pdf_path):
+            raise FileNotFoundError(f"El archivo de plantilla no se encontró en {plantilla_pdf_path}")
+        
         # leemos el PDF plantilla para obtener sus dimensiones
-        lector = PdfReader(plantilla_pdf)
+        lector = PdfReader(plantilla_pdf_path)
         pagina = lector.pages[0]
         ancho = float(pagina.mediabox.width)
         alto = float(pagina.mediabox.height)
@@ -112,14 +119,16 @@ class DiplomasService(BaseService):
         # creamos un PDF temporal con el texto deseado
         packet = io.BytesIO()
         can = canvas.Canvas(packet, pagesize=(ancho, alto))
-        texto = f"Enhorabuena {diploma.nombre} {diploma.apellidos}, has participado en las jornadas Innosoft como {diploma.participacion}"
-
+        
+        # generamos el texto personalizado reemplazando los marcadores
+        texto_personalizado = self.generate_custom_text(plantilla_pdf.custom_text, diploma)
+        
         # configuramos la fuente y el tamaño
         can.setFont("Times-Roman", 26)
 
         # calculamos el ancho máximo disponible y dividir el texto en líneas
         ancho_maximo = ancho * 0.60
-        lineas = self.text_pdf_format(texto, ancho_maximo, can)
+        lineas = self.text_pdf_format(texto_personalizado, ancho_maximo, can)
 
         # calculamos la posición inicial para centrar el texto verticalmente
         altura_total_texto = len(lineas) * 40
@@ -144,7 +153,7 @@ class DiplomasService(BaseService):
         writer.add_page(pagina)
 
         # creamos la ruta de la carpeta donde se guardarán los diplomas
-        folder_path = os.path.join(current_app.root_path, "../docs", "diplomas")
+        folder_path = os.path.join(current_app.root_path, "../docs/diplomas")
         folder_path = os.path.abspath(folder_path)
         if not os.path.exists(folder_path):
             os.makedirs(folder_path, exist_ok=True)
@@ -155,6 +164,35 @@ class DiplomasService(BaseService):
         # guardamos el nuevo diploma con el nombre de archivo deseado
         with open(file_path, "wb") as output_pdf:
             writer.write(output_pdf)
+
+
+    def generate_custom_text(self, custom_text, diploma):
+        """
+        Reemplaza los marcadores en el texto personalizado con los valores del diploma.
+        Los marcadores están definidos entre corchetes, e.g., [nombre], [apellidos].
+        """
+        if not custom_text:
+            # Texto predeterminado si no hay texto personalizado
+            return f"Enhorabuena {diploma.nombre} {diploma.apellidos}, has participado en las jornadas Innosoft como {diploma.participacion}"
+        
+        # Diccionario con los atributos del diploma
+        atributos = {
+            "nombre": diploma.nombre,
+            "apellidos": diploma.apellidos,
+            "uvus": diploma.uvus,
+            "correo": diploma.correo,
+            "perfil": diploma.perfil,
+            "participacion": diploma.participacion,
+            "comite": diploma.comite
+        }
+
+        # Reemplazar cada marcador en el texto personalizado
+        for marcador, valor in atributos.items():
+            marcador_formateado = f"[{marcador}]"
+            custom_text = custom_text.replace(marcador_formateado, str(valor))
+        
+        return custom_text
+
             
             
     def text_pdf_format(self, texto, ancho_maximo, can):
@@ -173,3 +211,56 @@ class DiplomasService(BaseService):
             lineas.append(linea_actual.strip())
 
         return lineas
+
+    def generate_preview_with_text(self, template_path, custom_text):
+        try:
+            # Leer el archivo de plantilla
+            reader = PdfReader(template_path)
+            page = reader.pages[0]
+
+            # Obtener dimensiones de la página
+            width = float(page.mediabox.width)
+            height = float(page.mediabox.height)
+
+            # Crear un PDF temporal con el texto superpuesto
+            packet = io.BytesIO()
+            can = canvas.Canvas(packet, pagesize=(width, height))
+
+            # Configuración del texto
+            can.setFont("Times-Roman", 26)
+            text_width = width * 0.8
+            text_lines = self.text_pdf_format(custom_text, text_width, can)
+
+            # Posicionar el texto centrado verticalmente
+            y_position = height / 2 + len(text_lines) * 15
+            for line in text_lines:
+                text_x = (width - can.stringWidth(line)) / 2
+                can.drawString(text_x, y_position, line)
+                y_position -= 30
+
+            can.save()
+            packet.seek(0)
+
+            # Leer el PDF temporal con el texto
+            temp_pdf = PdfReader(packet)
+            temp_page = temp_pdf.pages[0]
+
+            # Combinar la página temporal con el texto en la plantilla original
+            page.merge_page(temp_page)
+
+            # Crear un archivo temporal para guardar el PDF final
+            temp_dir = os.path.join(current_app.root_path, "docs")
+            if not os.path.exists(temp_dir):
+                os.makedirs(temp_dir, exist_ok=True)
+
+            temp_path = os.path.join(temp_dir, "temp_preview.pdf")
+            writer = PdfWriter()
+            writer.add_page(page)
+
+            with open(temp_path, "wb") as output_file:
+                writer.write(output_file)
+
+            return temp_path
+        except Exception as e:
+            print(f"Error al generar vista previa: {e}")
+            raise

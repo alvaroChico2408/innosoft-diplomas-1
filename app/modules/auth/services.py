@@ -1,6 +1,7 @@
 import os
 
 from flask_login import login_user
+from sqlalchemy.exc import IntegrityError
 from flask_login import current_user
 
 from app.modules.auth.models import User
@@ -9,6 +10,7 @@ from app.modules.profile.models import UserProfile
 from app.modules.profile.repositories import UserProfileRepository
 from core.configuration.configuration import uploads_folder_name
 from core.services.BaseService import BaseService
+import hashlib
 
 
 class AuthenticationService(BaseService):
@@ -43,6 +45,9 @@ class AuthenticationService(BaseService):
             if not surname:
                 raise ValueError("Surname is required.")
 
+            if not self.is_email_available(email):
+                return None, "The email address is already registered."
+
             user_data = {
                 "email": email,
                 "password": password,
@@ -52,23 +57,67 @@ class AuthenticationService(BaseService):
             profile_data = {
                 "name": name,
                 "surname": surname,
+                "email": email,
+                "password": hashlib.sha256(password.encode()).hexdigest(),
             }
 
             user = self.create(commit=False, **user_data)
             profile_data["user_id"] = user.id
             self.user_profile_repository.create(**profile_data)
             self.repository.session.commit()
-        except Exception as exc:
+        except IntegrityError as e:
             self.repository.session.rollback()
-            raise exc
+            if "Duplicate entry" in str(e):
+                return None, "The email address is already registered."
+            return None, "An error occurred while creating the profile."
+        except Exception:
+            self.repository.session.rollback()
+            return None, "Unexpected error occurred."
         return user
 
-    def update_profile(self, user_profile_id, form):
-        if form.validate():
-            updated_instance = self.update(user_profile_id, **form.data)
-            return updated_instance, None
+    def update_profile(self, user_id, email, **kwargs):
+        user = self.repository.get_by_id(user_id)
 
-        return None, form.errors
+        if not user:
+            return None, "User not found."
+
+        if email:
+            user.email = email
+
+        for key, value in kwargs.items():
+            if hasattr(user.profile, key):
+                setattr(user.profile, key, value)
+
+        self.repository.session.add(user)
+        self.user_profile_repository.session.add(user.profile)
+        self.repository.session.commit()
+        self.user_profile_repository.session.commit()
+        return user
+
+    def change_password(self, user_id, new_password):
+        user = self.repository.get_by_id(user_id)
+        if not user:
+            return None, "User not found."
+
+        # Actualizar contraseña en el modelo User
+        user.set_password(new_password)
+
+        # Actualizar también la contraseña en el UserProfile
+        user_profile = user.profile
+        if user_profile:
+            user_profile.set_password(new_password)
+
+        # Guardar cambios en la base de datos
+        try:
+            self.repository.session.add(user)
+            if user_profile:
+                self.user_profile_repository.session.add(user_profile)
+            self.repository.session.commit()
+            self.user_profile_repository.session.commit()
+            return user, None
+        except Exception as e:
+            self.repository.session.rollback()
+            return None, str(e)
 
     def get_authenticated_user(self) -> User | None:
         if current_user.is_authenticated:
