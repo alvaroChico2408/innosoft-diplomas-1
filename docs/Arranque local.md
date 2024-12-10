@@ -95,24 +95,28 @@ El servidor se ejecutará en [http://127.0.0.1:5000/](http://127.0.0.1:5000/)
 
 
 ## 7. Iniciar el Proyecto en la Máquina Virtual
-### 7.1 Desplazarse a la carpeta vagrant
+### 7.1 Copiar el Archivo de Configuración (Vagrant) de Ejemplo a .env
+```bash
+cp .env.vagrant.example .env
+```
+### 7.2 Desplazarse a la carpeta vagrant
 ```bash
 cd vagrant/
 ```
-### 7.2 Levantar la máquina virtual
+### 7.3 Levantar la máquina virtual
 ```bash
 vagrant up
 ```
 El servidor se ejecutará en [http://127.0.0.1:5000/](http://127.0.0.1:5000/)
-### 7.3 Conectar a la máquina virtual
+### 7.4 Conectar a la máquina virtual
 ```bash
 vagrant ssh
 ```
-### 7.4 Apagar la máquina virtual
+### 7.5 Apagar la máquina virtual
 ```bash
 vagrant halt
 ```
-### 7.5 Para volver a ejecutar los scripts de provisión (por ejemplo, después de realizar cambios), utiliza:
+### 7.6 Para volver a ejecutar los scripts de provisión (por ejemplo, después de realizar cambios), utiliza:
  - Si la máquina virtual está apagada: ```vagrant up --provision```
  - Si la máquina virtual necesita reiniciarse: ```vagrant reload --provision```
 
