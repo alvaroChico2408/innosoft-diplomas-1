@@ -1,0 +1,71 @@
+name: Security Tests
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  snyk-security-scan:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Node.js (si tu proyecto es Node.js)
+        uses: actions/setup-node@v2
+        with:
+          node-version: '14'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Authenticate with Snyk
+        run: snyk auth ${{ secrets.SNYK_TOKEN }}
+
+      - name: Run Snyk test (Vulnerabilities in dependencies)
+        run: snyk test
+
+      - name: Run Snyk monitor (Monitor for vulnerabilities over time)
+        run: snyk monitor
+
+  notify-security-results:
+    if: failure()  # Solo se ejecuta si el job de seguridad falla
+    runs-on: ubuntu-latest
+    needs: snyk-security-scan
+
+    steps:
+      - name: Send security failure notification to Slack
+        uses: slackapi/slack-github-action@v1
+        with:
+          slack-webhook-url: ${{ secrets.SLACK_WEBHOOK_URL }}
+          channel: '#your-channel-name'  # Canal de Slack
+          text: |
+            :warning: *Security Alert: Vulnerabilities Found* 
+            Commit URL: ${{ github.event.head_commit.url }}
+            Repository: ${{ github.repository }}
+            Branch: ${{ github.ref }}
+            Committer: ${{ github.actor }}
+            Please review the results of the Snyk scan.
+
+  security-success-notify:
+    if: success()  # Solo se ejecuta si el job de seguridad es exitoso
+    runs-on: ubuntu-latest
+    needs: snyk-security-scan
+
+    steps:
+      - name: Send security success notification to Slack
+        uses: slackapi/slack-github-action@v1
+        with:
+          slack-webhook-url: ${{ secrets.SLACK_WEBHOOK_URL }}
+          channel: '#your-channel-name'  # Canal de Slack
+          text: |
+            :white_check_mark: *No Security Vulnerabilities Found* 
+            Commit URL: ${{ github.event.head_commit.url }}
+            Repository: ${{ github.repository }}
+            Branch: ${{ github.ref }}
+            Committer: ${{ github.actor }}
