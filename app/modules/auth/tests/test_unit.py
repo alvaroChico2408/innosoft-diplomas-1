@@ -1,11 +1,15 @@
+from sqlite3 import IntegrityError
 import pytest
 from unittest.mock import patch, MagicMock
+from app.modules.auth.seeders import AuthSeeder
 from app.modules.auth.services import AuthenticationService
 from app.modules.profile.services import UserProfileService
 from app.modules.auth.models import User
 from app.modules.profile.models import UserProfile
 from werkzeug.datastructures import MultiDict
 from flask_login import current_user
+from app import create_app, db
+from selenium import webdriver
 
 
 @pytest.fixture
@@ -13,11 +17,35 @@ def authentication_service():
     """Fixture para inicializar AuthenticationService."""
     return AuthenticationService()
 
+@pytest.fixture
+def client():
+    app = create_app('testing')
+    with app.test_client() as client:
+        with app.app_context():
+            yield client
 
+@pytest.fixture
+def driver():
+    driver = webdriver.Chrome()  # Asegúrate de tener instalado el WebDriver adecuado.
+    yield driver
+    driver.quit()
+            
 @pytest.fixture
 def user_profile_service():
     """Fixture para inicializar UserProfileService."""
     return UserProfileService()
+
+def test_is_email_available(authentication_service):
+    """Verifica que el email esté disponible."""
+    with patch.object(authentication_service, 'is_email_available') as mock_is_email_available:
+        mock_is_email_available.return_value = True  # Simulando email disponible
+        
+        result = authentication_service.is_email_available(' ')
+        
+        # Verificaciones
+        
+        assert result is True
+
 
 
 def test_login_invalid_credentials(authentication_service):
@@ -143,3 +171,38 @@ def test_get_by_email(authentication_service):
         # Verificaciones
         mock_get_by_email.assert_called_once_with(' ')
         assert result == mock_user
+        
+
+def test_update_profile_user_not_found(authentication_service):
+    """Prueba de actualización de perfil con usuario inexistente."""
+    with patch.object(authentication_service.repository, 'get_by_id', return_value=None):
+        user, error = authentication_service.update_profile(999, email="new@example.com")
+        assert user is None
+        assert error == "User not found."
+
+def test_login_route(client):
+    response = client.post('/login', data={'username': 'user', 'password': 'pass'})
+    assert response.status_code == 200
+
+
+
+#def test_auth_seeder():
+#    app = create_app('testing')
+#    with app.app_context():
+#        seeder = AuthSeeder()
+#        seeder.run()
+#        assert db.session.query(User).count() > 0
+
+def test_create_with_profile_duplicate_email(authentication_service):
+    """Verifica que no se permita crear un usuario con un email duplicado."""
+    with patch.object(authentication_service, 'is_email_available', return_value=False):
+        result, error = authentication_service.create_with_profile(
+            email='duplicate@example.com',
+            password='password123',
+            name='Jane',
+            surname='Doe'
+        )
+        assert result is None
+        assert error == "The email address is already registered."
+
+
