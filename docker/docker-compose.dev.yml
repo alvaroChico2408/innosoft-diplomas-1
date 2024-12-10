@@ -5,7 +5,7 @@ services:
     build:
       context: ../
       dockerfile: docker/images/Dockerfile.mariadb
-    container_name: mariadb_container
+    container_name: localhost
     environment:
       MARIADB_ROOT_PASSWORD: diplomasdb_root_password
       MARIADB_DATABASE: diplomasdb
@@ -28,8 +28,8 @@ services:
       - db
       - redis
     environment:
-      MARIADB_HOSTNAME: mariadb_container  # Cambiado de localhost
-      REDIS_URL: redis://redis_container:6380  # Cambiado de localhost
+      MARIADB_HOSTNAME: localhost  # Cambiado de localhost
+      REDIS_URL: redis://localhost:6380  # Cambiado de localhost
     expose:
       - "5000"
     ports:
