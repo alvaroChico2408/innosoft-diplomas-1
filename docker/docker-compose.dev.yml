@@ -1,8 +1,12 @@
-services:
+version: "3.9"
 
+services:
   web:
     container_name: web_app_container
-    image: drorganvidez/boilerplate:dev
+    build:
+      context: ../
+      dockerfile: docker/images/Dockerfile.dev
+    image: diplomas_web_app:latest
     env_file:
       - ../.env
     expose:
@@ -12,70 +16,42 @@ services:
     depends_on:
       - db
       - redis
-    build:
-      context: ../
-      dockerfile: docker/images/Dockerfile.dev
     volumes:
       - ../:/app
       - /var/run/docker.sock:/var/run/docker.sock
-    command: [ "bash", "-c", "bash /app/docker/entrypoints/development_entrypoint.sh" ]
+    command: ["bash", "-c", "bash /app/docker/entrypoints/development_entrypoint.sh"]
     networks:
-      - boilerplate_network
+      - my_network
 
   db:
+    image: mariadb:latest
     container_name: mariadb_container
-    env_file:
-      - ../.env
-    build:
-      context: ../
-      dockerfile: docker/images/Dockerfile.mariadb
-    ports:
-      - "3306:3306"
+    environment:
+      MARIADB_ROOT_PASSWORD: diplomasdb_root_password
+      MARIADB_DATABASE: diplomasdb
+      MARIADB_USER: diplomasdb_user
+      MARIADB_PASSWORD: diplomasdb_password
     volumes:
       - db_data:/var/lib/mysql
-    networks:
-      - boilerplate_network
-
-  nginx:
-    container_name: nginx_web_server_container
-    image: nginx:latest
-    volumes:
-      - ./nginx/nginx.dev.conf:/etc/nginx/nginx.conf
-      - ./nginx/html:/usr/share/nginx/html
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
     ports:
-      - "80:80"
-    depends_on:
-      - web
+      - "3306:3306"
     networks:
-      - boilerplate_network
+      - my_network
 
   redis:
-    image: "redis:latest"
+    image: redis:latest
     container_name: redis_container
     restart: always
+    ports:
+      - "6379:6379"
     networks:
-      - boilerplate_network
-
-  worker:
-    container_name: rq_worker_container
-    env_file:
-      - ../.env
-    depends_on:
-      - redis
-    build:
-      context: ../
-      dockerfile: docker/images/Dockerfile.worker
-    volumes:
-      - ../app/:/app/app
-      - ../core/:/app/core
-      - ../uploads/:/app/uploads
-    networks:
-      - boilerplate_network
+      - my_network
 
 volumes:
   db_data:
 
 networks:
-  boilerplate_network:
-    driver: bridge
-    name: boilerplate_network
+  my_network:
+    external: true
+    name: innosoft-diplomas-1_my_network
