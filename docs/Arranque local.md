@@ -103,7 +103,7 @@ cp .env.vagrant.example .env
 ```bash
 cd vagrant/
 ```
-### 7.3 Levantar la máquina virtual por primera vez
+### 7.3 Levantar la máquina virtual
 ```bash
 vagrant up
 ```
@@ -116,22 +116,9 @@ vagrant ssh
 ```bash
 vagrant halt
 ```
-### 7.6 Para volver a ejecutar los scripts de provisión o se quiere volver a iniciar la máquina tras haber sido apagada:
- - **Si la máquina virtual está apagada:** ```vagrant up --provision```
- - **Si la máquina virtual necesita reiniciarse:** ```vagrant reload --provision```
-
-**Notas:**
-- Para volver a desplegar el proyecto en **localhost** (usando `flask run`) o en **Docker**, se recomienda **eliminar el entorno virtual** y volver a crearlo siguiendo los pasos descritos en el **punto 3**.
-- Si la máquina virtual se apaga, para volverla a iniciar correctamente se deben usar los comandos descritos en el **punto 7.6**.
-- Se recomienda eliminar los datos de la base de datos si se quiere volver a arrancar en local siguiendo los siguientes comandos:
-
-    - Nos conectamos a MariaDB: `sudo mysql -u root -p`
-    - Eliminamos las bases de datos de diplomasdb y diplomasdb_test:
-    `DROP diplomasdb;` y `DROP diplomasdb_test;`.
-    - Volvemos a realizar las migraciones con el .env que se quiera usar: `flask db upgrade` y `flask db migrate`.
-
-
-
+### 7.6 Para volver a ejecutar los scripts de provisión (por ejemplo, después de realizar cambios), utiliza:
+ - Si la máquina virtual está apagada: ```vagrant up --provision```
+ - Si la máquina virtual necesita reiniciarse: ```vagrant reload --provision```
 
 ## 8. Iniciar Sesión en el Proyecto
 
