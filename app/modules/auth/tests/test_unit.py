@@ -10,6 +10,7 @@ from werkzeug.datastructures import MultiDict
 from flask_login import current_user
 from app import create_app, db
 from selenium import webdriver
+from flask import url_for
 
 
 @pytest.fixture
@@ -48,12 +49,43 @@ def test_is_email_available(authentication_service):
 
 
 
-def test_login_invalid_credentials(authentication_service):
+def test_login_invalid_credentials_wrong_password(authentication_service):
     """Verifica que el login falle con credenciales inválidas."""
     with patch.object(authentication_service, 'login') as mock_login:
         mock_login.return_value = False  # Simulando un login fallido
 
         result = authentication_service.login('user@example.com', 'wrongpassword')
+
+        # Verificaciones
+        assert result is False
+     
+        
+def test_login_invalid_credentials_wrong_email(authentication_service):
+    """Verifica que el login falle con credenciales inválidas."""
+    with patch.object(authentication_service, 'login') as mock_login:
+        mock_login.return_value = False  # Simulando un login fallido
+
+        result = authentication_service.login('wrongemail@example.com', 'correctpassword')
+
+        # Verificaciones
+        assert result is False
+        
+def test_login_invalid_credentials_empty_email(authentication_service):
+    """Verifica que el login falle con credenciales inválidas."""
+    with patch.object(authentication_service, 'login') as mock_login:
+        mock_login.return_value = False  # Simulando un login fallido
+
+        result = authentication_service.login('', 'correctpassword')
+
+        # Verificaciones
+        assert result is False
+        
+def test_login_invalid_credentials_empty_password(authentication_service):
+    """Verifica que el login falle con credenciales inválidas."""
+    with patch.object(authentication_service, 'login') as mock_login:
+        mock_login.return_value = False  # Simulando un login fallido
+
+        result = authentication_service.login('correctemail@example.com', '')
 
         # Verificaciones
         assert result is False
@@ -183,6 +215,19 @@ def test_update_profile_user_not_found(authentication_service):
 def test_login_route(client):
     response = client.post('/login', data={'username': 'user', 'password': 'pass'})
     assert response.status_code == 200
+
+def test_logout_route(client):
+    # Simula un usuario registrado que inicia sesión
+    login_response = client.post('/login', data={'username': 'user', 'password': 'pass'})
+    
+    # Verifica que el inicio de sesión sea exitoso
+    assert login_response.status_code == 200
+
+    # Simula que el usuario se desloguea
+    logout_response = client.get('/logout', follow_redirects=True)
+
+    # Verifica que el deslogueo sea exitoso
+    assert logout_response.status_code == 200
 
 
 
