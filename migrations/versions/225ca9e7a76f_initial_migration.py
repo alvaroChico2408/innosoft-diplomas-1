@@ -107,6 +107,22 @@ def upgrade():
             "password": hashed_password
         }
     )
+    # Inserta un registro en la tabla 'diploma_templates'
+    connection = op.get_bind()
+    template_text = "¡Enhorabuena [nombre] [apellidos], has participado en las jornadas de Innosoft 2024 como [participacion]!"
+
+    # Insertar el template en la tabla diploma_templates
+    connection.execute(
+        sa.text(
+            "INSERT INTO diploma_templates (filename, custom_text, file_path) "
+            "VALUES (:filename, :custom_text, :file_path)"
+        ),
+        {
+            "filename": "Plantilla diploma.pdf",
+            "custom_text": template_text,
+            "file_path": "docs/plantillas/Plantilla diploma.pdf"
+        }
+    )
     # ### end Alembic commands ###
 
 

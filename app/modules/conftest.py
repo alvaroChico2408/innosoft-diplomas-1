@@ -1,4 +1,9 @@
 import pytest
+from selenium.webdriver.common.by import By
+from selenium.webdriver.common.keys import Keys
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+from core.environment.host import get_host_for_selenium_testing
 
 from app import create_app, db
 from app.modules.auth.models import User
@@ -82,3 +87,24 @@ def logout(test_client):
         response: Response to GET request to log out.
     """
     return test_client.get('/logout', follow_redirects=True)
+
+
+def login_selenium(driver, email, password):
+    """
+    Realiza el login del usuario en Selenium.
+    
+    Args:
+        driver: WebDriver de Selenium.
+        email (str): Correo electrónico del usuario.
+        password (str): Contraseña del usuario.
+    """
+    host = get_host_for_selenium_testing()
+    driver.get(f'{host}/login')
+    
+    driver.find_element(By.ID, "email").send_keys(email)
+    driver.find_element(By.ID, "password").send_keys(password)
+    driver.find_element(By.ID, "submit").click()
+
+    WebDriverWait(driver, 10).until(
+        EC.presence_of_element_located((By.CSS_SELECTOR, ".welcome-box h2.display-4.text-primary"))
+    )
