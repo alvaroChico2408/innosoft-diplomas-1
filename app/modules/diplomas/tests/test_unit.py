@@ -3,6 +3,7 @@ from unittest.mock import patch
 from app.modules.diplomas.forms import UploadExcelForm
 from app.modules.diplomas.services import DiplomasService
 from app.modules.diplomas.models import Diploma
+from app import create_app, db
 
 from flask import url_for
 from unittest.mock import patch, MagicMock
@@ -37,6 +38,13 @@ def diploma_service():
 @pytest.fixture 
 def diplomas_models():
     return Diploma()
+
+@pytest.fixture
+def client():
+    app = create_app('testing')
+    with app.test_client() as client:
+        with app.app_context():
+            yield client
 
 def test_validate_and_save_excel(diploma_service):
     
@@ -276,3 +284,14 @@ def test_from_excel_row_with_invalid_data(diplomas_models):
     with pytest.raises(ValueError, match="Correo no tiene un formato válido."):
         diplomas_models.from_excel_row(row)
         
+def test_generate_diplomas_route_unregistered_user(client):
+    response = client.get('/diplomas')
+    assert response.status_code == 302
+    
+def test_manage_template_route_unregistered_user(client):
+    response = client.get('/manage-templates')
+    assert response.status_code == 302
+    
+def test_diplomas_visualization_route_unregistered_user(client):
+    response = client.get('/diplomas-visualization')
+    assert response.status_code == 302
