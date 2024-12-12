@@ -155,3 +155,52 @@ vagrant halt
 - Si encuentras problemas con las dependencias, revisa el archivo `requirements.txt` y actualiza las librerías.
 
 
+# Manual de Uso para el Despliegue de la Aplicación en Docker
+
+## 1. Pasos anteriores
+- Una vez seguidos los pasos 2, 3, 4, y 5 anteriormente mencionados.
+
+## 2. Instalar Docker Compose
+
+- El primer paso es descargar la última versión de Docker Compose. No obstante, las últimas versiones de Docker ya incluyen Docker Compose. Antes de intentar realizar una instalación de Docker Compose, lanza el siguiente comando:
+
+```bash
+docker compose version
+```
+
+- Si te funciona, puedes saltarte el paso de descargar e instalar Docker Compose. Si no, puedes descargar Docker Compose usando el siguiente comando, pero asegúrate de verificar la última versión en la página de lanzamientos de Docker Compose:
+
+```bash
+mkdir -p ~/.docker/cli-plugins/
+
+LATEST_VERSION=$(curl -s https://api.github.com/repos/docker/compose/releases/latest | grep '"tag_name":' | sed -E 's/.*"([^"]+)".*/\1/')
+
+sudo curl -SL "https://github.com/docker/compose/releases/download/${LATEST_VERSION}/docker-compose-$(uname -s)-$(uname -m)" -o ~/.docker/cli-plugins/docker-compose
+```
+
+- Aplicar Permisos Ejecutables: asegúrate de que el archivo de Docker Compose tenga permisos ejecutables:
+
+```bash
+chmod +x ~/.docker/cli-plugins/docker-compose
+```
+
+- Verificar la instalación de Docker Compose: para confirmar que Docker Compose se ha instalado correctamente, ejecuta:
+
+```bash
+docker compose --version
+```
+
+## 3. Construir y levantar una imagen de Docker
+
+```bash
+docker-compose -f docker/docker-compose.yml up --build -d
+```
+
+- (Para parar Docker)
+```bash
+docker-compose -f docker/docker-compose.yml down --build -d
+```
+
+## 4. Verificación en el Navegador
+
+Una vez que el contenedor esté en ejecución, abre tu navegador y accede a [1](http://localhost:5000). Si ves la aplicación funcionando, ¡felicidades! Has dockerizado exitosamente la aplicación Flask.
