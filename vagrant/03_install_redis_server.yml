@@ -1,0 +1,15 @@
+- hosts: all
+  become: true
+
+  tasks:
+    - name: Instalar redis-server
+      apt:
+        name: redis-server
+        state: present
+        update_cache: yes
+
+    - name: Habilitar y arrancar redis-server
+      systemd:
+        name: redis-server
+        state: started
+        enabled: yes

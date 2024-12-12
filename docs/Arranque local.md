@@ -1,14 +1,3 @@
-<div align="center">
-
-  <a href="">[![Pytest Testing Suite](https://github.com/drorganvidez/flask_base/actions/workflows/tests.yml/badge.svg?branch=main)](https://github.com/drorganvidez/flask_base/actions/workflows/tests.yml)</a>
-  <a href="">[![Commits Syntax Checker](https://github.com/drorganvidez/flask_base/actions/workflows/commits.yml/badge.svg?branch=main)](https://github.com/drorganvidez/flask_base/actions/workflows/commits.yml)</a>
-  
-</div>
-
-# diplomas-innosoft-1
-
-Este es el proyecto de la asignatura EGC para crear diplomas para los alumnos organizadores y participantes en las jornadas InnoSoft.
-
 # Manual de Uso para el Despliegue de la Aplicación en Local
 
 ## 1. Clonar el Repositorio

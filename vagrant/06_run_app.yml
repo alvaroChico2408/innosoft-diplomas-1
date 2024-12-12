@@ -24,12 +24,12 @@
         executable: /bin/bash
       environment: "{{ common_environment }}"
 
-    - name: Set database with Rosemary
+    - name: Set database
       shell: |
         source {{ working_dir }}venv/bin/activate
         cd {{ working_dir }}
         flask db upgrade
-        rosemary db:seed -y --reset
+        flask db migrate
       args:
         executable: /bin/bash
       environment: "{{ common_environment }}"
