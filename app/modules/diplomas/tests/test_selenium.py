@@ -6,6 +6,7 @@ from app.modules.conftest import login_selenium
 from selenium.webdriver.common.action_chains import ActionChains
 import time
 
+
 class TestDiplomas:
     
     diploma_generator_button = ".sidebar-item:nth-child(4) .align-middle:nth-child(2)"
