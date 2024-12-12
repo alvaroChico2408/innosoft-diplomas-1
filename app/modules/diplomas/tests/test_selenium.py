@@ -1,5 +1,4 @@
 from selenium.webdriver.common.by import By
-from selenium.webdriver.common.action_chains import ActionChains
 from core.environment.host import get_host_for_selenium_testing
 from core.selenium.common import initialize_driver
 import time
