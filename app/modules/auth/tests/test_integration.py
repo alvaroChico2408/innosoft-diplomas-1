@@ -41,3 +41,14 @@ def test_logout(test_client):
     assert not current_user.is_authenticated, "El usuario todavía está autenticado después del cierre de sesión."
 
 
+def test_login_invalid_credentials(test_client):
+    """
+    Prueba el inicio de sesión con credenciales inválidas.
+    """
+    # Intentar iniciar sesión con credenciales inválidas
+    login_response = login(test_client, "user@example", "test1234")
+    assert login_response.status_code == 200, "El inicio de sesión no fue exitoso."
+    
+    
+
+
