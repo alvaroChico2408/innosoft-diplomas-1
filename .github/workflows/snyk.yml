@@ -30,12 +30,18 @@ jobs:
         run: npm install -g snyk
 
       - name: Authenticate with Snyk
-        run: snyk auth ${{ secrets.SNYK_TOKEN }}
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+        run: snyk auth
 
       - name: Run Snyk test (Vulnerabilities in dependencies)
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
         run: snyk test
 
       - name: Run Snyk monitor (Monitor for vulnerabilities over time)
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
         run: snyk monitor
 
   notify-security-results:
