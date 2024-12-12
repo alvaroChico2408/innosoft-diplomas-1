@@ -32,9 +32,9 @@ jobs:
 
       - name: Validate Commit Messages
         run: |
-          RANGE=$(git rev-list --count ${{ github.event.before }}..${{ github.sha }}) || true
-          if [ "$RANGE" -eq 0 ]; then
-            echo "HEAD" | commitlint
+          if git rev-parse ${{ github.event.before }} >/dev/null 2>&1; then
+            RANGE=$(git log --format=%s ${{ github.event.before }}..${{ github.sha }})
           else
-            git log --format=%s ${{ github.event.before }}..${{ github.sha }} | commitlint
+            RANGE=$(git log -1 --format=%s)
           fi
+          echo "$RANGE" | commitlint
