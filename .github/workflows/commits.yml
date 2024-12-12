@@ -3,17 +3,32 @@ name: Commits Syntax Checker
 on:
   pull_request:
     branches: [main, preproduction]
-    types: [opened, reopened, edited, review_requested, synchronize]
+    types: [opened, reopened, edited, synchronize]
   push:
     branches:
       - "main"
       - "preproduction"
-  workflow_call:
 
 jobs:
   check:
     name: Conventional Commits
     runs-on: ubuntu-latest
+
     steps:
-      - uses: actions/checkout@v2
-      - uses: webiny/action-conventional-commits@v1.0.3
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+
+      - name: Install Commitlint
+        run: npm install -g @commitlint/{cli,config-conventional}
+
+      - name: Create Custom Commitlint Config
+        run: |
+          echo "module.exports = { extends: ['@commitlint/config-conventional'], rules: { 'header-pattern': [2, 'always', /^\\[\\w+\\]\\s.+/] } };" > commitlint.config.js
+
+      - name: Validate Commit Messages
+        run: git log --format=%s ${{ github.event.before }}..${{ github.sha }} | commitlint
