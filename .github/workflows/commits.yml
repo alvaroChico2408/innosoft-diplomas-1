@@ -17,6 +17,8 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
+        with:
+          fetch-depth: 0 # Descarga todo el historial de commits
 
       - name: Setup Node.js
         uses: actions/setup-node@v3
