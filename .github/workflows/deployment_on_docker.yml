@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main  # Cambia esto al nombre de la rama que desees usar
+      - preproduction
 
 jobs:
   build-and-push:
