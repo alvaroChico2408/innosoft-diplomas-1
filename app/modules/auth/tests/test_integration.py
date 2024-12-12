@@ -60,3 +60,10 @@ def test_login_invalid_password(test_client):
     
 
 
+def test_login_invalid_email(test_client):
+    """
+    Prueba el inicio de sesión con un correo electrónico incorrecto.
+    """
+    # Intentar iniciar sesión con un correo electrónico incorrecto
+    login_response = login(test_client, "user1example", "test1234")
+    assert login_response.status_code == 200, "El inicio de sesión no fue exitoso."
