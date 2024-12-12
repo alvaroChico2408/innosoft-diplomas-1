@@ -28,9 +28,13 @@ jobs:
 
       - name: Create Custom Commitlint Config
         run: |
-          echo "module.exports = { extends: ['@commitlint/config-conventional'], rules: { 'header-pattern': [2, 'always', /^\\[\\w+\\]\\s.+/] } };" > commitlint.config.js
+          echo "module.exports = { extends: ['@commitlint/config-conventional'], rules: { 'type-case': [2, 'always', 'lower-case'], 'header-pattern': [2, 'always', /^\\[\\w+\\]\\s.+/] } };" > commitlint.config.js
 
       - name: Validate Commit Messages
         run: |
-          RANGE=$(git log --format=%s ${{ github.event.before }}..${{ github.sha }} || echo "HEAD")
-          echo "$RANGE" | commitlint
+          RANGE=$(git rev-list --count ${{ github.event.before }}..${{ github.sha }}) || true
+          if [ "$RANGE" -eq 0 ]; then
+            echo "HEAD" | commitlint
+          else
+            git log --format=%s ${{ github.event.before }}..${{ github.sha }} | commitlint
+          fi
