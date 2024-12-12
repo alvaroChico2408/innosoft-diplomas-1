@@ -31,4 +31,6 @@ jobs:
           echo "module.exports = { extends: ['@commitlint/config-conventional'], rules: { 'header-pattern': [2, 'always', /^\\[\\w+\\]\\s.+/] } };" > commitlint.config.js
 
       - name: Validate Commit Messages
-        run: git log --format=%s ${{ github.event.before }}..${{ github.sha }} | commitlint
+        run: |
+          RANGE=$(git log --format=%s ${{ github.event.before }}..${{ github.sha }} || echo "HEAD")
+          echo "$RANGE" | commitlint
