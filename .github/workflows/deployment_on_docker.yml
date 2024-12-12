@@ -1,9 +1,13 @@
-name: Build and Push Docker Image to Docker Hub
+name: Publish image in Docker Hub
 
 on:
   push:
     branches:
-      - main  # Cambia esto al nombre de la rama que desees usar
+      - main
+      - preproduction
+  pull_request:
+    branches:
+      - main
       - preproduction
 
 jobs:
