@@ -50,5 +50,13 @@ def test_login_invalid_credentials(test_client):
     assert login_response.status_code == 200, "El inicio de sesión no fue exitoso."
     
     
+def test_login_invalid_password(test_client):
+    """
+    Prueba el inicio de sesión con una contraseña incorrecta.
+    """
+    # Intentar iniciar sesión con una contraseña incorrecta
+    login_response = login(test_client, "user1@example", "test12345")
+    assert login_response.status_code == 200, "El inicio de sesión no fue exitoso."
+    
 
 
