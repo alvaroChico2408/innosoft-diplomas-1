@@ -1,33 +1,9 @@
 import pytest
 from unittest.mock import patch
-from app.modules.diplomas.forms import UploadExcelForm
 from app.modules.diplomas.services import DiplomasService
 from app.modules.diplomas.models import Diploma
-
-from flask import url_for
-from unittest.mock import patch, MagicMock
-
-#@pytest.fixture(scope='module')
-#def test_client(test_client):
-#    """
-#    Extends the test_client fixture to add additional specific data for module testing.
-#    """
-#    with test_client.application.app_context():
-#        # Add HERE new elements to the database that you want to exist in the test context.
-#        # DO NOT FORGET to use db.session.add(<element>) and db.session.commit() to save the data.
-#        pass
-
-#    yield test_client
-
-
-#def test_sample_assertion(test_client):
-#    """
-#    Sample test to verify that the test framework and environment are working correctly.
-#    It does not communicate with the Flask application; it only performs a simple assertion to
-#    confirm that the tests in this module can be executed.
-#    """
-#    greeting = "Hello, World!"
-#    assert greeting == "Hello, World!", "The greeting does not coincide with 'Hello, World!'"
+from app import create_app
+from unittest.mock import patch
 
 
 @pytest.fixture 
@@ -37,6 +13,13 @@ def diploma_service():
 @pytest.fixture 
 def diplomas_models():
     return Diploma()
+
+@pytest.fixture
+def client():
+    app = create_app('testing')
+    with app.test_client() as client:
+        with app.app_context():
+            yield client
 
 def test_validate_and_save_excel(diploma_service):
     
@@ -276,3 +259,52 @@ def test_from_excel_row_with_invalid_data(diplomas_models):
     with pytest.raises(ValueError, match="Correo no tiene un formato válido."):
         diplomas_models.from_excel_row(row)
         
+        
+# comprobando que no deja acceder a usuarios que no esten logueados
+def test_generate_diplomas_route_unregistered_user(client):
+    response = client.get('/diplomas')
+    assert response.status_code == 302
+    assert '/login' in response.headers['Location']
+    
+def test_manage_template_route_unregistered_user(client):
+    response = client.get('/manage-templates')
+    assert response.status_code == 302
+    assert '/login' in response.headers['Location']
+    
+def test_diplomas_visualization_route_unregistered_user(client):
+    response = client.get('/diplomas-visualization')
+    assert response.status_code == 302
+    assert '/login' in response.headers['Location']
+    
+    
+def test_view_diploma_route_unregistered_user(client):
+    response = client.get('/view_diploma/1')
+    assert response.status_code == 302
+    assert '/login' in response.headers['Location']
+    
+def test_delete_diploma_route_unregistered_user(client):
+    response = client.post('/delete_diploma/1')
+    assert response.status_code == 302
+    assert '/login' in response.headers['Location']
+    
+def test_send_diplomas_route_unregistered_user(client):
+    response = client.post('/send_diplomas')
+    assert response.status_code == 302
+    assert '/login' in response.headers['Location']
+    
+def test_view_template_route_unregistered_user(client):
+    response = client.get('/view_template/1')
+    assert response.status_code == 302
+    assert '/login' in response.headers['Location']
+
+def test_delete_template_route_unregistered_user(client):
+    response = client.post('/delete_template/1')
+    assert response.status_code == 302
+    assert '/login' in response.headers['Location']
+    
+def test_delete_selected_diplomas_route_unregistered_user(client):
+    response = client.post('/delete_selected_diplomas')
+    assert response.status_code == 302
+    assert '/login' in response.headers['Location']
+    
+    

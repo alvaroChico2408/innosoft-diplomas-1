@@ -1,9 +1,7 @@
 import pytest
 from unittest.mock import patch, MagicMock
 from app.modules.profile.services import UserProfileService
-from werkzeug.datastructures import MultiDict
-from flask_login import current_user
-#from app import create_app
+
 
 @pytest.fixture
 def user_profile_service():

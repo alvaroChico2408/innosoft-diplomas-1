@@ -1,4 +1,6 @@
 from selenium.webdriver.common.by import By
+from core.environment.host import get_host_for_selenium_testing
+
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from core.selenium.common import initialize_driver
