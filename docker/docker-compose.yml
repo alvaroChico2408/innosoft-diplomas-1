@@ -1,48 +1,69 @@
-services:
-  web:
-    container_name: web_app_container
-    image: docker/diplomasdb_docker:dev
-    env_file:
-      - ../.env
-    expose:
-      - "5000"
-    depends_on:
-      - db
-    build:
-      context: ../
-      dockerfile: docker/images/Dockerfile.dev
-    volumes:
-      - ../:/app
-      - /var/run/docker.sock:/var/run/docker.sock
-    command: [ "sh", "-c", "sh /app/docker/entrypoints/development_entrypoint.sh" ]
-    networks:
-      - uvlhub_network
+version: "3.9"
 
+services:
   db:
-    container_name: mariadb_container
-    env_file:
-      - ../.env
     build:
       context: ../
       dockerfile: docker/images/Dockerfile.mariadb
-    restart: always
-    ports:
-      - "3307:3306"
+    container_name: mariadb_container
+    environment:
+      MARIADB_ROOT_PASSWORD: diplomasdb_root_password
+      MARIADB_DATABASE: diplomasdb
+      MARIADB_USER: diplomasdb_user
+      MARIADB_PASSWORD: diplomasdb_password
     volumes:
       - db_data:/var/lib/mysql
+    ports:
+      - "3306:3306"  # Cambia el puerto si es necesario
     networks:
       - uvlhub_network
+    restart: always
+
+  web:
+    build:
+      context: ../
+      dockerfile: docker/images/Dockerfile.dev
+    container_name: web_app_container
+    depends_on:
+      - db
+      - redis
+    environment:
+      - FLASK_ENV=development
+      - MARIADB_HOSTNAME=db
+      - MARIADB_PORT=3306
+      - MARIADB_DATABASE=diplomasdb
+      - MARIADB_USER=diplomasdb_user
+      - MARIADB_PASSWORD=diplomasdb_password
+    expose:
+      - "5000"
+    ports:
+      - "5000:5000"
+    volumes:
+      - ../:/app
+      - /var/run/docker.sock:/var/run/docker.sock
+    command: ["bash", "-c", "sh /app/docker/entrypoints/development_entrypoint.sh"]
+    networks:
+      - uvlhub_network
+
+  redis:
+    image: redis:latest
+    container_name: redis_container
+    ports:
+      - "6380:6379"  # Cambia el puerto host
+    networks:
+      - uvlhub_network
+    restart: always
 
   nginx:
     container_name: nginx_web_server_container
     image: nginx:latest
+    depends_on:
+      - web
+    ports:
+      - "80:80"
     volumes:
       - ./nginx/nginx.dev.conf:/etc/nginx/nginx.conf
       - ./nginx/html:/usr/share/nginx/html
-    ports:
-      - "80:80"
-    depends_on:
-      - web
     networks:
       - uvlhub_network
 
@@ -51,3 +72,4 @@ volumes:
 
 networks:
   uvlhub_network:
+    driver: bridge
