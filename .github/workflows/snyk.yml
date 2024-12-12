@@ -4,9 +4,11 @@ on:
   push:
     branches:
       - main
+      - preproduction
   pull_request:
     branches:
       - main
+      - preproduction
 
 jobs:
   snyk-security-scan:
