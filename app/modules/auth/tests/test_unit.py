@@ -1,16 +1,9 @@
-from sqlite3 import IntegrityError
 import pytest
 from unittest.mock import patch, MagicMock
-from app.modules.auth.seeders import AuthSeeder
 from app.modules.auth.services import AuthenticationService
 from app.modules.profile.services import UserProfileService
-from app.modules.auth.models import User
-from app.modules.profile.models import UserProfile
-from werkzeug.datastructures import MultiDict
-from flask_login import current_user
-from app import create_app, db
+from app import create_app
 from selenium import webdriver
-from flask import url_for
 
 
 @pytest.fixture
