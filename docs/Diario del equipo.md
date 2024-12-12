@@ -119,3 +119,5 @@
 
 Para ver la imputación de horas por persona y tareas le invitó a ver en la carpeta `docs/clockify-reports` en la que se encuentran los informes del tiempo tardado en cada una de las actividades en las que cada uno de los miembros del equipo ha trabajo. Para ver un resumen más general, le invito a visitar el documento `Documento del proyecto.md` que se encuentra en la misma carpeta que este archivo.
 
+Para ver el grado de implicación de cada alumno le invito a visitar la página `Home` de la wiki del repositorio.
+

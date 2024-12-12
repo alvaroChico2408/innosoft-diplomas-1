@@ -6,7 +6,6 @@ from core.selenium.common import initialize_driver
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 
-import time
 
 class TestLogin():
     def setup_method(self, method):

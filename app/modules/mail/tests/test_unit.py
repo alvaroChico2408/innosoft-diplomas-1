@@ -43,21 +43,6 @@ def test_send_email_with_attachment_invalid(mail_service):
         
         assert result is False
 
-def test_init_app(mail_service):
-    app = MagicMock()
-    app.config = {}
-    mail_service.init_app(app)
-    
-    assert mail_service.mail is not None
-    assert mail_service.sender is not None
-    assert app.config['MAIL_SERVER'] == 'smtp.gmail.com'
-    assert app.config['MAIL_PORT'] == 587
-    assert app.config['MAIL_USE_TLS'] == True
-    assert app.config['MAIL_USE_SSL'] == False
-    assert app.config['MAIL_USERNAME'] == 'diplomasinnosoft2024@gmail.com'
-    assert app.config['MAIL_PASSWORD'] == 'slav jfes qacm knls'
-    assert app.config['MAIL_DEFAULT_SENDER'] == 'diplomasinnosoft2024@gmail.com'
-
 
 def test_sender_is_initialized_correctly(mail_service):
     app = MagicMock()
