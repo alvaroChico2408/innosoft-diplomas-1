@@ -259,14 +259,52 @@ def test_from_excel_row_with_invalid_data(diplomas_models):
     with pytest.raises(ValueError, match="Correo no tiene un formato válido."):
         diplomas_models.from_excel_row(row)
         
+        
+# comprobando que no deja acceder a usuarios que no esten logueados
 def test_generate_diplomas_route_unregistered_user(client):
     response = client.get('/diplomas')
     assert response.status_code == 302
+    assert '/login' in response.headers['Location']
     
 def test_manage_template_route_unregistered_user(client):
     response = client.get('/manage-templates')
     assert response.status_code == 302
+    assert '/login' in response.headers['Location']
     
 def test_diplomas_visualization_route_unregistered_user(client):
     response = client.get('/diplomas-visualization')
     assert response.status_code == 302
+    assert '/login' in response.headers['Location']
+    
+    
+def test_view_diploma_route_unregistered_user(client):
+    response = client.get('/view_diploma/1')
+    assert response.status_code == 302
+    assert '/login' in response.headers['Location']
+    
+def test_delete_diploma_route_unregistered_user(client):
+    response = client.post('/delete_diploma/1')
+    assert response.status_code == 302
+    assert '/login' in response.headers['Location']
+    
+def test_send_diplomas_route_unregistered_user(client):
+    response = client.post('/send_diplomas')
+    assert response.status_code == 302
+    assert '/login' in response.headers['Location']
+    
+def test_view_template_route_unregistered_user(client):
+    response = client.get('/view_template/1')
+    assert response.status_code == 302
+    assert '/login' in response.headers['Location']
+
+def test_delete_template_route_unregistered_user(client):
+    response = client.post('/delete_template/1')
+    assert response.status_code == 302
+    assert '/login' in response.headers['Location']
+    
+def test_delete_selected_diplomas_route_unregistered_user(client):
+    response = client.post('/delete_selected_diplomas')
+    assert response.status_code == 302
+    assert '/login' in response.headers['Location']
+    
+    
