@@ -111,21 +111,23 @@ function resetParticipationFilter() {
 
 // Manejo de eliminación de múltiples diplomas
 function handleDeleteSelected(event) {
-    const selectedDiplomas = [];
-    document.querySelectorAll('.send-checkbox:checked').forEach(checkbox => {
-        const diplomaIdCell = checkbox.closest('tr').querySelector('td:first-child');
-        if (diplomaIdCell) {
-            selectedDiplomas.push(diplomaIdCell.textContent.trim());
+    if (confirm('Are you sure you want to delete the selected diplomas?')) {
+        const selectedDiplomas = [];
+        document.querySelectorAll('.send-checkbox:checked').forEach(checkbox => {
+            const diplomaIdCell = checkbox.closest('tr').querySelector('td:first-child');
+            if (diplomaIdCell) {
+                selectedDiplomas.push(diplomaIdCell.textContent.trim());
+            }
+        });
+
+        if (selectedDiplomas.length === 0) {
+            event.preventDefault(); // Detener envío del formulario
+            alert("Please select at least one diploma to delete.");
+            return false;
         }
-    });
 
-    if (selectedDiplomas.length === 0) {
-        event.preventDefault(); // Detener envío del formulario
-        alert("Please select at least one diploma to delete.");
-        return false;
+        // Colocar los IDs en el campo oculto
+        document.getElementById('diplomaIdsInput').value = JSON.stringify(selectedDiplomas);
+        return true; // Permitir el envío del formulario
     }
-
-    // Colocar los IDs en el campo oculto
-    document.getElementById('diplomaIdsInput').value = JSON.stringify(selectedDiplomas);
-    return true; // Permitir el envío del formulario
 }
