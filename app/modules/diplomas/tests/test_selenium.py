@@ -5,6 +5,7 @@ from core.selenium.common import initialize_driver
 from app.modules.conftest import login_selenium
 from selenium.webdriver.common.action_chains import ActionChains
 import time
+import pytest
 
 
 class TestDiplomas:
@@ -19,6 +20,7 @@ class TestDiplomas:
     def teardown_method(self, method):
         self.driver.quit()
 
+    @pytest.mark.usefixtures("populate_diplomas_with_pdfs")
     def test_ver_diploma(self):
         self.driver.maximize_window()
         login_selenium(self.driver, "user1@example.com", "password")
@@ -29,6 +31,7 @@ class TestDiplomas:
 
         time.sleep(2)
 
+    @pytest.mark.usefixtures("populate_diplomas_with_pdfs")
     def test_filtra_diplomas(self):
         self.driver.maximize_window()
         login_selenium(self.driver, "user1@example.com", "password")
@@ -53,6 +56,7 @@ class TestDiplomas:
         WebDriverWait(self.driver, 10).until(EC.element_to_be_clickable((By.CSS_SELECTOR, ".btn-secondary"))).click()
         WebDriverWait(self.driver, 10).until(EC.element_to_be_clickable((By.CSS_SELECTOR, ".btn-close"))).click()
 
+    @pytest.mark.usefixtures("populate_diplomas_with_pdfs")
     def test_borra_diploma(self):
         self.driver.maximize_window()
         login_selenium(self.driver, "user1@example.com", "password")
@@ -66,6 +70,7 @@ class TestDiplomas:
         assert alert.text == "Are you sure you want to delete this diploma?"
         alert.dismiss()
 
+    @pytest.mark.usefixtures("populate_diplomas_with_pdfs")
     def test_borra_todos_diplomas(self):
         self.driver.maximize_window()
         login_selenium(self.driver, "user1@example.com", "password")
