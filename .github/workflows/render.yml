@@ -1,0 +1,66 @@
+name: Deploy to Render
+
+on:
+    push:
+      tags:
+      - 'v*' 
+    pull_request:
+      branches:
+        - main
+
+jobs:
+
+  testing:
+
+    name: Run Tests
+    runs-on: ubuntu-latest
+
+    services:
+      mysql:
+        image: mariadb:10.5
+        env:
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: InnosoftPrueba_everybody
+          MYSQL_USER: InnosoftPrueba_everybody
+          MYSQL_PASSWORD: 07328b8f633ace227ba17e96c42ba9aff96a69a9
+        ports:
+          - 3306:3306
+        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
+
+    steps:
+
+    - uses: actions/checkout@v4
+
+    - uses: actions/setup-python@v5
+      with:
+        python-version: '3.12'
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+
+    - name: Run Tests
+      env:
+        FLASK_ENV: testing
+        MARIADB_HOSTNAME: 127.0.0.1
+        MARIADB_PORT: 3306
+        MARIADB_TEST_DATABASE: InnosoftPrueba_everybody
+        MARIADB_USER: InnosoftPrueba_everybody
+        MARIADB_PASSWORD: 07328b8f633ace227ba17e96c42ba9aff96a69a9
+      run: |
+        pytest app/modules/ --ignore-glob='*selenium*'
+
+  deploy:
+    name: Deploy to Render
+    needs: testing
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out the repo
+        uses: actions/checkout@v4
+
+      - name: Deploy to Render
+        env:
+          deploy_url: ${{ secrets.RENDER_DEPLOY_HOOK_URL }}
+        run: | 
+          curl -f https://innosoft-diplomas-1.onrender.com/ || echo "Error: Cannot reach the deployment URL"

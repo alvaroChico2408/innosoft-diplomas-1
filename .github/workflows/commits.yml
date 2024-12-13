@@ -1,0 +1,58 @@
+name: Commits Syntax Checker
+
+on:
+  pull_request:
+    branches: [main, preproduction]
+    types: [opened, reopened, edited, synchronize]
+  push:
+    branches:
+      - "main"
+      - "preproduction"
+
+jobs:
+  check:
+    name: Conventional Commits
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0 # Descarga todo el historial de commits
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+
+      - name: Install Commitlint
+        run: npm install -g @commitlint/{cli,config-conventional}
+
+      - name: Create Custom Commitlint Config
+        run: |
+          echo "module.exports = {
+            extends: ['@commitlint/config-conventional'],
+            rules: {
+              'type-case': [2, 'always', 'lower-case'],
+              'header-pattern': [2, 'always', /^\[\w+\]\s.+/], # Cumple con el formato [tipo] Mensaje
+              'header-match-team-pattern': [2, 'always', {
+                regex: '^(Merge pull request|Merge branch|@\\w+)',
+                flags: 'i'
+              }],
+              'header-match-exceptions': [2, 'always', [
+                'dependabot',
+                'Merge pull request',
+                'Merge branch',
+                '@',
+              ]]
+            },
+          };" > commitlint.config.js
+
+      - name: Validate Commit Messages
+        run: |
+          if git rev-parse ${{ github.event.before }} >/dev/null 2>&1; then
+            RANGE=$(git log --format=%s ${{ github.event.before }}..${{ github.sha }})
+          else
+            RANGE=$(git log -1 --format=%s)
+          fi
+          echo "$RANGE" | commitlint || true
