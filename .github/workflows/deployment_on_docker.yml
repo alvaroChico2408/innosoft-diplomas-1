@@ -9,31 +9,29 @@ on:
     branches:
       - main
       - preproduction
+
 jobs:
-  push_to_registry:
-    name: Push Docker image to Docker Hub
-    runs-on: ubuntu-latest
-    steps:
-      - name: Check out the repo
-        uses: actions/checkout@v3
-
-      - name: Log in to Docker Hub
-        uses: docker/login-action@f4ef78c080cd8ba55a85445d5b36e214a81df20a
-        with:
-          username: ${{ secrets.DOCKER_USER }}
-          password: ${{ secrets.DOCKER_PASSWORD }}
-
-      - name: Build and push Docker image
-        run: docker build --build-arg VERSION_TAG=${{ github.event.release.tag_name }} -t alvaroChico2408/innosoft-diplomas-1:${{ github.event.release.tag_name }} -f docker/images/Dockerfile.prod .
-        env:
-          DOCKER_CLI_EXPERIMENTAL: enabled
-
-      - name: Push Docker image to Docker Hub
-        run: docker push alvaroChico2408/innosoft-diplomas-1:${{ github.event.release.tag_name }}
-
-      - name: Tag and push latest
-        run: |
-          docker tag alvaroChico2408/innosoft-diplomas-1:${{ github.event.release.tag_name }} 
-          docker push alvaroChico2408/innosoft-diplomas-1:latest
-        env:
-          DOCKER_CLI_EXPERIMENTAL: enabled
+    build-and-push:
+          runs-on: ubuntu-latest
+      
+          steps:
+            # Paso 1: Clonar el código fuente
+            - name: Checkout code
+              uses: actions/checkout@v3
+      
+            # Paso 2: Iniciar sesión en Docker Hub
+            - name: Log in to Docker Hub
+              uses: docker/login-action@v2
+              with:
+                username: ${{ secrets.DOCKER_USERNAME }} # Configura este secreto en GitHub
+                password: ${{ secrets.DOCKER_PASSWORD }} # Configura este secreto en GitHub
+      
+            # Paso 3: Construir la imagen Docker sin usar etiquetas personalizadas
+            - name: Build Docker image
+              run: |
+                docker build -t alvaroChico2408/innosoft-diplomas-1 -f docker/images/Dockerfile.dev .
+      
+            # Paso 4: Subir la imagen a Docker Hub
+            - name: Push Docker image
+              run: |
+                docker push alvaroChico2408/innosoft-diplomas-1
