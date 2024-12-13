@@ -28,9 +28,9 @@ jobs:
             # Paso 3: Construir la imagen Docker sin usar etiquetas personalizadas
             - name: Build Docker image
               run: |
-                docker build -t alvaroChico2408/innosoft-diplomas-1 -f docker/images/Dockerfile.dev .
+                docker build -t alvarojimenezosuna03/innosoft-diplomas-1 -f docker/images/Dockerfile.dev .
       
             # Paso 4: Subir la imagen a Docker Hub
             - name: Push Docker image
               run: |
-                docker push alvaroChico2408/innosoft-diplomas-1
+                docker push alvarojimenezosuna03/innosoft-diplomas-1
