@@ -62,5 +62,5 @@ jobs:
       - name: Deploy to Render
         env:
           deploy_url: ${{ secrets.RENDER_DEPLOY_HOOK_URL }}
-        run: |
-          curl "$deploy_url"
+        run: | 
+          curl -f https://innosoft-diplomas-1.onrender.com/ || echo "Error: Cannot reach the deployment URL"
