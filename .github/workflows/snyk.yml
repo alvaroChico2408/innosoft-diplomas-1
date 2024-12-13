@@ -5,6 +5,10 @@ on:
     branches:
       - main
       - preproduction
+  pull_request:
+    branches:
+      - main
+      - preproduction
 
 jobs:
   snyk:
