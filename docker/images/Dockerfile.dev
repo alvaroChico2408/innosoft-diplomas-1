@@ -68,3 +68,6 @@ RUN npm install
 
 # Expose port 5000 for the Flask app
 EXPOSE 5000
+
+# Define el comando para ejecutar la aplicación
+CMD ["bash", "-c", "flask db upgrade && flask run --host=0.0.0.0 --port=5000"]

@@ -1,0 +1,34 @@
+name: Snyk Scan
+
+on:
+  push:
+    branches:
+      - main
+      - preproduction
+  pull_request:
+    branches:
+      - main
+      - preproduction
+
+jobs:
+  snyk:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Paso 1: Clonar el código
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # Paso 2: Instalar Snyk CLI
+      - name: Install Snyk CLI
+        run: npm install -g snyk
+
+      # Paso 3: Autenticarse con Snyk
+      - name: Authenticate with Snyk
+        run: snyk auth $SNYK_TOKEN
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+
+      # Paso 4: Escanear el proyecto
+      - name: Run Snyk scan
+        run: snyk test

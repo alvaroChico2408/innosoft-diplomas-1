@@ -1,0 +1,36 @@
+name: Publish image in Docker Hub
+
+on:
+  push:
+    branches:
+      - main
+      - preproduction
+  pull_request:
+    branches:
+      - main
+      - preproduction
+
+jobs:
+    build-and-push:
+          runs-on: ubuntu-latest
+      
+          steps:
+            # Paso 1: Clonar el código fuente
+            - name: Checkout code
+              uses: actions/checkout@v3
+      
+            - name: Log in to Docker Hub
+              uses: docker/login-action@f4ef78c080cd8ba55a85445d5b36e214a81df20a
+              with:
+                username: ${{ secrets.DOCKER_USER }}
+                password: ${{ secrets.DOCKER_PASSWORD }}
+      
+            # Paso 3: Construir la imagen Docker sin usar etiquetas personalizadas
+            - name: Build Docker image
+              run: |
+                docker build -t alvarojimenezosuna03/innosoft-diplomas-1 -f docker/images/Dockerfile.dev .
+      
+            # Paso 4: Subir la imagen a Docker Hub
+            - name: Push Docker image
+              run: |
+                docker push alvarojimenezosuna03/innosoft-diplomas-1
