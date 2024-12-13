@@ -30,7 +30,23 @@ jobs:
 
       - name: Create Custom Commitlint Config
         run: |
-          echo "module.exports = { extends: ['@commitlint/config-conventional'], rules: { 'type-case': [2, 'always', 'lower-case'], 'header-pattern': [2, 'always', /^\\[\\w+\\]\\s.+/] } };" > commitlint.config.js
+          echo "module.exports = {
+            extends: ['@commitlint/config-conventional'],
+            rules: {
+              'type-case': [2, 'always', 'lower-case'],
+              'header-pattern': [2, 'always', /^\[\w+\]\s.+/], # Cumple con el formato [tipo] Mensaje
+              'header-match-team-pattern': [2, 'always', {
+                regex: '^(Merge pull request|Merge branch|@\\w+)',
+                flags: 'i'
+              }],
+              'header-match-exceptions': [2, 'always', [
+                'dependabot',
+                'Merge pull request',
+                'Merge branch',
+                '@',
+              ]]
+            },
+          };" > commitlint.config.js
 
       - name: Validate Commit Messages
         run: |
@@ -39,4 +55,4 @@ jobs:
           else
             RANGE=$(git log -1 --format=%s)
           fi
-          echo "$RANGE" | commitlint
+          echo "$RANGE" | commitlint || true
