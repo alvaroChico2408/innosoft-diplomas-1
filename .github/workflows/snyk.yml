@@ -1,11 +1,7 @@
-name: Snyk Security Check
+name: Snyk Vulnerability Scan
 
 on:
   push:
-    branches:
-      - main
-      - preproduction
-  pull_request:
     branches:
       - main
       - preproduction
@@ -15,18 +11,20 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      # Paso 1: Clonar el código
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Set up Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: 18
+      # Paso 2: Instalar Snyk CLI
+      - name: Install Snyk CLI
+        run: npm install -g snyk
 
+      # Paso 3: Autenticarse con Snyk
       - name: Authenticate with Snyk
         run: snyk auth $SNYK_TOKEN
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
 
+      # Paso 4: Escanear vulnerabilidades
       - name: Run Snyk Test
         run: snyk test
