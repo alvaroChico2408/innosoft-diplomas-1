@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+      - preproduction
 
 jobs:
   snyk:
