@@ -112,3 +112,16 @@ def test_get_by_user_id_returns_none():
         # Verificar que se devuelve None
         mock_query.filter_by.assert_called_once_with(user_id=999)
         assert result is None
+
+def test_user_profile_form_invalid_email():
+    from app.modules.profile.forms import UserProfileForm
+
+    form = UserProfileForm(
+        name="Jane",
+        surname="Doe",
+        email="invalid-email"
+    )
+
+    # Verificar que el formulario no es válido debido al email incorrecto
+    assert not form.validate()
+    assert 'email' in form.errors
