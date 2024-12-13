@@ -19,12 +19,11 @@ jobs:
             - name: Checkout code
               uses: actions/checkout@v3
       
-            # Paso 2: Iniciar sesión en Docker Hub
             - name: Log in to Docker Hub
-              uses: docker/login-action@v2
+              uses: docker/login-action@f4ef78c080cd8ba55a85445d5b36e214a81df20a
               with:
-                username: ${{ secrets.DOCKER_USERNAME }} # Configura este secreto en GitHub
-                password: ${{ secrets.DOCKER_PASSWORD }} # Configura este secreto en GitHub
+                username: ${{ secrets.DOCKER_USER }}
+                password: ${{ secrets.DOCKER_PASSWORD }}
       
             # Paso 3: Construir la imagen Docker sin usar etiquetas personalizadas
             - name: Build Docker image
