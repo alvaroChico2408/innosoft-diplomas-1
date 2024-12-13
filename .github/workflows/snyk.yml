@@ -25,6 +25,7 @@ jobs:
           else
             echo "Secrets are available, proceeding with Snyk scan."
             echo "skip=false" >> $GITHUB_ENV
+          fi
 
       # Paso 2: Instalar Snyk CLI si los secretos están disponibles
       - name: Install Snyk CLI
