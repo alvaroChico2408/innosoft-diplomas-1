@@ -40,8 +40,8 @@ jobs:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
 
       # Paso 4: Ejecutar el análisis de Snyk
-      - name: Run Snyk Test
-        if: env.skip == 'false'
+      # Paso 4: Escanear el proyecto
+      - name: Run Snyk scan
         run: snyk test
 
       # Paso 5: Marcar como éxito si se omite
