@@ -1,9 +1,11 @@
 <div align="center">
 
-  <a href="">[![Pytest Testing Suite](https://github.com/drorganvidez/flask_base/actions/workflows/tests.yml/badge.svg?branch=main)](https://github.com/drorganvidez/flask_base/actions/workflows/tests.yml)</a>
-  <a href="">[![Commits Syntax Checker](https://github.com/drorganvidez/flask_base/actions/workflows/commits.yml/badge.svg?branch=main)](https://github.com/drorganvidez/flask_base/actions/workflows/commits.yml)</a>
-  
+  <a href="">[![Pytest Testing Suite](https://github.com/alvaroChico2408/innosoft-diplomas-1/actions/workflows/test.yml/badge.svg?branch=main)](https://github.com/alvaroChico2408/innosoft-diplomas-1/actions/workflows/test.yml)</a>
+  <a href="">[![Snyk Vulnerability Scan](https://github.com/alvaroChico2408/innosoft-diplomas-1/actions/workflows/snyk.yml/badge.svg?branch=main)](https://github.com/alvaroChico2408/innosoft-diplomas-1/actions/workflows/snyk.yml)</a>
+  <a href="">[![Commits Syntax Checker](https://github.com/alvaroChico2408/innosoft-diplomas-1/actions/workflows/commits.yml/badge.svg?branch=main)](https://github.com/alvaroChico2408/innosoft-diplomas-1/actions/workflows/commits.yml)</a>7
+
 </div>
+
 
 # diplomas-innosoft-1
 
@@ -203,4 +205,4 @@ docker-compose -f docker/docker-compose.yml down --build -d
 
 ## 4. Verificación en el Navegador
 
-Una vez que el contenedor esté en ejecución, abre tu navegador y accede a [1](http://localhost:5000). Si ves la aplicación funcionando, ¡felicidades! Has dockerizado exitosamente la aplicación Flask.
+Una vez que el contenedor esté en ejecución, abre tu navegador y accede a [http://localhost:5000](http://localhost:5000). Si ves la aplicación funcionando, ¡felicidades! Has dockerizado exitosamente la aplicación Flask.
