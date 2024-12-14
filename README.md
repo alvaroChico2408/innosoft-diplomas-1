@@ -2,7 +2,7 @@
 
   <a href="">[![Pytest Testing Suite](https://github.com/alvaroChico2408/innosoft-diplomas-1/actions/workflows/test.yml/badge.svg?branch=main)](https://github.com/alvaroChico2408/innosoft-diplomas-1/actions/workflows/test.yml)</a>
   <a href="">[![Snyk Vulnerability Scan](https://github.com/alvaroChico2408/innosoft-diplomas-1/actions/workflows/snyk.yml/badge.svg?branch=main)](https://github.com/alvaroChico2408/innosoft-diplomas-1/actions/workflows/snyk.yml)</a>
-  <a href="">[![Commits Syntax Checker](https://github.com/alvaroChico2408/innosoft-diplomas-1/actions/workflows/commits.yml/badge.svg?branch=main)](https://github.com/alvaroChico2408/innosoft-diplomas-1/actions/workflows/commits.yml)</a>7
+  <a href="">[![Commits Syntax Checker](https://github.com/alvaroChico2408/innosoft-diplomas-1/actions/workflows/commits.yml/badge.svg?branch=main)](https://github.com/alvaroChico2408/innosoft-diplomas-1/actions/workflows/commits.yml)</a>
 
 </div>
 
