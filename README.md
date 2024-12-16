@@ -11,8 +11,9 @@
 
 Este es el proyecto de la asignatura EGC para crear diplomas para los alumnos organizadores y participantes en las jornadas InnoSoft.
 
-# Manual de Uso para el Despliegue de la Aplicación en Local
+# Manual de Uso para el Despliegue de la Aplicación
 
+# Despliegue en Local
 ## 1. Clonar el Repositorio
 Clonar el repositorio por las claves SSH e inicializarlo en el IDE preferido.
 
@@ -103,48 +104,42 @@ flask db migrate
 ```bash
 flask run
 ```
-El servidor se ejecutará en [http://127.0.0.1:5000/](http://127.0.0.1:5000/)
+El servidor se ejecutará en [http://localhost:5000/](http://localhost:5000/)
 
-
-
-## 7. Iniciar el Proyecto en la Máquina Virtual
-### 7.1 Copiar el Archivo de Configuración (Vagrant) de Ejemplo a .env
+## 7. Para ejecutar las pruebas:
+### Pruebas unitarias y de intregración
 ```bash
-cp .env.vagrant.example .env
+rosemary test
 ```
-### 7.2 Desplazarse a la carpeta vagrant
+### Pruebas de selenium
+ - Cambiar el archivo init.py de la carpeta app de "development" a "testing."
+- Ejecutar los siguientes comandos:
+  - `flask db downgrade`
+  - `flask db upgrade`
+  - `flask db migrate`
+
+- Iniciamos la aplicación:
+`flask run`
+- Ejecutamos los tests módulo a módulo: 
+  `pytest <ruta del archivo te test_selenium.py>`
+
+### Pruebas de locust 
+ - Cambiar el archivo init.py de la carpeta app de "testing" a "development."
+- Ejecutar los siguientes comandos:
+  - `flask db downgrade`
+  - `flask db upgrade`
+  - `flask db migrate`
+
+- Iniciamos la aplicación:
+`flask run`
+- Ejecutamos los tests módulo a módulo: 
+  `rosemary locust <modulo>`
+
+
+### Para ver la cobertura
 ```bash
-cd vagrant/
+rosemary coverage
 ```
-### 7.3 Levantar la máquina virtual por primera vez
-```bash
-vagrant up
-```
-El servidor se ejecutará en [http://127.0.0.1:5000/](http://127.0.0.1:5000/)
-### 7.4 Conectar a la máquina virtual
-```bash
-vagrant ssh
-```
-### 7.5 Apagar la máquina virtual
-```bash
-vagrant halt
-```
-### 7.6 Para volver a ejecutar los scripts de provisión o se quiere volver a iniciar la máquina tras haber sido apagada:
- - **Si la máquina virtual está apagada:** ```vagrant up --provision```
- - **Si la máquina virtual necesita reiniciarse:** ```vagrant reload --provision```
-
-**Notas:**
-- Para volver a desplegar el proyecto en **localhost** (usando `flask run`) o en **Docker**, se recomienda **eliminar el entorno virtual** y volver a crearlo siguiendo los pasos descritos en el **punto 3**.
-- Si la máquina virtual se apaga, para volverla a iniciar correctamente se deben usar los comandos descritos en el **punto 7.6**.
-- Se recomienda eliminar los datos de la base de datos si se quiere volver a arrancar en local siguiendo los siguientes comandos:
-
-    - Nos conectamos a MariaDB: `sudo mysql -u root -p`
-    - Eliminamos las bases de datos de diplomasdb y diplomasdb_test:
-    `DROP diplomasdb;` y `DROP diplomasdb_test;`.
-    - Volvemos a realizar las migraciones con el .env que se quiera usar: `flask db upgrade` y `flask db migrate`.
-
-
-
 
 ## 8. Iniciar Sesión en el Proyecto
 
@@ -155,12 +150,124 @@ vagrant halt
 - Verificar que las bases de datos `diplomasdb` y `diplomasdb_test` estén configuradas correctamente.
 - Asegurarse de que estás utilizando la versión correcta de Python (Python 3.12).
 - Si encuentras problemas con las dependencias, revisa el archivo `requirements.txt` y actualiza las librerías.
+- Se recomienda que **siempre que se cambie un .env** se realicen los siguientes comandos:
+  - `flask db downgrade`
+  - `flask db upgrade`
+  - `flask db migrate`
 
 
-# Manual de Uso para el Despliegue de la Aplicación en Docker
+# Despligue en Máquina Virtual
 
 ## 1. Pasos anteriores
-- Una vez seguidos los pasos 2, 3, 4, y 5 anteriormente mencionados.
+- Una vez seguidos los pasos 2, 3, 4, y 5 anteriormente mencionados en "Despliegue en Local", ejecutar lo siguiente:
+```bash
+cp .env.vagrant.example .env
+```
+Y ejecutar los siguientes comandos:
+   - `flask db downgrade`
+  - `flask db upgrade`
+  - `flask db migrate`
+
+
+## 2. Instalar Vagrant, VirtualBox y Ansible sobre Ubuntu 22.04 (Jammy Jellyfish):
+Actualizamos la lista de paquetes:
+```bash
+sudo apt update
+```
+Instalar vagrant, ansible y virtualbox
+```bash
+sudo apt install vagrant ansible virtualbox
+```
+Si el paquete vagrant no está disponible tendrás que añadir manualmente el repo oficial y la clave GPG:
+```bash
+wget -O - https://apt.releases.hashicorp.com/gpg | sudo gpg --dearmor -o /usr/share/keyrings/hashicorp-archive-keyring.gpg
+
+echo "deb [signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] https://apt.releases.hashicorp.com $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/hashicorp.list
+
+sudo apt update && sudo apt install vagrant ansible virtualbox
+```
+## 3. Instalación del programa Virtual Box
+- **VirtualBox**: [Descargar aquí](https://www.virtualbox.org/wiki/Downloads)
+
+## 4. Desactivar el modo "Secure Boot" en la BIOS
+
+Para desactivar el modo "Secure Boot", sigue estos pasos:
+
+1. Reinicia tu equipo y accede a la BIOS/UEFI (generalmente presionando teclas como **F2**, **Del**, o **Esc** al arrancar).
+2. Busca la opción **Secure Boot** en el menú de configuración de seguridad o arranque.
+3. Cámbiala a **Disabled** o **Off**.
+4. Guarda los cambios y reinicia el equipo.
+
+## 5. Eliminar las siguientes carpetas:
+```bash
+rm -r uploads
+rm -r rosemary.egg-info
+rm app.log*
+```
+
+## 6. Desplazarse a la carpeta vagrant
+```bash
+cd vagrant/
+```
+## 7. Levantar la máquina virtual por primera vez
+```bash
+vagrant up
+```
+El servidor se ejecutará en [http://localhost:5000/](http://localhost:5000/)
+## 8. Conectar a la máquina virtual
+```bash
+vagrant ssh
+```
+## 9. Apagar la máquina virtual
+```bash
+vagrant halt
+```
+## 10. Para volver a ejecutar los scripts de provisión o se quiere volver a iniciar la máquina tras haber sido apagada:
+ - **Si la máquina virtual está apagada:** ```vagrant up --provision```
+ - **Si la máquina virtual necesita reiniciarse:** ```vagrant reload --provision```
+
+
+## 11. Iniciar Sesión en el Proyecto
+
+### 11.1 Credenciales de Acceso:
+- **Correo electrónico:** user1@example.com
+- **Contraseña:** password
+
+## 12. Destruimos la máquina virtual
+Vemos las máquinas virtuales que tenemos funcionando en nuestro sistema:
+```bash
+vagrant global-status
+```
+Destruimos la máquina virtual:
+```bash
+vagrant destroy <uuid>
+```
+
+**Notas:**
+- Si hay errores y no reconoce algún comando **es recomendable eliminar el entorno virtual** y **volver a instalarlo** con los pasos del **punto 3 y 4** de "Despligue en Local" (con el **.env** correspondiente que se quiera usar).
+- Si la máquina virtual se apaga, para volverla a iniciar correctamente se deben usar los comandos descritos en el **punto 7.6**.
+
+## 13. Otros Detalles Importantes
+- Verificar que las bases de datos `diplomasdb` y `diplomasdb_test` estén configuradas correctamente.
+- Asegurarse de que estás utilizando la versión correcta de Python (Python 3.12).
+- Si encuentras problemas con las dependencias, revisa el archivo `requirements.txt` y actualiza las librerías.
+- Se recomienda que **siempre que se cambie un .env** se realicen los siguientes comandos:
+  - `flask db downgrade`
+  - `flask db upgrade`
+  - `flask db migrate`
+
+# Despliegue en Docker
+
+## 1. Pasos anteriores
+- Una vez seguidos los pasos 2, 3, 4, y 5 anteriormente mencionados en "Despliegue en Local", ejecutar lo siguiente:
+```bash
+cp .env.docker.example .env
+```
+Y ejecutar los siguientes comandos:
+   - `flask db downgrade`
+  - `flask db upgrade`
+  - `flask db migrate`
+
 
 ## 2. Instalar Docker Compose
 
@@ -192,17 +299,53 @@ chmod +x ~/.docker/cli-plugins/docker-compose
 docker compose --version
 ```
 
-## 3. Construir y levantar una imagen de Docker
+
+## 3. Parar el proceso de Mariadb en el puerto 3306
+Debido a que MariaDb por defecto se inicia en el puerto 3306 (el cual necesita docker), debemos parar el proceso de la aplicación, para ello ejecutamos:
+```bash
+sudo systemctl stop mariadb
+```
+Verificamos que se ha parado con el comando: `sudo lsof -i :3306`
+## 4. Construir y levantar una imagen de Docker
 
 ```bash
 docker-compose -f docker/docker-compose.yml up --build -d
 ```
+El servidor se ejecutará en [http://localhost:5000/](http://localhost:5000/)
 
-- (Para parar Docker)
+Si queremos parar Docker:
 ```bash
-docker-compose -f docker/docker-compose.yml down --build -d
+docker-compose -f docker/docker-compose.yml down
 ```
 
-## 4. Verificación en el Navegador
 
-Una vez que el contenedor esté en ejecución, abre tu navegador y accede a [http://localhost:5000](http://localhost:5000). Si ves la aplicación funcionando, ¡felicidades! Has dockerizado exitosamente la aplicación Flask.
+## 5. Iniciar Sesión en el Proyecto
+
+### 5.1 Credenciales de Acceso:
+- **Correo electrónico:** user1@example.com
+- **Contraseña:** password
+
+## 6. Matamos el contenedor de Docker
+```bash
+sh scripts /clean_docker.sh
+```
+## 7. Iniciamos de nuevo MariaDb
+```bash
+sudo systemctl start mariadb
+```
+
+
+**Notas:**
+- Si hay errores y no reconoce algún comando **es recomendable eliminar el entorno virtual** y **volver a instalarlo** con los pasos del **punto 3 y 4** de "Despligue en Local" (con el **.env** correspondiente que se quiera usar).
+
+
+
+## 8. Otros Detalles Importantes
+- Verificar que las bases de datos `diplomasdb` y `diplomasdb_test` estén configuradas correctamente.
+- Asegurarse de que estás utilizando la versión correcta de Python (Python 3.12).
+- Si encuentras problemas con las dependencias, revisa el archivo `requirements.txt` y actualiza las librerías.
+- Se recomienda que **siempre que se cambie un .env** se realicen los siguientes comandos:
+  - `flask db downgrade`
+  - `flask db upgrade`
+  - `flask db migrate`
+

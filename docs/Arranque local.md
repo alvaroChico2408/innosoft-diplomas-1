@@ -90,48 +90,42 @@ flask db migrate
 ```bash
 flask run
 ```
-El servidor se ejecutará en [http://127.0.0.1:5000/](http://127.0.0.1:5000/)
+El servidor se ejecutará en [http://localhost:5000/](http://localhost:5000/)
 
-
-
-## 7. Iniciar el Proyecto en la Máquina Virtual
-### 7.1 Copiar el Archivo de Configuración (Vagrant) de Ejemplo a .env
+## 7. Para ejecutar las pruebas:
+### Pruebas unitarias y de intregración
 ```bash
-cp .env.vagrant.example .env
+rosemary test
 ```
-### 7.2 Desplazarse a la carpeta vagrant
+### Pruebas de selenium
+ - Cambiar el archivo init.py de la carpeta app de "development" a "testing."
+- Ejecutar los siguientes comandos:
+  - `flask db downgrade`
+  - `flask db upgrade`
+  - `flask db migrate`
+
+- Iniciamos la aplicación:
+`flask run`
+- Ejecutamos los tests módulo a módulo: 
+  `pytest <ruta del archivo te test_selenium.py>`
+
+### Pruebas de locust 
+ - Cambiar el archivo init.py de la carpeta app de "testing" a "development."
+- Ejecutar los siguientes comandos:
+  - `flask db downgrade`
+  - `flask db upgrade`
+  - `flask db migrate`
+
+- Iniciamos la aplicación:
+`flask run`
+- Ejecutamos los tests módulo a módulo: 
+  `rosemary locust <modulo>`
+
+
+### Para ver la cobertura
 ```bash
-cd vagrant/
+rosemary coverage
 ```
-### 7.3 Levantar la máquina virtual por primera vez
-```bash
-vagrant up
-```
-El servidor se ejecutará en [http://127.0.0.1:5000/](http://127.0.0.1:5000/)
-### 7.4 Conectar a la máquina virtual
-```bash
-vagrant ssh
-```
-### 7.5 Apagar la máquina virtual
-```bash
-vagrant halt
-```
-### 7.6 Para volver a ejecutar los scripts de provisión o se quiere volver a iniciar la máquina tras haber sido apagada:
- - **Si la máquina virtual está apagada:** ```vagrant up --provision```
- - **Si la máquina virtual necesita reiniciarse:** ```vagrant reload --provision```
-
-**Notas:**
-- Para volver a desplegar el proyecto en **localhost** (usando `flask run`) o en **Docker**, se recomienda **eliminar el entorno virtual** y volver a crearlo siguiendo los pasos descritos en el **punto 3**.
-- Si la máquina virtual se apaga, para volverla a iniciar correctamente se deben usar los comandos descritos en el **punto 7.6**.
-- Se recomienda eliminar los datos de la base de datos si se quiere volver a arrancar en local siguiendo los siguientes comandos:
-
-    - Nos conectamos a MariaDB: `sudo mysql -u root -p`
-    - Eliminamos las bases de datos de diplomasdb y diplomasdb_test:
-    `DROP diplomasdb;` y `DROP diplomasdb_test;`.
-    - Volvemos a realizar las migraciones con el .env que se quiera usar: `flask db upgrade` y `flask db migrate`.
-
-
-
 
 ## 8. Iniciar Sesión en el Proyecto
 
@@ -142,5 +136,7 @@ vagrant halt
 - Verificar que las bases de datos `diplomasdb` y `diplomasdb_test` estén configuradas correctamente.
 - Asegurarse de que estás utilizando la versión correcta de Python (Python 3.12).
 - Si encuentras problemas con las dependencias, revisa el archivo `requirements.txt` y actualiza las librerías.
-
-
+- Se recomienda que **siempre que se cambie un .env** se realicen los siguientes comandos:
+  - `flask db downgrade`
+  - `flask db upgrade`
+  - `flask db migrate`
