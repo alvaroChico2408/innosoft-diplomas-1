@@ -125,3 +125,20 @@ class TestDiplomas:
         alert.dismiss()
 
         time.sleep(2)
+
+    def test_bienvenido_a_diplomas(self):
+        # Abre la página que contiene el <h2>
+        self.driver.get(get_host_for_selenium_testing())
+
+        # Espera a que el elemento <h2> esté presente
+        WebDriverWait(self.driver, 10).until(
+            EC.presence_of_element_located((By.CSS_SELECTOR, 'h2.display-4.text-primary'))
+        )
+
+        # Encuentra el elemento <h2> con la clase correcta
+        h2_element = self.driver.find_element(By.CSS_SELECTOR, 'h2.display-4.text-primary')
+
+        # Verifica que el texto del elemento sea "Bienvenido a Diplomas"
+        assert "BIENVENIDO A DIPLOMAS" in h2_element.text, f"Se esperaba 'BIENVENIDO A DIPLOMAS', pero se encontró: {h2_element.text}"
+        
+        time.sleep(2)
